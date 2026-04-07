@@ -183,7 +183,7 @@
             line-height: 1.4;
         }
 
-        /* About Section */
+        /* About Section - Unified */
         .about-section {
             padding: 60px 60px;
             max-width: 1400px;
@@ -198,24 +198,54 @@
             margin-bottom: 50px;
         }
 
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 80px;
-            align-items: start;
-        }
-
-        .about-text h2 {
+        .about-title {
             font-family: 'Playfair Display', serif;
             font-size: 2.8rem;
             font-weight: 400;
-            margin-bottom: 35px;
+            margin-bottom: 50px;
             line-height: 1.2;
         }
 
-        .about-text h2 .highlight {
+        .about-title .highlight {
             color: #ff6b35;
             font-style: italic;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: rgba(157, 139, 111, 0.08);
+            padding: 30px;
+            border-left: 3px solid #ff6b35;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(157, 139, 111, 0.12);
+            transform: translateY(-5px);
+        }
+
+        .stat-card h4 {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #9d8b6f;
+            margin-bottom: 12px;
+        }
+
+        .stat-card p {
+            font-size: 1.1rem;
+            color: #f5f0e8;
+            line-height: 1.5;
+        }
+
+        .about-text {
+            max-width: 900px;
         }
 
         .about-text p {
@@ -228,38 +258,6 @@
         .about-text strong {
             color: #f5f0e8;
             font-weight: 500;
-        }
-
-        .info-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .info-card {
-            background: rgba(157, 139, 111, 0.08);
-            padding: 28px;
-            border-left: 3px solid #ff6b35;
-            transition: all 0.3s ease;
-        }
-
-        .info-card:hover {
-            background: rgba(157, 139, 111, 0.12);
-            transform: translateX(5px);
-        }
-
-        .info-card h4 {
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #9d8b6f;
-            margin-bottom: 12px;
-        }
-
-        .info-card p {
-            font-size: 1.1rem;
-            color: #f5f0e8;
-            line-height: 1.5;
         }
 
         /* Portfolio Section */
@@ -438,6 +436,10 @@
             .skill-item {
                 min-width: 140px;
             }
+
+            .about-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         @media (max-width: 768px) {
@@ -449,9 +451,8 @@
                 font-size: 2.2rem;
             }
 
-            .about-content {
+            .about-grid {
                 grid-template-columns: 1fr;
-                gap: 50px;
             }
 
             .portfolio-grid {
@@ -524,42 +525,44 @@
 
     <section class="about-section" id="about">
         <p class="section-label">01 — О себе</p>
-        <div class="about-content">
-            <div class="about-text">
-                <h2>Кто я и <span class="highlight">что делаю</span></h2>
-                <p>
-                    Я <strong>2D/3D-художник и иллюстратор</strong> с продуктовым опытом более 7 лет. 
-                    Работаю с графикой для мобильных и казуальных игр, интерфейсами приложений и 
-                    персонажами светлячками.
-                </p>
-                <p>
-                    Имею уверенные навыки в <strong>3D-моделировании</strong> (Blender — более 3 лет), 
-                    <strong>2D-анимации в Spine</strong> (более 2 лет) и создании иллюстраций в Photoshop.
-                </p>
-                <p>
-                    Работаю с генеративным ИИ (Midjourney, Stable Diffusion) — использую для генерации 
-                    референсов и быстрой проверки концептов.
-                </p>
-                <p>
-                    Отличаюсь <strong>вниманием к деталям</strong>, самостоятельностью и хорошим 
-                    взаимодействием с командами на всех этапах разработки.
-                </p>
+        <h2 class="about-title">Кто я и <span class="highlight">что делаю</span></h2>
+        
+        <div class="about-grid">
+            <div class="stat-card">
+                <h4>Опыт</h4>
+                <p>7+ лет в геймдеве</p>
             </div>
+            <div class="stat-card">
+                <h4>Направление</h4>
+                <p>2D · 3D · Анимация · UI/UX</p>
+            </div>
+            <div class="stat-card">
+                <h4>Инструменты</h4>
+                <p>Blender · Spine · Photoshop</p>
+            </div>
+            <div class="stat-card">
+                <h4>Фриланс</h4>
+                <p>Коллаборации</p>
+            </div>
+        </div>
 
-            <div class="info-cards">
-                <div class="info-card">
-                    <h4>Опыт</h4>
-                    <p>7+ лет в геймдеве</p>
-                </div>
-                <div class="info-card">
-                    <h4>Направление</h4>
-                    <p>2D · 3D · Анимация · UI/UX</p>
-                </div>
-                <div class="info-card">
-                    <h4>Фриланс</h4>
-                    <p>Коллаборации</p>
-                </div>
-            </div>
+        <div class="about-text">
+            <p>
+                Я <strong>2D/3D-художник и иллюстратор</strong> с продуктовым опытом более 7 лет. 
+                Работаю с графикой для мобильных и казуальных игр, интерфейсами приложений и персонажными скетчами.
+            </p>
+            <p>
+                Имею уверенные навыки в <strong>3D-моделировании</strong> (Blender — более 3 лет), 
+                <strong>2D-анимации в Spine</strong> (более 2 лет) и создании иллюстраций в Photoshop.
+            </p>
+            <p>
+                Работаю с генеративным ИИ (Midjourney, Stable Diffusion) — использую для генерации 
+                референсов и быстрой проверки концептов.
+            </p>
+            <p>
+                Отличаюсь <strong>вниманием к деталям</strong>, самостоятельностью и хорошим 
+                взаимодействием с командами на всех этапах разработки.
+            </p>
         </div>
     </section>
 
