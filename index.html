@@ -20,6 +20,15 @@
             overflow-x: hidden;
         }
 
+        /* Decorative Lines */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #9d8b6f 50%, transparent);
+            margin: 80px 0;
+            opacity: 0.3;
+        }
+
         /* Header */
         header {
             padding: 40px 60px 60px;
@@ -374,6 +383,46 @@
             letter-spacing: 1px;
         }
 
+        /* Lightbox Modal */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 3rem;
+            color: #f5f0e8;
+            cursor: pointer;
+            transition: color 0.3s;
+            font-weight: 300;
+            line-height: 1;
+        }
+
+        .lightbox-close:hover {
+            color: #ff6b35;
+        }
+
         @media (max-width: 1024px) {
             header {
                 flex-direction: column;
@@ -415,6 +464,12 @@
 
             .portfolio-section {
                 padding: 40px 30px;
+            }
+
+            .lightbox-close {
+                top: 15px;
+                right: 20px;
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -462,12 +517,10 @@
                 <h3>UI/UX</h3>
                 <p>От концепта до анимаций</p>
             </div>
-            <div class="skill-item">
-                <h3>RU·EN·EL</h3>
-                <p>Ая родной / En базовый / El учу</p>
-            </div>
         </div>
     </header>
+
+    <div class="section-divider"></div>
 
     <section class="about-section" id="about">
         <p class="section-label">01 — О себе</p>
@@ -506,13 +559,11 @@
                     <h4>Фриланс</h4>
                     <p>Коллаборации</p>
                 </div>
-                <div class="info-card">
-                    <h4>Языки</h4>
-                    <p>RU·EN · греческий (учу)</p>
-                </div>
             </div>
         </div>
     </section>
+
+    <div class="section-divider"></div>
 
     <section class="portfolio-section" id="portfolio">
         <div class="portfolio-header">
@@ -530,146 +581,153 @@
 
         <div class="portfolio-grid">
             <div class="portfolio-item" data-category="3d">
-                <img src="arbalet.jpg" alt="Арбалет">
+                <img src="arbalet.jpg" alt="Арбалет" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>3D Арбалет</h3>
                     <p>Blender · моделирование</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="illustration">
-                <img src="bach.jpg" alt="Бах">
+                <img src="bach.jpg" alt="Бах" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Портрет Баха</h3>
                     <p>Digital painting</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="3d">
-                <img src="bochka.jpg" alt="Бочка">
+                <img src="bochka.jpg" alt="Бочка" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>3D Бочка</h3>
                     <p>Blender · текстурирование</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="concept">
-                <img src="concept.jpg" alt="Концепт">
+                <img src="concept.jpg" alt="Концепт" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Концепт персонажа</h3>
                     <p>Character design</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="animation">
-                <img src="dotti.gif" alt="Дотти">
+                <img src="dotti.gif" alt="Дотти" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Dotti анимация</h3>
                     <p>Spine · 2D анимация</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="illustration">
-                <img src="final.jpg" alt="Финал">
+                <img src="final.jpg" alt="Финал" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Финальный арт</h3>
                     <p>Illustration</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="animation">
-                <img src="fox.gif" alt="Лиса">
+                <img src="fox.gif" alt="Лиса" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Fox анимация</h3>
                     <p>Spine animation</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="illustration">
-                <img src="gnev.jpg" alt="Гнев">
+                <img src="gnev.jpg" alt="Гнев" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Гнев — 7 грехов</h3>
                     <p>Character illustration</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="animation">
-                <img src="idle.gif" alt="Idle">
+                <img src="idle.gif" alt="Idle" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Idle анимация</h3>
                     <p>Spine · персонаж</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="animation">
-                <img src="krok.gif" alt="Крокодил">
+                <img src="krok.gif" alt="Крокодил" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Крокодил</h3>
                     <p>2D animation</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="illustration">
-                <img src="len.jpg" alt="Лень">
+                <img src="len.jpg" alt="Лень" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Лень — 7 грехов</h3>
                     <p>Character design</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="3d">
-                <img src="mysh.jpg" alt="Мышь">
+                <img src="mysh.jpg" alt="Мышь" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Мышь</h3>
                     <p>3D Character</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="concept">
-                <img src="piratka.jpg" alt="Пиратка">
+                <img src="piratka.jpg" alt="Пиратка" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Пиратка</h3>
                     <p>Character concept</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="3d">
-                <img src="pistol.jpg" alt="Пистолет">
+                <img src="pistol.jpg" alt="Пистолет" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>3D Пистолет</h3>
                     <p>Blender · hard surface</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="3d">
-                <img src="robot.jpg" alt="Робот">
+                <img src="robot.jpg" alt="Робот" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Робот</h3>
                     <p>3D character</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="3d">
-                <img src="sani.jpg" alt="Сани">
+                <img src="sani.jpg" alt="Сани" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Сани</h3>
                     <p>3D modeling</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="illustration">
-                <img src="smert.jpg" alt="Смерть">
+                <img src="smert.jpg" alt="Смерть" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Смерть</h3>
                     <p>Dark illustration</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="concept">
-                <img src="sukkub.jpg" alt="Суккуб">
+                <img src="sukkub.jpg" alt="Суккуб" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Суккуб</h3>
                     <p>Character art</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="concept">
-                <img src="zavist.jpg" alt="Зависть">
+                <img src="zavist.jpg" alt="Зависть" class="portfolio-img">
                 <div class="portfolio-overlay">
                     <h3>Зависть — 7 грехов</h3>
                     <p>Character concept</p>
                 </div>
             </div>
-           <div class="portfolio-item" data-category="gameui">
-    <video src="βνξθ 2025.mp4" autoplay loop muted playsinline></video>
-    <div class="portfolio-overlay">
-        <h3>Game UI</h3>
-        <p>Interface Design</p>
-    </div>
-</div>
+            <div class="portfolio-item" data-category="gameui">
+                <video src="βνξθ 2025.mp4" autoplay loop muted playsinline></video>
+                <div class="portfolio-overlay">
+                    <h3>Game UI</h3>
+                    <p>Interface Design</p>
+                </div>
+            </div>
+        </div>
     </section>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
 
     <script>
         // Portfolio Filter
@@ -678,9 +736,7 @@
 
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Remove active class from all buttons
                 filterButtons.forEach(btn => btn.classList.remove('active'));
-                // Add active class to clicked button
                 button.classList.add('active');
 
                 const filter = button.getAttribute('data-filter');
@@ -697,6 +753,28 @@
                     }
                 });
             });
+        });
+
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const portfolioImages = document.querySelectorAll('.portfolio-img');
+
+        portfolioImages.forEach(img => {
+            img.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lightbox.classList.add('active');
+                lightboxImg.src = img.src;
+            });
+        });
+
+        lightboxClose.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
         });
     </script>
 </body>
