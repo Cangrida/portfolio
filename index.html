@@ -310,14 +310,14 @@
         /* Portfolio Grid */
         .portfolio-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
         }
 
         .portfolio-item {
             position: relative;
             overflow: hidden;
-            aspect-ratio: 16/10;
+            aspect-ratio: 1/1;
             cursor: pointer;
             border-radius: 4px;
             transition: opacity 0.3s ease;
@@ -327,7 +327,8 @@
             display: none;
         }
 
-        .portfolio-item img {
+        .portfolio-item img,
+        .portfolio-item video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -335,7 +336,8 @@
             filter: brightness(0.9);
         }
 
-        .portfolio-item:hover img {
+        .portfolio-item:hover img,
+        .portfolio-item:hover video {
             transform: scale(1.08);
             filter: brightness(1);
         }
@@ -604,11 +606,11 @@
                     <p>Character design</p>
                 </div>
             </div>
-            <div class="portfolio-item" data-category="illustration">
+            <div class="portfolio-item" data-category="3d">
                 <img src="mysh.jpg" alt="Мышь">
                 <div class="portfolio-overlay">
                     <h3>Мышь</h3>
-                    <p>Illustration</p>
+                    <p>3D Character</p>
                 </div>
             </div>
             <div class="portfolio-item" data-category="concept">
@@ -653,14 +655,20 @@
                     <p>Character art</p>
                 </div>
             </div>
-            <div class="portfolio-item" data-category="illustration">
+            <div class="portfolio-item" data-category="concept">
                 <img src="zavist.jpg" alt="Зависть">
                 <div class="portfolio-overlay">
                     <h3>Зависть — 7 грехов</h3>
-                    <p>Series illustration</p>
+                    <p>Character concept</p>
                 </div>
             </div>
-        </div>
+           <div class="portfolio-item" data-category="gameui">
+    <video src="βνξθ 2025.mp4" autoplay loop muted playsinline></video>
+    <div class="portfolio-overlay">
+        <h3>Game UI</h3>
+        <p>Interface Design</p>
+    </div>
+</div>
     </section>
 
     <script>
