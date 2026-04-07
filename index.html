@@ -253,17 +253,65 @@
             line-height: 1.5;
         }
 
-        /* Portfolio Grid */
+        /* Portfolio Section */
         .portfolio-section {
             padding: 60px 60px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
+        .portfolio-header {
+            margin-bottom: 50px;
+        }
+
+        .portfolio-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .portfolio-title .accent {
+            color: #ff6b35;
+            font-style: italic;
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            background: transparent;
+            color: #9d8b6f;
+            border: 1px solid #9d8b6f;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-btn:hover {
+            color: #ff6b35;
+            border-color: #ff6b35;
+        }
+
+        .filter-btn.active {
+            background: #ff6b35;
+            color: #1a1510;
+            border-color: #ff6b35;
+        }
+
+        /* Portfolio Grid */
         .portfolio-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
             gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
         }
 
         .portfolio-item {
@@ -272,6 +320,11 @@
             aspect-ratio: 16/10;
             cursor: pointer;
             border-radius: 4px;
+            transition: opacity 0.3s ease;
+        }
+
+        .portfolio-item.hidden {
+            display: none;
         }
 
         .portfolio-item img {
@@ -460,134 +513,147 @@
     </section>
 
     <section class="portfolio-section" id="portfolio">
+        <div class="portfolio-header">
+            <p class="section-label">02 — Работы</p>
+            <h2 class="portfolio-title">Избранные <span class="accent">проекты</span></h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="illustration">Иллюстрация</button>
+                <button class="filter-btn" data-filter="concept">Концепт</button>
+                <button class="filter-btn" data-filter="3d">3D</button>
+                <button class="filter-btn" data-filter="animation">Анимация</button>
+                <button class="filter-btn" data-filter="gameui">Game UI</button>
+            </div>
+        </div>
+
         <div class="portfolio-grid">
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="3d">
                 <img src="arbalet.jpg" alt="Арбалет">
                 <div class="portfolio-overlay">
                     <h3>3D Арбалет</h3>
                     <p>Blender · моделирование</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="bach.jpg" alt="Бах">
                 <div class="portfolio-overlay">
                     <h3>Портрет Баха</h3>
                     <p>Digital painting</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="3d">
                 <img src="bochka.jpg" alt="Бочка">
                 <div class="portfolio-overlay">
                     <h3>3D Бочка</h3>
                     <p>Blender · текстурирование</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="concept">
                 <img src="concept.jpg" alt="Концепт">
                 <div class="portfolio-overlay">
                     <h3>Концепт персонажа</h3>
                     <p>Character design</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="animation">
                 <img src="dotti.gif" alt="Дотти">
                 <div class="portfolio-overlay">
                     <h3>Dotti анимация</h3>
                     <p>Spine · 2D анимация</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="final.jpg" alt="Финал">
                 <div class="portfolio-overlay">
                     <h3>Финальный арт</h3>
                     <p>Illustration</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="animation">
                 <img src="fox.gif" alt="Лиса">
                 <div class="portfolio-overlay">
                     <h3>Fox анимация</h3>
                     <p>Spine animation</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="gnev.jpg" alt="Гнев">
                 <div class="portfolio-overlay">
                     <h3>Гнев — 7 грехов</h3>
                     <p>Character illustration</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="animation">
                 <img src="idle.gif" alt="Idle">
                 <div class="portfolio-overlay">
                     <h3>Idle анимация</h3>
                     <p>Spine · персонаж</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="animation">
                 <img src="krok.gif" alt="Крокодил">
                 <div class="portfolio-overlay">
                     <h3>Крокодил</h3>
                     <p>2D animation</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="len.jpg" alt="Лень">
                 <div class="portfolio-overlay">
                     <h3>Лень — 7 грехов</h3>
                     <p>Character design</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="mysh.jpg" alt="Мышь">
                 <div class="portfolio-overlay">
                     <h3>Мышь</h3>
                     <p>Illustration</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="concept">
                 <img src="piratka.jpg" alt="Пиратка">
                 <div class="portfolio-overlay">
                     <h3>Пиратка</h3>
                     <p>Character concept</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="3d">
                 <img src="pistol.jpg" alt="Пистолет">
                 <div class="portfolio-overlay">
                     <h3>3D Пистолет</h3>
                     <p>Blender · hard surface</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="3d">
                 <img src="robot.jpg" alt="Робот">
                 <div class="portfolio-overlay">
                     <h3>Робот</h3>
                     <p>3D character</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="3d">
                 <img src="sani.jpg" alt="Сани">
                 <div class="portfolio-overlay">
                     <h3>Сани</h3>
                     <p>3D modeling</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="smert.jpg" alt="Смерть">
                 <div class="portfolio-overlay">
                     <h3>Смерть</h3>
                     <p>Dark illustration</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="concept">
                 <img src="sukkub.jpg" alt="Суккуб">
                 <div class="portfolio-overlay">
                     <h3>Суккуб</h3>
                     <p>Character art</p>
                 </div>
             </div>
-            <div class="portfolio-item">
+            <div class="portfolio-item" data-category="illustration">
                 <img src="zavist.jpg" alt="Зависть">
                 <div class="portfolio-overlay">
                     <h3>Зависть — 7 грехов</h3>
@@ -596,5 +662,34 @@
             </div>
         </div>
     </section>
+
+    <script>
+        // Portfolio Filter
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                const filter = button.getAttribute('data-filter');
+
+                portfolioItems.forEach(item => {
+                    if (filter === 'all') {
+                        item.classList.remove('hidden');
+                    } else {
+                        if (item.getAttribute('data-category') === filter) {
+                            item.classList.remove('hidden');
+                        } else {
+                            item.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
