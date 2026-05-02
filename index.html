@@ -20,24 +20,151 @@
             overflow-x: hidden;
         }
 
+        /* ===== HEADER HERO BACKGROUND ===== */
+        .header-wrapper {
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse 80% 90% at 60% 40%, #2e1f0e 0%, #1a1510 60%);
+        }
+
+        .header-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.12) 0%, transparent 70%);
+            animation: pulse-glow 6s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .header-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to bottom, transparent, #1a1510);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Noise texture overlay */
+        .header-noise {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+        }
+
+        /* Animated orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            animation: float-orb 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 107, 53, 0.08);
+            top: 10%;
+            right: 20%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 200px;
+            height: 200px;
+            background: rgba(157, 139, 111, 0.1);
+            top: 50%;
+            right: 5%;
+            animation-delay: -3s;
+        }
+
+        .orb-3 {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 107, 53, 0.06);
+            bottom: 20%;
+            left: 30%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float-orb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, -20px) scale(1.05); }
+            66% { transform: translate(-15px, 15px) scale(0.95); }
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
         /* Decorative Lines */
         .section-divider {
             width: 100%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #9d8b6f 50%, transparent);
+            height: 3px;
+            background: linear-gradient(to right, transparent, #ff6b35 50%, transparent);
             margin: 80px 0;
-            opacity: 0.3;
+            opacity: 0.6;
+        }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        /* Skill items stagger */
+        .skill-item {
+            transition-delay: calc(var(--i, 0) * 0.12s);
         }
 
         /* Header */
         header {
-            padding: 40px 60px 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-            gap: 80px;
+            position: relative;
+            z-index: 2;
         }
 
         .logo {
@@ -171,11 +298,29 @@
             line-height: 1.4;
         }
 
-        /* About Section */
-        .about-section {
-            padding: 0 60px 60px;
+        /* ===== ОБЩИЙ КОНТЕЙНЕР ===== */
+        .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 60px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* header-wrapper .container — flex для раскладки хедера */
+        .header-wrapper .container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 140px;
+            padding-top: 40px;
+            padding-bottom: 60px;
+            max-width: 1400px;
+        }
+
+        /* About Section */
+        .about-section {
+            padding-bottom: 60px;
         }
 
         .section-label {
@@ -217,9 +362,7 @@
 
         /* Portfolio Section */
         .portfolio-section {
-            padding: 60px 60px 80px;
-            max-width: 1400px;
-            margin: 0 auto;
+            padding-bottom: 80px;
         }
 
         .portfolio-header {
@@ -336,7 +479,46 @@
             letter-spacing: 1px;
         }
 
-        /* Lightbox Modal */
+        /* Полноширинное видео Game UI */
+        .portfolio-item-fullwidth {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .portfolio-item-fullwidth video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            filter: brightness(0.9);
+        }
+
+        .portfolio-item-fullwidth:hover video {
+            transform: scale(1.02);
+            filter: brightness(1);
+        }
+
+        .portfolio-item-fullwidth .portfolio-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(26,21,16,0.95) 0%, transparent 100%);
+            padding: 35px 40px;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .portfolio-item-fullwidth:hover .portfolio-overlay {
+            transform: translateY(0);
+            opacity: 1;
+        }
         .lightbox {
             display: none;
             position: fixed;
@@ -395,8 +577,8 @@
         }
 
         @media (max-width: 768px) {
-            header {
-                padding: 30px;
+            .container {
+                padding: 0 30px;
             }
 
             h1 {
@@ -405,14 +587,6 @@
 
             .portfolio-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .about-section {
-                padding: 0 30px 40px;
-            }
-
-            .portfolio-section {
-                padding: 40px 30px;
             }
 
             .lightbox-close {
@@ -424,20 +598,25 @@
     </style>
 </head>
 <body>
-    <header>
+    <div class="header-wrapper">
+        <div class="header-noise"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    <div class="container">
         <div class="hero">
-            <img src="logo.png" alt="Galina" class="logo">
-            <p class="subtitle">2D / 3D Artist · Animator · Illustrator</p>
-            <h1>
+            <img src="logo.png" alt="Galina" class="logo reveal">
+            <p class="subtitle reveal reveal-delay-1">2D / 3D Artist · Animator · Illustrator</p>
+            <h1 class="reveal reveal-delay-2">
                 Галина<br>
                 Гольтяпина —<br>
                 <span class="accent">художник</span>
             </h1>
-            <div class="cta-buttons">
+            <div class="cta-buttons reveal reveal-delay-3">
                 <a href="#portfolio" class="btn btn-primary">Смотреть работы</a>
                 <a href="#contact" class="btn btn-secondary">Написать →</a>
             </div>
-            <div class="social-links">
+            <div class="social-links reveal reveal-delay-4">
                 <a href="mailto:your@email.com">Email</a>
                 <a href="https://t.me/cangrida" target="_blank">Telegram</a>
                 <a href="https://www.artstation.com/galexin" target="_blank">Artstation</a>
@@ -446,30 +625,32 @@
         </div>
 
         <div class="skills-sidebar">
-            <div class="skill-item">
+            <div class="skill-item reveal reveal-right" style="--i:0">
                 <h3>7+</h3>
                 <p>Лет в геймдеве</p>
             </div>
-            <div class="skill-item">
+            <div class="skill-item reveal reveal-right" style="--i:1">
                 <h3>2D·3D</h3>
                 <p>Иллюстрация, моделирование</p>
             </div>
-            <div class="skill-item">
+            <div class="skill-item reveal reveal-right" style="--i:2">
                 <h3>Spine</h3>
                 <p>Анимация персонажей 2D+СКА</p>
             </div>
-            <div class="skill-item">
+            <div class="skill-item reveal reveal-right" style="--i:3">
                 <h3>UI/UX</h3>
                 <p>От концепта до анимаций</p>
             </div>
         </div>
-    </header>
+    </div><!-- /container -->
+    </div><!-- /header-wrapper -->
 
     <div class="section-divider"></div>
 
     <section class="about-section" id="about">
-        <p class="section-label">01 — О себе</p>
-        <h2 class="about-title">Кто я и <span class="highlight">что делаю</span></h2>
+      <div class="container">
+        <p class="section-label reveal">01 — О себе</p>
+        <h2 class="about-title reveal reveal-delay-1">Кто я и <span class="highlight">что делаю</span></h2>
         
         <div class="about-text">
             <p>
@@ -489,15 +670,17 @@
                 взаимодействием с командами на всех этапах разработки.
             </p>
         </div>
+      </div><!-- /container -->
     </section>
 
     <div class="section-divider"></div>
 
     <section class="portfolio-section" id="portfolio">
+      <div class="container">
         <div class="portfolio-header">
-            <p class="section-label">02 — Работы</p>
-            <h2 class="portfolio-title">Избранные <span class="accent">проекты</span></h2>
-            <div class="filter-buttons">
+            <p class="section-label reveal">02 — Работы</p>
+            <h2 class="portfolio-title reveal reveal-delay-1">Избранные <span class="accent">проекты</span></h2>
+            <div class="filter-buttons reveal reveal-delay-2">
                 <button class="filter-btn active" data-filter="all">Все</button>
                 <button class="filter-btn" data-filter="illustration">Иллюстрация</button>
                 <button class="filter-btn" data-filter="concept">Концепт</button>
@@ -508,159 +691,146 @@
         </div>
 
         <div class="portfolio-grid">
-            <div class="portfolio-item" data-category="3d">
-                <img src="arbalet.jpg" alt="Арбалет" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>3D Арбалет</h3>
-                    <p>Blender · моделирование</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="illustration">
+            <!-- 1 --> <div class="portfolio-item" data-category="illustration">
                 <img src="bach.jpg" alt="Бах" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Портрет Баха</h3>
-                    <p>Digital painting</p>
-                </div>
+                <div class="portfolio-overlay"><h3>Портрет Баха</h3><p>Digital painting</p></div>
             </div>
-            <div class="portfolio-item" data-category="3d">
-                <img src="bochka.jpg" alt="Бочка" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>3D Бочка</h3>
-                    <p>Blender · текстурирование</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="concept">
-                <img src="concept.jpg" alt="Концепт" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Концепт персонажа</h3>
-                    <p>Character design</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="animation">
-                <img src="dotti.gif" alt="Дотти" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Dotti анимация</h3>
-                    <p>Spine · 2D анимация</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="illustration">
-                <img src="final.jpg" alt="Финал" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Финальный арт</h3>
-                    <p>Illustration</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="animation">
-                <img src="fox.gif" alt="Лиса" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Fox анимация</h3>
-                    <p>Spine animation</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="illustration">
-                <img src="gnev.jpg" alt="Гнев" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Гнев — 7 грехов</h3>
-                    <p>Character illustration</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="animation">
-                <img src="idle.gif" alt="Idle" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Idle анимация</h3>
-                    <p>Spine · персонаж</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="animation">
-                <img src="krok.gif" alt="Крокодил" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Крокодил</h3>
-                    <p>2D animation</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="illustration">
-                <img src="len.jpg" alt="Лень" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Лень — 7 грехов</h3>
-                    <p>Character design</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="3d">
-                <img src="mysh.jpg" alt="Мышь" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Мышь</h3>
-                    <p>3D Character</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="concept">
-                <img src="piratka.jpg" alt="Пиратка" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Пиратка</h3>
-                    <p>Character concept</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="3d">
-                <img src="pistol.jpg" alt="Пистолет" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>3D Пистолет</h3>
-                    <p>Blender · hard surface</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="3d">
-                <img src="robot.jpg" alt="Робот" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Робот</h3>
-                    <p>3D character</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="3d">
-                <img src="sani.jpg" alt="Сани" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Сани</h3>
-                    <p>3D modeling</p>
-                </div>
-            </div>
-            <div class="portfolio-item" data-category="illustration">
+            <!-- 2 --> <div class="portfolio-item" data-category="illustration">
                 <img src="smert.jpg" alt="Смерть" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Смерть</h3>
-                    <p>Dark illustration</p>
-                </div>
+                <div class="portfolio-overlay"><h3>Смерть</h3><p>Dark illustration</p></div>
             </div>
-            <div class="portfolio-item" data-category="concept">
-                <img src="sukkub.jpg" alt="Суккуб" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Суккуб</h3>
-                    <p>Character art</p>
-                </div>
+            <!-- 3 --> <div class="portfolio-item" data-category="illustration">
+                <img src="final.jpg" alt="Финал" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Финальный арт</h3><p>Illustration</p></div>
             </div>
-            <div class="portfolio-item" data-category="concept">
+            <!-- 4 --> <div class="portfolio-item" data-category="illustration">
+                <img src="gnev.jpg" alt="Гнев" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Гнев — 7 грехов</h3><p>Character illustration</p></div>
+            </div>
+            <!-- 5 --> <div class="portfolio-item" data-category="illustration">
+                <img src="len.jpg" alt="Лень" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Лень — 7 грехов</h3><p>Character design</p></div>
+            </div>
+            <!-- 6 --> <div class="portfolio-item" data-category="concept">
+                <img src="concept.jpg" alt="Концепт" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Концепт персонажа</h3><p>Character design</p></div>
+            </div>
+            <!-- 7 --> <div class="portfolio-item" data-category="concept">
                 <img src="zavist.jpg" alt="Зависть" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3>Зависть — 7 грехов</h3>
-                    <p>Character concept</p>
-                </div>
+                <div class="portfolio-overlay"><h3>Зависть — 7 грехов</h3><p>Character concept</p></div>
             </div>
-            <div class="portfolio-item" data-category="gameui">
-                <video src="βνξθ 2025.mp4" autoplay loop muted playsinline></video>
-                <div class="portfolio-overlay">
-                    <h3>Game UI</h3>
-                    <p>Interface Design</p>
-                </div>
+            <!-- 8 --> <div class="portfolio-item" data-category="concept">
+                <img src="sukkub.jpg" alt="Суккуб" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Суккуб</h3><p>Character art</p></div>
+            </div>
+            <!-- 9 --> <div class="portfolio-item" data-category="illustration">
+                <img src="piratka.jpg" alt="Пиратка" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Пиратка</h3><p>Character concept</p></div>
+            </div>
+            <!-- 10 --> <div class="portfolio-item" data-category="3d">
+                <img src="pistol.jpg" alt="Пистолет" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>3D Пистолет</h3><p>Blender · hard surface</p></div>
+            </div>
+            <!-- 11 --> <div class="portfolio-item" data-category="3d">
+                <img src="robot.jpg" alt="Робот" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Робот</h3><p>3D character</p></div>
+            </div>
+            <!-- 12 --> <div class="portfolio-item" data-category="3d">
+                <img src="bochka.jpg" alt="Бочка" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>3D Бочка</h3><p>Blender · текстурирование</p></div>
+            </div>
+            <!-- 13 --> <div class="portfolio-item" data-category="3d">
+                <img src="arbalet.jpg" alt="Арбалет" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>3D Арбалет</h3><p>Blender · моделирование</p></div>
+            </div>
+            <!-- 14 --> <div class="portfolio-item" data-category="animation">
+                <img src="fox.gif" alt="Лиса" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Fox анимация</h3><p>Spine animation</p></div>
+            </div>
+            <!-- 15 --> <div class="portfolio-item" data-category="animation">
+                <img src="idle.gif" alt="Idle" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Idle анимация</h3><p>Spine · персонаж</p></div>
+            </div>
+            <!-- 16 --> <div class="portfolio-item" data-category="animation">
+                <img src="krok.gif" alt="Крокодил" class="portfolio-img">
+                <div class="portfolio-overlay"><h3>Крокодил</h3><p>2D animation</p></div>
+            </div>
+            <!-- 17 --> <div class="portfolio-item" data-category="animation">
+                <video autoplay loop muted playsinline class="portfolio-img"><source src="крокодильчик актив.webm" type="video/webm"></video>
+                <div class="portfolio-overlay"><h3>Крокодильчик актив</h3><p>2D animation</p></div>
+            </div>
+            <!-- 18 --> <div class="portfolio-item" data-category="animation">
+                <video autoplay loop muted playsinline class="portfolio-img"><source src="tiger dance.webm" type="video/webm"></video>
+                <div class="portfolio-overlay"><h3>Tiger Dance</h3><p>2D animation</p></div>
+            </div>
+            <!-- 19 --> <div class="portfolio-item" data-category="animation">
+                <video autoplay loop muted playsinline class="portfolio-img"><source src="tiger drink.webm" type="video/webm"></video>
+                <div class="portfolio-overlay"><h3>Tiger Drink</h3><p>2D animation</p></div>
             </div>
         </div>
-    </section>
 
-    <!-- Lightbox Modal -->
+        <!-- 20 — Game UI на всю ширину -->
+        <div class="portfolio-item-fullwidth" data-category="gameui">
+            <video src="βνξθ 2025.mp4" autoplay loop muted playsinline></video>
+            <div class="portfolio-overlay">
+                <h3>Game UI</h3>
+                <p>Interface Design</p>
+            </div>
+        </div>
+      </div><!-- /container -->
+    </section>
     <div class="lightbox" id="lightbox">
         <span class="lightbox-close" id="lightbox-close">&times;</span>
         <img class="lightbox-content" id="lightbox-img">
     </div>
 
     <script>
-        // Portfolio Filter
+        // ===== SCROLL REVEAL =====
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Portfolio items анимация при появлении
+        const gridObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) scale(1)';
+                    }, entry.target.dataset.delay || 0);
+                    gridObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.portfolio-item').forEach((item, i) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(30px) scale(0.97)';
+            item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            item.dataset.delay = (i % 4) * 100;
+            gridObserver.observe(item);
+        });
+
+        // ===== PARALLAX для orbs =====
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            document.querySelector('.orb-1').style.transform = `translate(${x * 0.8}px, ${y * 0.8}px)`;
+            document.querySelector('.orb-2').style.transform = `translate(${x * 0.4}px, ${y * 0.4}px)`;
+            document.querySelector('.orb-3').style.transform = `translate(${-x * 0.6}px, ${-y * 0.6}px)`;
+        });
+
+        // ===== Portfolio Filter =====
         const filterButtons = document.querySelectorAll('.filter-btn');
-        const portfolioItems = document.querySelectorAll('.portfolio-item');
+        const portfolioItems = document.querySelectorAll('.portfolio-item, .portfolio-item-fullwidth');
 
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -683,7 +853,7 @@
             });
         });
 
-        // Lightbox functionality
+        // ===== Lightbox =====
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         const lightboxClose = document.getElementById('lightbox-close');
