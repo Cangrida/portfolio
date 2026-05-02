@@ -174,7 +174,8 @@
         }
 
         .hero {
-            max-width: 600px;
+            max-width: 550px;
+            flex: 0 0 550px;
         }
 
         .subtitle {
@@ -239,39 +240,82 @@
             transform: translateY(-2px);
         }
 
-        .social-links {
+        .contact-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .contact-card {
             display: flex;
-            gap: 25px;
-            margin-top: 35px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .social-links a {
-            color: #9d8b6f;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(255, 107, 53, 0.07);
+            border: 1px solid rgba(255, 107, 53, 0.25);
+            border-radius: 10px;
             text-decoration: none;
-            transition: color 0.3s;
-            position: relative;
+            color: #f5f0e8;
+            transition: all 0.3s ease;
         }
 
-        .social-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: #ff6b35;
-            transition: width 0.3s;
+        .contact-card:hover {
+            background: rgba(255, 107, 53, 0.15);
+            border-color: #ff6b35;
+            transform: translateY(-2px);
         }
 
-        .social-links a:hover {
+        .contact-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
             color: #ff6b35;
+            fill: #ff6b35;
         }
 
-        .social-links a:hover::after {
-            width: 100%;
+        .contact-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #ff6b35;
+        }
+
+        .contact-card div {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .contact-label {
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #9d8b6f;
+        }
+
+        .contact-value {
+            font-size: 0.82rem;
+            color: #f5f0e8;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Social links — убираем старые */
+        .social-links { display: none; }
+
+        @media (max-width: 1024px) {
+            .contact-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .contact-cards {
+                grid-template-columns: 1fr;
+            }
         }
 
         .skills-sidebar {
@@ -279,6 +323,7 @@
             flex-direction: column;
             gap: 45px;
             min-width: 220px;
+            margin-top: 120px;
         }
 
         .skill-item h3 {
@@ -307,15 +352,15 @@
             box-sizing: border-box;
         }
 
-        /* header-wrapper .container — flex для раскладки хедера */
         .header-wrapper .container {
             display: flex;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 140px;
+            gap: 60px;
             padding-top: 40px;
             padding-bottom: 60px;
             max-width: 1400px;
+            width: 100%;
         }
 
         /* About Section */
@@ -614,13 +659,36 @@
             </h1>
             <div class="cta-buttons reveal reveal-delay-3">
                 <a href="#portfolio" class="btn btn-primary">Смотреть работы</a>
-                <a href="#contact" class="btn btn-secondary">Написать →</a>
             </div>
-            <div class="social-links reveal reveal-delay-4">
-                <a href="mailto:your@email.com">Email</a>
-                <a href="https://t.me/cangrida" target="_blank">Telegram</a>
-                <a href="https://www.artstation.com/galexin" target="_blank">Artstation</a>
-                <a href="https://www.behance.net/0aa04108" target="_blank">Behance</a>
+            <div class="contact-cards reveal reveal-delay-4">
+                <a href="mailto:galina.goltiapina@gmail.com" class="contact-card">
+                    <span class="contact-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
+                    <div>
+                        <span class="contact-label">Email</span>
+                        <span class="contact-value">galina.goltiapina@gmail.com</span>
+                    </div>
+                </a>
+                <a href="https://t.me/cangrida" target="_blank" class="contact-card">
+                    <span class="contact-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.16 13.67l-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.99.889z"/></svg></span>
+                    <div>
+                        <span class="contact-label">Telegram</span>
+                        <span class="contact-value">@cangrida</span>
+                    </div>
+                </a>
+                <a href="https://www.artstation.com/galexin" target="_blank" class="contact-card">
+                    <span class="contact-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 17.723l2.027 3.505h.001a2.424 2.424 0 0 0 2.164 1.333h13.457l-2.792-4.838H0zm24 .025c0-.484-.143-.935-.388-1.314L15.728 2.728a2.424 2.424 0 0 0-2.164-1.333H9.419L21.598 22.54l1.92-3.325c.378-.637.482-.919.482-1.467zm-11.129-3.462L7.428 4.858l-5.444 9.428h10.887z"/></svg></span>
+                    <div>
+                        <span class="contact-label">ArtStation</span>
+                        <span class="contact-value">galexin</span>
+                    </div>
+                </a>
+                <a href="https://www.behance.net/0aa04108" target="_blank" class="contact-card">
+                    <span class="contact-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 1.202.61 1.86 1.895 1.86.73 0 1.235-.323 1.418-.81h2.443zm-7.181-3h4.473c-.104-1.31-.73-1.999-2.254-1.999-1.33 0-2.019.738-2.219 1.999zM8.307 7.979c.966 0 1.71.59 1.71 1.58 0 .985-.749 1.696-1.71 1.696H5.266V7.979h3.041zm-.65 7.333H5.266v-3.016h2.39c1.078 0 1.792.538 1.792 1.55 0 .978-.71 1.466-1.791 1.466zM2.996 4c-1.658 0-3 1.342-3 3v10c0 1.658 1.342 3 3 3h9.875c2.063 0 3.63-1.244 3.63-3.25 0-1.4-.67-2.504-1.853-3.075.87-.594 1.397-1.545 1.397-2.763C16.045 5.46 14.44 4 12.19 4H2.996z"/></svg></span>
+                    <div>
+                        <span class="contact-label">Behance</span>
+                        <span class="contact-value">0aa04108</span>
+                    </div>
+                </a>
             </div>
         </div>
 
@@ -655,7 +723,7 @@
         <div class="about-text">
             <p>
                 Я <strong>2D/3D-художник и иллюстратор</strong> с продуктовым опытом более 7 лет. 
-                Специализируюсь на графике для мобильных и казуальных игр, интерфейсах и анимации персонажей.
+                Специализируюсь на графике для казуальных и мидкорных игр, интерфейсах и анимации персонажей.
             </p>
             <p>
                 Имею уверенные навыки в <strong>3D-моделировании</strong> (Blender — более 3 лет), 
