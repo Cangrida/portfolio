@@ -134,11 +134,11 @@ const ILLUSTRATIONS = [
   { id:'i9', title:'Ричард Бах. 2026',                     cat:'', desc:'', src:'bach.jpg',    w:2746, h:1900 },
 ];
 
-// ЗАЛ II — тумбы для 3D (заглушки, замени src на glb потом)
+// ЗАЛ II — тумбы для 3D
 const PEDESTALS_3D = [
-  { id:'3d1', title:'3D · Скоро',   cat:'3D · Blender', desc:'3D модель появится здесь.' },
-  { id:'3d2', title:'3D · Скоро',   cat:'3D · Blender', desc:'3D модель появится здесь.' },
-  { id:'3d3', title:'3D · Скоро',   cat:'3D · Blender', desc:'3D модель появится здесь.' },
+  { id:'3d1', title:'Арбалет. 14 февраля. 2026', cat:'3D · Blender' },
+  { id:'3d2', title:'Сани Санты. 2026',           cat:'3D · Blender' },
+  { id:'3d3', title:'Скоро...',                    cat:'3D · Blender' },
 ];
 
 // ЗАЛ II — анимации на стене (заглушки)
@@ -391,20 +391,32 @@ function buildPedestal(x,z,art){
   const pl=new THREE.PointLight(0xff8844,1.8,3.5);
   pl.position.set(x,2.3,z); scene.add(pl);
 
-  // Надпись на верхней плите тумбы (горизонтально, вровень с поверхностью)
-  const lc=document.createElement('canvas'); lc.width=512; lc.height=512;
+  // Табличка спереди тумбы — вертикальная, хорошо видна
+  const lc=document.createElement('canvas'); lc.width=512; lc.height=128;
   const lx=lc.getContext('2d');
-  lx.fillStyle='#252525'; lx.fillRect(0,0,512,512);
-  lx.strokeStyle='rgba(255,107,53,0.25)'; lx.lineWidth=1;
-  lx.strokeRect(20,20,472,472);
-  lx.fillStyle='rgba(255,107,53,0.85)'; lx.font='bold 38px Arial,sans-serif'; lx.textAlign='center';
-  lx.fillText(art.title, 256, 256);
+  lx.fillStyle='#1c1c1f'; lx.fillRect(0,0,512,128);
+  lx.strokeStyle='rgba(255,107,53,0.5)'; lx.lineWidth=2;
+  lx.strokeRect(6,6,500,116);
+  lx.fillStyle='rgba(255,107,53,0.9)'; lx.font='bold 32px Arial,sans-serif'; lx.textAlign='center';
+  // Перенос строки если название длинное
+  const words = art.title.split(' ');
+  let line1 = '', line2 = '';
+  words.forEach(w => { if((line1+' '+w).length < 22) line1+=(line1?'  ':'')+w; else line2+=(line2?' ':'')+w; });
+  if(line2){
+    lx.fillText(line1, 256, 52);
+    lx.fillStyle='rgba(240,236,228,0.7)'; lx.font='24px Arial,sans-serif';
+    lx.fillText(line2, 256, 90);
+  } else {
+    lx.fillText(art.title, 256, 72);
+  }
   const lm=new THREE.Mesh(
-    new THREE.CircleGeometry(0.34, 32),
-    new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(lc),roughness:0.7})
+    new THREE.PlaneGeometry(0.72, 0.18),
+    new THREE.MeshStandardMaterial({
+      map:new THREE.CanvasTexture(lc), roughness:0.8,
+      emissive: new THREE.Color(0x0a0600), emissiveIntensity:0.6
+    })
   );
-  lm.rotation.x=-Math.PI/2; // горизонтально
-  lm.position.set(x, 1.06, z); // прямо на верхней плите
+  lm.position.set(x, 0.6, z+0.36); // спереди тумбы, на уровне глаз
   scene.add(lm);
 }
 
@@ -471,6 +483,42 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
   // Плавное парение — добавляем в animate через отдельный массив
   window._floatingModels = window._floatingModels || [];
   window._floatingModels.push({ x: targetX, baseY: floatY, z: targetZ, phase: 0 });
+})();
+
+// Загружаем сани на вторую тумбу
+(function(){
+  const gltfLoader2 = new THREE.GLTFLoader();
+  const targetX = 0, targetZ = H2_Z, floatY = 1.9;
+  gltfLoader2.load(
+    'сани новый год.glb',
+    (gltf) => {
+      const model = gltf.scene;
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 0.8 / maxDim;
+      model.scale.setScalar(scale);
+      box.setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      model.position.set(targetX, floatY, targetZ);
+      model.traverse(child => {
+        if(child.isMesh){ child.castShadow=true; child.receiveShadow=true; }
+      });
+      scene.add(model);
+      // Убираем заглушку второй тумбы
+      if(spinners[1]){ scene.remove(spinners[1]); spinners[1]=model; }
+      else spinners.push(model);
+      const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
+      aLight.position.set(targetX, floatY+1.2, targetZ);
+      scene.add(aLight);
+      console.log('Сани загружены!');
+    },
+    undefined,
+    (err)=>{ console.warn('Не удалось загрузить сани новый год.glb:', err); }
+  );
+  window._floatingModels = window._floatingModels || [];
+  window._floatingModels.push({ baseY: floatY, phase: 1.5 });
 })();
 
 // ═══════════════════════════════════════════════════════
