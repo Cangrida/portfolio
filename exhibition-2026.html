@@ -138,7 +138,7 @@ const ILLUSTRATIONS = [
 const PEDESTALS_3D = [
   { id:'3d1', title:'Арбалет. 14 февраля. 2026', cat:'3D · Blender' },
   { id:'3d2', title:'Сани Санты. 2026',           cat:'3D · Blender' },
-  { id:'3d3', title:'Скоро...',                    cat:'3D · Blender' },
+  { id:'3d3', title:'Робот. 2026',                 cat:'3D · Blender' },
 ];
 
 // ЗАЛ II — анимации на стене (заглушки)
@@ -509,6 +509,40 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
     },
     undefined,
     (err)=>{ console.warn('Не удалось загрузить сани новый год.glb:', err); }
+  );
+})();
+
+// Загружаем робота на третью тумбу
+(function(){
+  const gltfLoader3 = new THREE.GLTFLoader();
+  const targetX = 3, targetZ = H2_Z-3, floatY = 0.95;
+  gltfLoader3.load(
+    'robot.glb',
+    (gltf) => {
+      const model = gltf.scene;
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const scale = 0.8 / Math.max(size.x, size.y, size.z);
+      model.scale.setScalar(scale);
+      box.setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      model.position.set(targetX, floatY, targetZ);
+      model.traverse(child => {
+        if(child.isMesh){ child.castShadow=true; child.receiveShadow=true; }
+      });
+      scene.add(model);
+      if(spinners[2]){ scene.remove(spinners[2]); spinners[2]=model; }
+      else spinners.push(model);
+      window._glbModels = window._glbModels || [];
+      window._glbModels.push({ model, baseY: floatY, phase: 3.0 });
+      const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
+      aLight.position.set(targetX, floatY+1.2, targetZ);
+      scene.add(aLight);
+      console.log('Робот загружен!');
+    },
+    undefined,
+    (err)=>{ console.warn('Не удалось загрузить robot.glb:', err); }
   );
 })();
 
