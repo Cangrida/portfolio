@@ -217,49 +217,50 @@ canvas { display:block; }
 // ДАННЫЕ РАБОТ — замени src на свои файлы!
 // ═══════════════════════════════════════════════════════
 const ARTWORKS = [
-  // ЗАЛ 1 — Иллюстрации
-  { id:1,  room:0, wall:'N', pos:0,   title:'Работа 1',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:2,  room:0, wall:'N', pos:1,   title:'Работа 2',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:3,  room:0, wall:'N', pos:2,   title:'Работа 3',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:4,  room:0, wall:'S', pos:0,   title:'Работа 4',   cat:'Концепт-арт',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:5,  room:0, wall:'S', pos:1,   title:'Работа 5',   cat:'Концепт-арт',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:6,  room:0, wall:'S', pos:2,   title:'Работа 6',   cat:'Концепт-арт',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:7,  room:0, wall:'E', pos:0,   title:'Работа 7',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:8,  room:0, wall:'W', pos:0,   title:'Работа 8',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  // ЗАЛ 2 — 3D и анимации
-  { id:9,  room:1, wall:'N', pos:0,   title:'3D Работа 1', cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:10, room:1, wall:'N', pos:1,   title:'3D Работа 2', cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:11, room:1, wall:'N', pos:2,   title:'3D Работа 3', cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:12, room:1, wall:'S', pos:0,   title:'Анимация 1',  cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:13, room:1, wall:'S', pos:1,   title:'Анимация 2',  cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:14, room:1, wall:'S', pos:2,   title:'Анимация 3',  cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:15, room:1, wall:'E', pos:0,   title:'Game UI',     cat:'UI Design',     desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:16, room:1, wall:'W', pos:0,   title:'Проект',      cat:'Game UI',       desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  // ЗАЛ 3 — Проекты
-  { id:17, room:2, wall:'N', pos:0,   title:'Проект 1',    cat:'Иллюстрация',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:18, room:2, wall:'N', pos:1,   title:'Проект 2',    cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:19, room:2, wall:'N', pos:2,   title:'Проект 3',    cat:'Концепт-арт',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:20, room:2, wall:'S', pos:0,   title:'Проект 4',    cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:21, room:2, wall:'S', pos:1,   title:'Проект 5',    cat:'Иллюстрация',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:22, room:2, wall:'S', pos:2,   title:'Проект 6',    cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:23, room:2, wall:'E', pos:0,   title:'Проект 7',    cat:'Иллюстрация',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:24, room:2, wall:'W', pos:0,   title:'Проект 8',    cat:'Концепт-арт',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  // ЗАЛ 4 — Финальный
-  { id:25, room:3, wall:'N', pos:0,   title:'Итог 2026 · 1', cat:'Иллюстрация', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:26, room:3, wall:'N', pos:1,   title:'Итог 2026 · 2', cat:'3D · Blender',desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:27, room:3, wall:'N', pos:2,   title:'Итог 2026 · 3', cat:'Концепт-арт', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:28, room:3, wall:'S', pos:0,   title:'Итог 2026 · 4', cat:'Spine · Unity',desc:'Описание работы. Замени на своё.', src:null, type:'image' },
-  { id:29, room:3, wall:'S', pos:1,   title:'Итог 2026 · 5', cat:'Иллюстрация', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:30, room:3, wall:'S', pos:2,   title:'Итог 2026 · 6', cat:'3D · Blender',desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:31, room:3, wall:'E', pos:0,   title:'Итог 2026 · 7', cat:'Game UI',     desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
-  { id:32, room:3, wall:'W', pos:0,   title:'Итог 2026 · 8', cat:'Концепт-арт', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  // ЗАЛ I — Скетчи (часть 1)
+  { id:1,  room:0, wall:'N', pos:0, title:'Скетч · 1',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'1.jpg',   type:'image' },
+  { id:2,  room:0, wall:'N', pos:1, title:'Скетч · 2',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'2.jpg',   type:'image' },
+  { id:3,  room:0, wall:'N', pos:2, title:'Скетч · 3',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'3.jpg',   type:'image' },
+  { id:4,  room:0, wall:'S', pos:0, title:'Скетч · 4',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'4.jpg',   type:'image' },
+  { id:5,  room:0, wall:'S', pos:1, title:'Скетч · 5',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'5.jpg',   type:'image' },
+  { id:6,  room:0, wall:'S', pos:2, title:'Скетч · S05', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s05.jpg', type:'image' },
+  { id:7,  room:0, wall:'E', pos:0, title:'Скетч · S04', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s04.jpg', type:'image' },
+  { id:8,  room:0, wall:'W', pos:0, title:'Скетч · S01', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s01.jpg', type:'image' },
+  // ЗАЛ II — Скетчи (часть 2)
+  { id:9,  room:1, wall:'N', pos:0, title:'Скетч · S02', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s02.jpg', type:'image' },
+  { id:10, room:1, wall:'N', pos:1, title:'Скетч · S03', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s03.jpg', type:'image' },
+  { id:11, room:1, wall:'N', pos:2, title:'Скетч · S06', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s06.jpg', type:'image' },
+  { id:12, room:1, wall:'S', pos:0, title:'Скетч · S07', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s07.jpg', type:'image' },
+  { id:13, room:1, wall:'S', pos:1, title:'Скетч · S08', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s08.jpg', type:'image' },
+  { id:14, room:1, wall:'S', pos:2, title:'Скетч · S09', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s09.jpg', type:'image' },
+  { id:15, room:1, wall:'E', pos:0, title:'Скетч · S10', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s10.jpg', type:'image' },
+  { id:16, room:1, wall:'W', pos:0, title:'Скетч · S11', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s11.jpg', type:'image' },
+  // ЗАЛ III — Скетчи (завершение) + Иллюстрации
+  { id:17, room:2, wall:'N', pos:0, title:'Скетч · S12',                    cat:'Скетч · 2026',        desc:'Скетч из серии зарисовок 2026 года.',            src:'s12.jpg',    type:'image' },
+  { id:18, room:2, wall:'N', pos:1, title:'Скетч · S13',                    cat:'Скетч · 2026',        desc:'Скетч из серии зарисовок 2026 года.',            src:'s13.jpg',    type:'image' },
+  { id:19, room:2, wall:'N', pos:2, title:'И даже смерть не разлучит нас',  cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'hero.jpg',   type:'image' },
+  { id:20, room:2, wall:'S', pos:0, title:'Доктор Богомол',                 cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'mantis.jpg', type:'image' },
+  { id:21, room:2, wall:'S', pos:1, title:'Fungi. Фаина с 14 февраля!',     cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'faina.jpg',  type:'image' },
+  { id:22, room:2, wall:'S', pos:2, title:'Цикл 7 смертных грехов. Похоть', cat:'Иллюстрация',         desc:'Серия «7 смертных грехов», 2026.',                src:'lust.jpg',   type:'image' },
+  { id:23, room:2, wall:'E', pos:0, title:'Цикл 7 смертных грехов. Лень',   cat:'Иллюстрация',         desc:'Серия «7 смертных грехов», 2026.',                src:'sloth.jpg',  type:'image' },
+  { id:24, room:2, wall:'W', pos:0, title:'Вархаммер Пиратка',              cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'пиратка.jpg',type:'image' },
+  // ЗАЛ IV — Учебные работы + резерв
+  { id:25, room:3, wall:'N', pos:0, title:'Учебная работа. Анатомия',       cat:'Иллюстрация · учёба', desc:'Учебная работа по анатомии, 2026.',               src:'anatomy.jpg', type:'image' },
+  { id:26, room:3, wall:'N', pos:1, title:'Учебная работа. Ричард Бах',     cat:'Иллюстрация · учёба', desc:'Портрет по мотивам произведений Баха, 2026.',     src:'bach.jpg',    type:'image' },
+  { id:27, room:3, wall:'N', pos:2, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
+  { id:28, room:3, wall:'S', pos:0, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
+  { id:29, room:3, wall:'S', pos:1, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
+  { id:30, room:3, wall:'S', pos:2, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
+  { id:31, room:3, wall:'E', pos:0, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
+  { id:32, room:3, wall:'W', pos:0, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
 ];
 
+
 const ROOM_NAMES = [
-  'Зал I · Иллюстрации',
-  'Зал II · 3D и Анимации',
-  'Зал III · Проекты',
-  'Зал IV · Итоги 2026',
+  'Зал I · Скетчи',
+  'Зал II · Скетчи',
+  'Зал III · Иллюстрации',
+  'Зал IV · Учебные работы',
 ];
 
 // ═══════════════════════════════════════════════════════
