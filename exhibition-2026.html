@@ -93,6 +93,7 @@ canvas { display:block; }
 <div id="pause-screen"><p>пауза · кликни чтобы продолжить</p></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 // ДАННЫЕ РАБОТ
@@ -404,9 +405,69 @@ function buildPedestal(x,z,art){
 }
 
 // 3 тумбы в центре Зала II
+// Тумба 1 — Арбалет (GLB)
 buildPedestal(-3, H2_Z+3, PEDESTALS_3D[0]);
 buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
 buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
+
+// Загружаем арбалет над первой тумбой
+(function(){
+  const gltfLoader = new THREE.GLTFLoader();
+  const targetX = -3, targetZ = H2_Z+3, floatY = 1.9;
+
+  gltfLoader.load(
+    'арбалет.glb',
+    (gltf) => {
+      const model = gltf.scene;
+
+      // Автомасштаб — вписываем в куб ~0.8
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 0.8 / maxDim;
+      model.scale.setScalar(scale);
+
+      // Центрируем по боксу
+      box.setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      model.position.set(targetX, floatY, targetZ);
+
+      // Материалы — принимаем освещение сцены
+      model.traverse(child => {
+        if(child.isMesh){
+          child.castShadow = true;
+          child.receiveShadow = true;
+          if(child.material) child.material.needsUpdate = true;
+        }
+      });
+
+      scene.add(model);
+      spinners.push(model); // вращается в animate()
+
+      // Убираем заглушку-геометрию с первой тумбы
+      // (заглушка уже добавлена в spinners[0], удаляем её)
+      if(spinners.length > 1){
+        const placeholder = spinners[0];
+        scene.remove(placeholder);
+        spinners.splice(0, 1);
+      }
+
+      // Подсветка арбалета
+      const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
+      aLight.position.set(targetX, floatY + 1.2, targetZ);
+      scene.add(aLight);
+
+      console.log('Арбалет загружен!');
+    },
+    undefined,
+    (err) => { console.warn('Не удалось загрузить арбалет.glb:', err); }
+  );
+
+  // Плавное парение — добавляем в animate через отдельный массив
+  window._floatingModels = window._floatingModels || [];
+  window._floatingModels.push({ x: targetX, baseY: floatY, z: targetZ, phase: 0 });
+})();
 
 // ═══════════════════════════════════════════════════════
 // УПРАВЛЕНИЕ
@@ -538,6 +599,17 @@ function animate(){
   requestAnimationFrame(animate);
   const dt=clock.getDelta();
   spinners.forEach(o=>{ o.rotation.y+=0.5*dt; o.rotation.x+=0.2*dt; });
+
+  // Парение 3D моделей
+  if(window._floatingModels){
+    window._floatingModels.forEach(fm=>{
+      fm.phase += dt;
+      const obj = spinners[spinners.length-1]; // последний в массиве — GLB
+      if(obj && obj.isObject3D){
+        obj.position.y = fm.baseY + Math.sin(fm.phase * 1.2) * 0.08;
+      }
+    });
+  }
 
   if(isPlaying&&!isPaused&&!panelOpen){
     euler.set(pitch,yaw,0);
