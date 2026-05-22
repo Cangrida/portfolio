@@ -591,6 +591,8 @@ document.getElementById('enter-btn').addEventListener('click', () => {
 });
 
 document.addEventListener('pointerlockchange', () => {
+  // Если панель открыта — pointer lock потерян специально, не пауза
+  if (panelOpen) return;
   isPaused = !document.pointerLockElement;
   document.getElementById('pause-screen').classList.toggle('active', isPaused && isPlaying);
 });
@@ -622,7 +624,11 @@ document.addEventListener('keydown', e => {
 function closePanel() {
   document.getElementById('artwork-panel').classList.remove('open');
   panelOpen = false;
-  renderer.domElement.requestPointerLock();
+  isPaused = false;
+  // Небольшая задержка — браузер должен обработать закрытие панели прежде чем захватить мышь
+  setTimeout(() => {
+    renderer.domElement.requestPointerLock();
+  }, 80);
 }
 
 // ═══════════════════════════════════════════════════════
