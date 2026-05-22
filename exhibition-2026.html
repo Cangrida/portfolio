@@ -214,364 +214,242 @@ canvas { display:block; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
-// ДАННЫЕ РАБОТ — замени src на свои файлы!
+// СКЕТЧИ — все 18 работ в одном зале
 // ═══════════════════════════════════════════════════════
 const ARTWORKS = [
-  // ЗАЛ I — Скетчи (часть 1)
-  { id:1,  room:0, wall:'N', pos:0, title:'Скетч · 1',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'1.jpg',   type:'image' },
-  { id:2,  room:0, wall:'N', pos:1, title:'Скетч · 2',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'2.jpg',   type:'image' },
-  { id:3,  room:0, wall:'N', pos:2, title:'Скетч · 3',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'3.jpg',   type:'image' },
-  { id:4,  room:0, wall:'S', pos:0, title:'Скетч · 4',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'4.jpg',   type:'image' },
-  { id:5,  room:0, wall:'S', pos:1, title:'Скетч · 5',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'5.jpg',   type:'image' },
-  { id:6,  room:0, wall:'S', pos:2, title:'Скетч · S05', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s05.jpg', type:'image' },
-  { id:7,  room:0, wall:'E', pos:0, title:'Скетч · S04', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s04.jpg', type:'image' },
-  { id:8,  room:0, wall:'W', pos:0, title:'Скетч · S01', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s01.jpg', type:'image' },
-  // ЗАЛ II — Скетчи (часть 2)
-  { id:9,  room:1, wall:'N', pos:0, title:'Скетч · S02', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s02.jpg', type:'image' },
-  { id:10, room:1, wall:'N', pos:1, title:'Скетч · S03', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s03.jpg', type:'image' },
-  { id:11, room:1, wall:'N', pos:2, title:'Скетч · S06', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s06.jpg', type:'image' },
-  { id:12, room:1, wall:'S', pos:0, title:'Скетч · S07', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s07.jpg', type:'image' },
-  { id:13, room:1, wall:'S', pos:1, title:'Скетч · S08', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s08.jpg', type:'image' },
-  { id:14, room:1, wall:'S', pos:2, title:'Скетч · S09', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s09.jpg', type:'image' },
-  { id:15, room:1, wall:'E', pos:0, title:'Скетч · S10', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s10.jpg', type:'image' },
-  { id:16, room:1, wall:'W', pos:0, title:'Скетч · S11', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s11.jpg', type:'image' },
-  // ЗАЛ III — Скетчи (завершение) + Иллюстрации
-  { id:17, room:2, wall:'N', pos:0, title:'Скетч · S12',                    cat:'Скетч · 2026',        desc:'Скетч из серии зарисовок 2026 года.',            src:'s12.jpg',    type:'image' },
-  { id:18, room:2, wall:'N', pos:1, title:'Скетч · S13',                    cat:'Скетч · 2026',        desc:'Скетч из серии зарисовок 2026 года.',            src:'s13.jpg',    type:'image' },
-  { id:19, room:2, wall:'N', pos:2, title:'И даже смерть не разлучит нас',  cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'hero.jpg',   type:'image' },
-  { id:20, room:2, wall:'S', pos:0, title:'Доктор Богомол',                 cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'mantis.jpg', type:'image' },
-  { id:21, room:2, wall:'S', pos:1, title:'Fungi. Фаина с 14 февраля!',     cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'faina.jpg',  type:'image' },
-  { id:22, room:2, wall:'S', pos:2, title:'Цикл 7 смертных грехов. Похоть', cat:'Иллюстрация',         desc:'Серия «7 смертных грехов», 2026.',                src:'lust.jpg',   type:'image' },
-  { id:23, room:2, wall:'E', pos:0, title:'Цикл 7 смертных грехов. Лень',   cat:'Иллюстрация',         desc:'Серия «7 смертных грехов», 2026.',                src:'sloth.jpg',  type:'image' },
-  { id:24, room:2, wall:'W', pos:0, title:'Вархаммер Пиратка',              cat:'Иллюстрация',         desc:'Цифровая живопись, 2026.',                        src:'пиратка.jpg',type:'image' },
-  // ЗАЛ IV — Учебные работы + резерв
-  { id:25, room:3, wall:'N', pos:0, title:'Учебная работа. Анатомия',       cat:'Иллюстрация · учёба', desc:'Учебная работа по анатомии, 2026.',               src:'anatomy.jpg', type:'image' },
-  { id:26, room:3, wall:'N', pos:1, title:'Учебная работа. Ричард Бах',     cat:'Иллюстрация · учёба', desc:'Портрет по мотивам произведений Баха, 2026.',     src:'bach.jpg',    type:'image' },
-  { id:27, room:3, wall:'N', pos:2, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
-  { id:28, room:3, wall:'S', pos:0, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
-  { id:29, room:3, wall:'S', pos:1, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
-  { id:30, room:3, wall:'S', pos:2, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
-  { id:31, room:3, wall:'E', pos:0, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
-  { id:32, room:3, wall:'W', pos:0, title:'Скоро...',  cat:'2026', desc:'Здесь появится новая работа.', src:null, type:'image' },
+  { id:1,  title:'Скетч · 1',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'1.jpg'   },
+  { id:2,  title:'Скетч · 2',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'2.jpg'   },
+  { id:3,  title:'Скетч · 3',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'3.jpg'   },
+  { id:4,  title:'Скетч · 4',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'4.jpg'   },
+  { id:5,  title:'Скетч · 5',   cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'5.jpg'   },
+  { id:6,  title:'Скетч · S01', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s01.jpg' },
+  { id:7,  title:'Скетч · S02', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s02.jpg' },
+  { id:8,  title:'Скетч · S03', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s03.jpg' },
+  { id:9,  title:'Скетч · S04', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s04.jpg' },
+  { id:10, title:'Скетч · S05', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s05.jpg' },
+  { id:11, title:'Скетч · S06', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s06.jpg' },
+  { id:12, title:'Скетч · S07', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s07.jpg' },
+  { id:13, title:'Скетч · S08', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s08.jpg' },
+  { id:14, title:'Скетч · S09', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s09.jpg' },
+  { id:15, title:'Скетч · S10', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s10.jpg' },
+  { id:16, title:'Скетч · S11', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s11.jpg' },
+  { id:17, title:'Скетч · S12', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s12.jpg' },
+  { id:18, title:'Скетч · S13', cat:'Скетч · 2026', desc:'Скетч из серии зарисовок 2026 года.', src:'s13.jpg' },
 ];
 
-
-const ROOM_NAMES = [
-  'Зал I · Скетчи',
-  'Зал II · Скетчи',
-  'Зал III · Иллюстрации',
-  'Зал IV · Учебные работы',
-];
+// ═══════════════════════════════════════════════════════
+// РАЗМЕРЫ ЗАЛА
+// Скетчи вертикальные ~1182×1406 → соотношение ~0.84
+// Холст: W=1.6, H=1.9 (вертикальный)
+// Зал: 9 картин по длинной стене с каждой стороны
+// ═══════════════════════════════════════════════════════
+const AW = 1.6, AH = 1.9;          // размер холста (вертикальный)
+const FRAME = 0.06;
+const SPACING = 3.2;               // расстояние между центрами картин
+const ROOM_W = 7;                  // ширина зала
+const ROOM_H = 5;                  // высота
+const ROOM_LEN = SPACING * 9 + 2; // длина зала под 9 картин
 
 // ═══════════════════════════════════════════════════════
 // THREE.JS SETUP
 // ═══════════════════════════════════════════════════════
-const renderer = new THREE.WebGLRenderer({ antialias:true });
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.35; // 25% освещение
+renderer.toneMappingExposure = 0.4;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080809);
-scene.fog = new THREE.FogExp2(0x080809, 0.035);
+scene.fog = new THREE.Fog(0x080809, 18, 40);
 
-const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.05, 80);
-camera.position.set(0, 1.7, 2);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 60);
+camera.position.set(0, 1.7, ROOM_LEN / 2 - 1.5);
 
 // ═══════════════════════════════════════════════════════
 // МАТЕРИАЛЫ
 // ═══════════════════════════════════════════════════════
-const ROOM_W = 14, ROOM_H = 5, ROOM_D = 12;
-const CORRIDOR_D = 4;
-const NUM_ROOMS = 4;
-
-const matWall = new THREE.MeshStandardMaterial({
-  color: 0x1c1c1f,
-  roughness: 0.95,
-  metalness: 0.02
-});
-const matFloor = new THREE.MeshStandardMaterial({
-  color: 0x111113,
-  roughness: 0.8,
-  metalness: 0.05
-});
-const matCeil = new THREE.MeshStandardMaterial({
-  color: 0x0e0e10,
-  roughness: 1,
-  metalness: 0
-});
-const matFrame = new THREE.MeshStandardMaterial({
-  color: 0x2a2215,
-  roughness: 0.6,
-  metalness: 0.3
-});
-const matPlaceholder = new THREE.MeshStandardMaterial({
-  color: 0x1e1a16,
-  roughness: 0.9
-});
-const matPedestal = new THREE.MeshStandardMaterial({
-  color: 0x252525,
-  roughness: 0.7,
-  metalness: 0.1
-});
+const matWall  = new THREE.MeshStandardMaterial({ color: 0x1c1c1f, roughness: 0.95 });
+const matFloor = new THREE.MeshStandardMaterial({ color: 0x111113, roughness: 0.85 });
+const matCeil  = new THREE.MeshStandardMaterial({ color: 0x0e0e10, roughness: 1.0  });
+const matFrame = new THREE.MeshStandardMaterial({ color: 0x2a2215, roughness: 0.6, metalness: 0.3 });
 
 // ═══════════════════════════════════════════════════════
-// СТРОИМ ЗАЛЫ
+// СТРОИМ ЗАЛ
 // ═══════════════════════════════════════════════════════
-const allFrameMeshes = []; // { mesh, artwork }
+// Пол
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_LEN), matFloor);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
 
-function buildRoom(roomIdx) {
-  const zOffset = roomIdx * (ROOM_D + CORRIDOR_D);
+// Потолок
+const ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_LEN), matCeil);
+ceil.rotation.x = Math.PI / 2;
+ceil.position.y = ROOM_H;
+scene.add(ceil);
 
-  // Пол
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_D), matFloor);
-  floor.rotation.x = -Math.PI/2;
-  floor.position.set(0, 0, -zOffset);
-  floor.receiveShadow = true;
-  scene.add(floor);
+// Длинные стены (N=дальняя торцевая, S=ближняя, E=правая длинная, W=левая длинная)
+// Левая стена (W)
+const wL = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_LEN, ROOM_H), matWall);
+wL.rotation.y = Math.PI / 2; wL.position.set(-ROOM_W/2, ROOM_H/2, 0);
+scene.add(wL);
+// Правая стена (E)
+const wR = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_LEN, ROOM_H), matWall);
+wR.rotation.y = -Math.PI / 2; wR.position.set(ROOM_W/2, ROOM_H/2, 0);
+scene.add(wR);
+// Торец дальний
+const wFar = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_H), matWall);
+wFar.position.set(0, ROOM_H/2, -ROOM_LEN/2);
+scene.add(wFar);
+// Торец ближний (вход)
+const wNear = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_H), matWall);
+wNear.rotation.y = Math.PI; wNear.position.set(0, ROOM_H/2, ROOM_LEN/2);
+scene.add(wNear);
 
-  // Потолок
-  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_D), matCeil);
-  ceil.rotation.x = Math.PI/2;
-  ceil.position.set(0, ROOM_H, -zOffset);
-  scene.add(ceil);
+// Плинтус
+[-ROOM_LEN/2, ROOM_LEN/2].forEach((z, i) => {
+  const s = new THREE.Mesh(new THREE.BoxGeometry(ROOM_W, 0.12, 0.04), matFrame);
+  s.position.set(0, 0.06, z + (i===0 ? 0.02 : -0.02));
+  s.rotation.y = i === 0 ? 0 : Math.PI;
+  scene.add(s);
+});
 
-  // Стены
-  const wallGeo = [
-    // Левая (W)
-    { geo: new THREE.PlaneGeometry(ROOM_D, ROOM_H), pos:[-(ROOM_W/2), ROOM_H/2, -zOffset], rot:[0, Math.PI/2, 0] },
-    // Правая (E)
-    { geo: new THREE.PlaneGeometry(ROOM_D, ROOM_H), pos:[ ROOM_W/2, ROOM_H/2, -zOffset], rot:[0, -Math.PI/2, 0] },
-    // Дальняя (N)
-    { geo: new THREE.PlaneGeometry(ROOM_W, ROOM_H), pos:[0, ROOM_H/2, -zOffset - ROOM_D/2], rot:[0, 0, 0] },
-    // Ближняя (S)
-    { geo: new THREE.PlaneGeometry(ROOM_W, ROOM_H), pos:[0, ROOM_H/2, -zOffset + ROOM_D/2], rot:[0, Math.PI, 0] },
-  ];
-  wallGeo.forEach(w => {
-    const mesh = new THREE.Mesh(w.geo, matWall);
-    mesh.position.set(...w.pos);
-    mesh.rotation.set(...w.rot);
-    mesh.receiveShadow = true;
-    scene.add(mesh);
-  });
+// Освещение общее — тусклое 25%
+scene.add(new THREE.AmbientLight(0x1a1510, 0.25));
 
-  // Плинтус — декоративная полоса снизу
-  const skirtGeo = new THREE.BoxGeometry(ROOM_W - 0.02, 0.15, 0.04);
-  [-ROOM_D/2, ROOM_D/2].forEach((z, i) => {
-    const s = new THREE.Mesh(skirtGeo, matFrame);
-    s.position.set(0, 0.075, -zOffset - z + (i===0?0.02:-0.02));
-    s.rotation.y = i===0 ? 0 : Math.PI;
-    scene.add(s);
-  });
-
-  // Коридор (кроме последнего зала)
-  if (roomIdx < NUM_ROOMS - 1) {
-    const cz = -zOffset - ROOM_D/2 - CORRIDOR_D/2;
-    const corrFloor = new THREE.Mesh(new THREE.PlaneGeometry(4, CORRIDOR_D), matFloor);
-    corrFloor.rotation.x = -Math.PI/2;
-    corrFloor.position.set(0, 0, cz);
-    corrFloor.receiveShadow = true;
-    scene.add(corrFloor);
-    const corrCeil = new THREE.Mesh(new THREE.PlaneGeometry(4, CORRIDOR_D), matCeil);
-    corrCeil.rotation.x = Math.PI/2;
-    corrCeil.position.set(0, ROOM_H, cz);
-    scene.add(corrCeil);
-    // Боковые стены коридора
-    [-2, 2].forEach(x => {
-      const cw = new THREE.Mesh(new THREE.PlaneGeometry(CORRIDOR_D, ROOM_H), matWall);
-      cw.position.set(x, ROOM_H/2, cz);
-      cw.rotation.y = x < 0 ? Math.PI/2 : -Math.PI/2;
-      cw.receiveShadow = true;
-      scene.add(cw);
-    });
-  }
-
-  // Основное освещение зала — очень слабое (25%)
-  const ambient = new THREE.AmbientLight(0x1a1510, 0.3);
-  scene.add(ambient);
-
-  // Потолочный рассеянный свет
-  const fill = new THREE.PointLight(0xfff5e0, 0.4, 20);
-  fill.position.set(0, ROOM_H - 0.3, -zOffset);
-  scene.add(fill);
-
-  // Размещаем работы
-  const roomArtworks = ARTWORKS.filter(a => a.room === roomIdx);
-  roomArtworks.forEach(art => placeArtwork(art, roomIdx, zOffset));
+// Потолочные лампы вдоль зала
+for (let i = 0; i < 5; i++) {
+  const z = -ROOM_LEN/2 + 3 + i * (ROOM_LEN / 4.5);
+  const pt = new THREE.PointLight(0xfff0d8, 0.35, 12);
+  pt.position.set(0, ROOM_H - 0.3, z);
+  scene.add(pt);
 }
 
 // ═══════════════════════════════════════════════════════
-// РАЗМЕЩЕНИЕ РАБОТЫ НА СТЕНЕ
+// РАЗМЕЩАЕМ КАРТИНЫ
+// 9 штук — левая стена, 9 штук — правая стена
 // ═══════════════════════════════════════════════════════
-const loader = new THREE.TextureLoader();
+const allMeshes = []; // { mesh, artwork }
+const texLoader = new THREE.TextureLoader();
 
-function placeArtwork(art, roomIdx, zOffset) {
-  const W = 2.6, H = 2.0;
-  const FRAME = 0.07;
-  const frameW = W + FRAME*2, frameH = H + FRAME*2;
-  const wallY = 2.2;
+function makePlaceholder(art) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 608; // ~вертикальное соотношение
+  const cx = c.getContext('2d');
+  cx.fillStyle = '#1a1714';
+  cx.fillRect(0, 0, 512, 608);
+  cx.strokeStyle = 'rgba(255,107,53,0.2)';
+  cx.lineWidth = 1;
+  cx.strokeRect(16, 16, 480, 576);
+  cx.fillStyle = 'rgba(255,107,53,0.35)';
+  cx.font = 'bold 90px serif';
+  cx.textAlign = 'center';
+  cx.fillText(art.id, 256, 280);
+  cx.fillStyle = 'rgba(240,236,228,0.3)';
+  cx.font = '22px sans-serif';
+  cx.fillText(art.title, 256, 340);
+  return new THREE.CanvasTexture(c);
+}
 
-  // Позиции по стене
-  const slots = [-3.5, 0, 3.5];
-  const xPos = art.pos < 3 ? slots[art.pos] : 0;
+function makeErrorCanvas(art) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 608;
+  const cx = c.getContext('2d');
+  cx.fillStyle = '#180a0a';
+  cx.fillRect(0, 0, 512, 608);
+  cx.fillStyle = 'rgba(255,80,50,0.6)';
+  cx.font = '14px sans-serif';
+  cx.textAlign = 'center';
+  cx.fillText('не найден: ' + art.src, 256, 270);
+  cx.fillStyle = 'rgba(255,200,150,0.5)';
+  cx.font = '20px serif';
+  cx.fillText(art.title, 256, 310);
+  return new THREE.CanvasTexture(c);
+}
 
-  let px, py = wallY, pz, rx = 0, ry = 0;
-
-  switch(art.wall) {
-    case 'N': px = xPos; pz = -zOffset - ROOM_D/2 + 0.05; ry = 0; break;
-    case 'S': px = xPos; pz = -zOffset + ROOM_D/2 - 0.05; ry = Math.PI; break;
-    case 'E': px = ROOM_W/2 - 0.05; pz = -zOffset; ry = -Math.PI/2; break;
-    case 'W': px = -ROOM_W/2 + 0.05; pz = -zOffset; ry = Math.PI/2; break;
-  }
+function placeArtwork(art, side, zPos) {
+  // side: 'L' = левая стена, 'R' = правая стена
+  const isLeft = side === 'L';
+  const px = isLeft ? -ROOM_W/2 + 0.04 : ROOM_W/2 - 0.04;
+  const ry = isLeft ? Math.PI/2 : -Math.PI/2;
+  const wallY = 2.0;
 
   // Рамка
-  const frameGeo = new THREE.BoxGeometry(frameW, frameH, 0.06);
+  const frameGeo = new THREE.BoxGeometry(AW + FRAME*2, AH + FRAME*2, 0.05);
   const frameMesh = new THREE.Mesh(frameGeo, matFrame);
-  frameMesh.position.set(px, py, pz);
+  frameMesh.position.set(px, wallY, zPos);
   frameMesh.rotation.y = ry;
-  frameMesh.castShadow = true;
   scene.add(frameMesh);
 
-  // Холст / изображение
-  const canvasMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(W, H),
-    art.src ? new THREE.MeshStandardMaterial({ roughness: 0.85 }) : matPlaceholder
-  );
-  const offset = 0.04;
-  canvasMesh.position.set(
-    px + (art.wall==='E'?-offset:art.wall==='W'?offset:0),
-    py,
-    pz + (art.wall==='N'?offset:art.wall==='S'?-offset:0)
-  );
-  canvasMesh.rotation.y = ry;
-  scene.add(canvasMesh);
+  // Холст
+  const mat = new THREE.MeshStandardMaterial({ color: 0x1a1714, roughness: 0.85 });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(AW, AH), mat);
+  const off = 0.04;
+  mesh.position.set(px + (isLeft ? off : -off), wallY, zPos);
+  mesh.rotation.y = ry;
+  scene.add(mesh);
 
-  // Заглушка — номер работы
-  if (!art.src) {
-    const canvas2d = document.createElement('canvas');
-    canvas2d.width = 512; canvas2d.height = 400;
-    const ctx = canvas2d.getContext('2d');
-    ctx.fillStyle = '#1a1714';
-    ctx.fillRect(0,0,512,400);
-    ctx.strokeStyle = 'rgba(255,107,53,0.15)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(20,20,472,360);
-    ctx.fillStyle = 'rgba(255,107,53,0.3)';
-    ctx.font = '80px serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(art.id, 256, 190);
-    ctx.fillStyle = 'rgba(240,236,228,0.2)';
-    ctx.font = '18px sans-serif';
-    ctx.fillText(art.title, 256, 240);
-    ctx.fillStyle = 'rgba(255,107,53,0.2)';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('[ замени src на путь к файлу ]', 256, 270);
-    const tex = new THREE.CanvasTexture(canvas2d);
-    canvasMesh.material = new THREE.MeshStandardMaterial({ map:tex, roughness:0.85 });
-  } else {
-    loader.load(art.src, tex => {
-      canvasMesh.material.map = tex;
-      canvasMesh.material.needsUpdate = true;
-    });
-  }
+  // Загружаем текстуру
+  texLoader.load(
+    art.src,
+    (tex) => {
+      tex.encoding = THREE.sRGBEncoding;
+      mat.map = tex;
+      mat.color.set(0xffffff);
+      mat.needsUpdate = true;
+    },
+    undefined,
+    () => {
+      mat.map = makeErrorCanvas(art);
+      mat.color.set(0xffffff);
+      mat.needsUpdate = true;
+    }
+  );
 
-  // Подсветка работы — спотлайт
-  const spot = new THREE.SpotLight(0xfff0d8, 2.5, 6, Math.PI/8, 0.5, 1.5);
-  spot.position.set(px, ROOM_H - 0.5, pz + (art.wall==='N'?1.2:art.wall==='S'?-1.2:0));
-  if (art.wall==='E') spot.position.set(px-1.2, ROOM_H-0.5, pz);
-  if (art.wall==='W') spot.position.set(px+1.2, ROOM_H-0.5, pz);
-  spot.target = canvasMesh;
-  spot.castShadow = false;
+  // Подсветка спотлайтом
+  const spot = new THREE.SpotLight(0xfff0d8, 3.0, 5, Math.PI/10, 0.4, 1.5);
+  spot.position.set(px + (isLeft ? 1.5 : -1.5), ROOM_H - 0.5, zPos);
+  spot.target = mesh;
   scene.add(spot);
   scene.add(spot.target);
 
-  // Табличка с номером
-  const labelGeo = new THREE.PlaneGeometry(0.8, 0.12);
-  const lCanvas = document.createElement('canvas');
-  lCanvas.width = 256; lCanvas.height = 40;
-  const lc = lCanvas.getContext('2d');
-  lc.fillStyle = '#1c1c1f';
-  lc.fillRect(0,0,256,40);
-  lc.fillStyle = 'rgba(255,107,53,0.7)';
-  lc.font = '13px sans-serif';
-  lc.textAlign = 'center';
-  lc.fillText(art.cat, 128, 26);
-  const labelMesh = new THREE.Mesh(labelGeo, new THREE.MeshStandardMaterial({
-    map: new THREE.CanvasTexture(lCanvas), roughness:0.9
-  }));
-  labelMesh.position.set(
-    px + (art.wall==='E'?-0.04:art.wall==='W'?0.04:0),
-    wallY - H/2 - 0.15,
-    pz + (art.wall==='N'?0.04:art.wall==='S'?-0.04:0)
+  // Табличка под картиной
+  const lc = document.createElement('canvas');
+  lc.width = 320; lc.height = 48;
+  const lctx = lc.getContext('2d');
+  lctx.fillStyle = '#1c1c1f';
+  lctx.fillRect(0, 0, 320, 48);
+  lctx.fillStyle = 'rgba(255,107,53,0.8)';
+  lctx.font = '14px sans-serif';
+  lctx.textAlign = 'center';
+  lctx.fillText(art.cat, 160, 20);
+  lctx.fillStyle = 'rgba(240,236,228,0.5)';
+  lctx.font = '13px sans-serif';
+  lctx.fillText(art.title, 160, 38);
+  const labelMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.9, 0.13),
+    new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(lc), roughness: 0.9 })
   );
+  labelMesh.position.set(px + (isLeft ? off : -off), wallY - AH/2 - 0.12, zPos);
   labelMesh.rotation.y = ry;
   scene.add(labelMesh);
 
-  // Сохраняем для raycasting
-  allFrameMeshes.push({ mesh: canvasMesh, artwork: art });
+  allMeshes.push({ mesh, artwork: art });
 }
 
-// ═══════════════════════════════════════════════════════
-// 3D ТУМБЫ (педестали) — в каждом зале по 2
-// ═══════════════════════════════════════════════════════
-const spinningObjects = [];
-
-function buildPedestals(roomIdx, zOffset) {
-  [[-3, -zOffset + 1], [3, -zOffset - 1]].forEach(([x, z]) => {
-    // Тумба
-    const pedGeo = new THREE.CylinderGeometry(0.3, 0.35, 1.0, 16);
-    const ped = new THREE.Mesh(pedGeo, matPedestal);
-    ped.position.set(x, 0.5, z);
-    ped.receiveShadow = true;
-    scene.add(ped);
-
-    // Верхняя плита
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.05, 16), matPedestal);
-    top.position.set(x, 1.02, z);
-    scene.add(top);
-
-    // Объект на тумбе (placeholder — позже заменишь на GLB)
-    const objGeo = new THREE.TorusKnotGeometry(0.18, 0.06, 80, 12);
-    const objMat = new THREE.MeshStandardMaterial({
-      color: 0x2a1f0f,
-      roughness: 0.4,
-      metalness: 0.6,
-      emissive: 0x1a0800,
-      emissiveIntensity: 0.3
-    });
-    const obj = new THREE.Mesh(objGeo, objMat);
-    obj.position.set(x, 1.45, z);
-    obj.castShadow = true;
-    scene.add(obj);
-    spinningObjects.push(obj);
-
-    // Подсветка тумбы
-    const pedLight = new THREE.PointLight(0xff8844, 1.5, 3);
-    pedLight.position.set(x, 2.2, z);
-    scene.add(pedLight);
-  });
-}
-
-// Строим все залы
-for (let i = 0; i < NUM_ROOMS; i++) {
-  const zOffset = i * (ROOM_D + CORRIDOR_D);
-  buildRoom(i);
-  buildPedestals(i, zOffset);
-}
-
-// Ограждающий пол (общий)
-const bigFloor = new THREE.Mesh(
-  new THREE.PlaneGeometry(ROOM_W + 4, NUM_ROOMS * (ROOM_D + CORRIDOR_D) + 10),
-  matFloor
-);
-bigFloor.rotation.x = -Math.PI/2;
-bigFloor.position.set(0, -0.01, -NUM_ROOMS * (ROOM_D + CORRIDOR_D)/2);
-scene.add(bigFloor);
+// Расставляем: 9 слева (чётные id) и 9 справа (нечётные)
+// Позиции вдоль Z: от ROOM_LEN/2-2 до -ROOM_LEN/2+2
+const startZ = ROOM_LEN/2 - 2.5;
+ARTWORKS.forEach((art, i) => {
+  const side = i % 2 === 0 ? 'L' : 'R';
+  const idx = Math.floor(i / 2); // 0..8
+  const zPos = startZ - idx * SPACING;
+  placeArtwork(art, side, zPos);
+});
 
 // ═══════════════════════════════════════════════════════
 // УПРАВЛЕНИЕ
@@ -579,7 +457,7 @@ scene.add(bigFloor);
 let isPlaying = false, isPaused = false, panelOpen = false;
 const keys = {};
 let yaw = 0, pitch = 0;
-const euler = new THREE.Euler(0,0,0,'YXZ');
+const euler = new THREE.Euler(0, 0, 0, 'YXZ');
 
 document.getElementById('enter-btn').addEventListener('click', () => {
   document.getElementById('intro').classList.add('fade-out');
@@ -592,7 +470,6 @@ document.getElementById('enter-btn').addEventListener('click', () => {
 });
 
 document.addEventListener('pointerlockchange', () => {
-  // Если панель открыта — pointer lock потерян специально, не пауза
   if (panelOpen) return;
   isPaused = !document.pointerLockElement;
   document.getElementById('pause-screen').classList.toggle('active', isPaused && isPlaying);
@@ -606,19 +483,18 @@ document.addEventListener('mousemove', e => {
   if (!isPlaying || isPaused || panelOpen) return;
   yaw   -= e.movementX * 0.0018;
   pitch -= e.movementY * 0.0018;
-  pitch = Math.max(-Math.PI/3, Math.min(Math.PI/3, pitch));
+  pitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, pitch));
 });
 
 document.addEventListener('keydown', e => { keys[e.code] = true; });
 document.addEventListener('keyup',   e => { keys[e.code] = false; });
 
-// Закрыть панель
 document.getElementById('panel-close').addEventListener('click', closePanel);
 document.addEventListener('keydown', e => {
   if (e.code === 'Escape' && panelOpen) { closePanel(); return; }
   if (e.code === 'KeyE' && !panelOpen && isPlaying && !isPaused) tryInteract();
-  if (e.code === 'Escape' && isPlaying && !panelOpen) {
-    if (document.pointerLockElement) document.exitPointerLock();
+  if (e.code === 'Escape' && isPlaying && !panelOpen && document.pointerLockElement) {
+    document.exitPointerLock();
   }
 });
 
@@ -626,32 +502,27 @@ function closePanel() {
   document.getElementById('artwork-panel').classList.remove('open');
   panelOpen = false;
   isPaused = false;
-  // Небольшая задержка — браузер должен обработать закрытие панели прежде чем захватить мышь
-  setTimeout(() => {
-    renderer.domElement.requestPointerLock();
-  }, 80);
+  setTimeout(() => renderer.domElement.requestPointerLock(), 80);
 }
 
 // ═══════════════════════════════════════════════════════
-// RAYCASTING — взаимодействие с работами
+// RAYCASTING
 // ═══════════════════════════════════════════════════════
 const raycaster = new THREE.Raycaster();
-const center = new THREE.Vector2(0,0);
+const center = new THREE.Vector2(0, 0);
 let nearbyArtwork = null;
 
 function checkInteraction() {
   raycaster.setFromCamera(center, camera);
-  const meshes = allFrameMeshes.map(f => f.mesh);
-  const hits = raycaster.intersectObjects(meshes);
+  const hits = raycaster.intersectObjects(allMeshes.map(f => f.mesh));
   const prompt = document.getElementById('interact-prompt');
-  if (hits.length > 0 && hits[0].distance < 4) {
-    const found = allFrameMeshes.find(f => f.mesh === hits[0].object);
+  if (hits.length > 0 && hits[0].distance < 3.5) {
+    const found = allMeshes.find(f => f.mesh === hits[0].object);
     nearbyArtwork = found ? found.artwork : null;
-    prompt.style.opacity = nearbyArtwork ? '1' : '0';
   } else {
     nearbyArtwork = null;
-    prompt.style.opacity = '0';
   }
+  prompt.style.opacity = nearbyArtwork ? '1' : '0';
 }
 
 function tryInteract() {
@@ -661,8 +532,8 @@ function tryInteract() {
   document.getElementById('panel-title').textContent = art.title;
   document.getElementById('panel-desc').textContent = art.desc;
   const img = document.getElementById('panel-img');
-  img.src = art.src || '';
-  img.style.display = art.src ? 'block' : 'none';
+  img.src = art.src;
+  img.style.display = 'block';
   document.getElementById('artwork-panel').classList.add('open');
   panelOpen = true;
   document.exitPointerLock();
@@ -671,26 +542,12 @@ function tryInteract() {
 // ═══════════════════════════════════════════════════════
 // ДВИЖЕНИЕ
 // ═══════════════════════════════════════════════════════
-const dir = new THREE.Vector3();
+const dir   = new THREE.Vector3();
 const right = new THREE.Vector3();
-const SPEED = 0.06;
-
-// Границы
-const BOUNDS_X = ROOM_W/2 - 0.5;
-const BOUNDS_Z_MIN = -(NUM_ROOMS * (ROOM_D + CORRIDOR_D)) + 1;
-const BOUNDS_Z_MAX = ROOM_D/2 - 0.5;
-
-// Определяем зал по позиции камеры
-function getCurrentRoom() {
-  const z = camera.position.z;
-  for (let i = 0; i < NUM_ROOMS; i++) {
-    const zc = -(i * (ROOM_D + CORRIDOR_D));
-    if (z > zc - ROOM_D/2 - CORRIDOR_D && z < zc + ROOM_D/2) return i;
-  }
-  return -1;
-}
-
-let lastRoom = -1;
+const SPEED = 0.07;
+const Z_MIN = -ROOM_LEN / 2 + 1.0;
+const Z_MAX =  ROOM_LEN / 2 - 1.0;
+const X_MAX = ROOM_W / 2 - 0.5;
 
 // ═══════════════════════════════════════════════════════
 // ГЛАВНЫЙ ЦИКЛ
@@ -699,51 +556,29 @@ const clock = new THREE.Clock();
 
 function animate() {
   requestAnimationFrame(animate);
-  const dt = clock.getDelta();
-
-  // Вращение тумб
-  spinningObjects.forEach((o, i) => {
-    o.rotation.y += 0.4 * dt;
-    o.rotation.x += 0.15 * dt;
-  });
+  clock.getDelta();
 
   if (isPlaying && !isPaused && !panelOpen) {
-    // Камера
     euler.set(pitch, yaw, 0);
     camera.quaternion.setFromEuler(euler);
 
-    // Движение
-    dir.set(0,0,0);
+    dir.set(0, 0, 0);
     camera.getWorldDirection(dir);
     dir.y = 0; dir.normalize();
-    right.crossVectors(dir, new THREE.Vector3(0,1,0)).normalize();
+    right.crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
 
     const move = new THREE.Vector3();
-    if (keys['KeyW'] || keys['ArrowUp'])    move.addScaledVector(dir,   SPEED);
-    if (keys['KeyS'] || keys['ArrowDown'])  move.addScaledVector(dir,  -SPEED);
-    if (keys['KeyA'] || keys['ArrowLeft'])  move.addScaledVector(right,-SPEED);
+    if (keys['KeyW'] || keys['ArrowUp'])    move.addScaledVector(dir,    SPEED);
+    if (keys['KeyS'] || keys['ArrowDown'])  move.addScaledVector(dir,   -SPEED);
+    if (keys['KeyA'] || keys['ArrowLeft'])  move.addScaledVector(right, -SPEED);
     if (keys['KeyD'] || keys['ArrowRight']) move.addScaledVector(right,  SPEED);
 
     camera.position.add(move);
-    camera.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, camera.position.x));
-    camera.position.z = Math.max(BOUNDS_Z_MIN, Math.min(BOUNDS_Z_MAX, camera.position.z));
+    camera.position.x = Math.max(-X_MAX, Math.min(X_MAX, camera.position.x));
+    camera.position.z = Math.max(Z_MIN,  Math.min(Z_MAX, camera.position.z));
     camera.position.y = 1.7;
 
     checkInteraction();
-
-    // Обновляем название зала
-    const room = getCurrentRoom();
-    if (room !== lastRoom) {
-      lastRoom = room;
-      const label = document.getElementById('room-label');
-      label.style.opacity = '0';
-      if (room >= 0) {
-        setTimeout(() => {
-          label.textContent = ROOM_NAMES[room];
-          label.style.opacity = '1';
-        }, 400);
-      }
-    }
   }
 
   renderer.render(scene, camera);
@@ -756,6 +591,4 @@ window.addEventListener('resize', () => {
 });
 
 animate();
-</script>
-</body>
-</html>
+</script></html>
