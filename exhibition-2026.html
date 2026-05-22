@@ -526,7 +526,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 0.8 / Math.max(size.x, size.y, size.z);
+      const scale = 2.4 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
