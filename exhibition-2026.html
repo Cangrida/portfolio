@@ -391,17 +391,21 @@ function buildPedestal(x,z,art){
   const pl=new THREE.PointLight(0xff8844,1.8,3.5);
   pl.position.set(x,2.3,z); scene.add(pl);
 
-  // Табличка
-  const lc=document.createElement('canvas'); lc.width=256; lc.height=48;
+  // Надпись на верхней плите тумбы (горизонтально, вровень с поверхностью)
+  const lc=document.createElement('canvas'); lc.width=512; lc.height=512;
   const lx=lc.getContext('2d');
-  lx.fillStyle='#1c1c1f'; lx.fillRect(0,0,256,48);
-  lx.fillStyle='rgba(255,107,53,0.7)'; lx.font='12px sans-serif'; lx.textAlign='center';
-  lx.fillText(art.cat,128,18);
-  lx.fillStyle='rgba(240,236,228,0.4)'; lx.font='11px sans-serif';
-  lx.fillText(art.title,128,34);
-  const lm=new THREE.Mesh(new THREE.PlaneGeometry(0.8,0.15),
-    new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(lc),roughness:0.9}));
-  lm.position.set(x,0.12,z+0.36); scene.add(lm);
+  lx.fillStyle='#252525'; lx.fillRect(0,0,512,512);
+  lx.strokeStyle='rgba(255,107,53,0.25)'; lx.lineWidth=1;
+  lx.strokeRect(20,20,472,472);
+  lx.fillStyle='rgba(255,107,53,0.85)'; lx.font='bold 38px Arial,sans-serif'; lx.textAlign='center';
+  lx.fillText(art.title, 256, 256);
+  const lm=new THREE.Mesh(
+    new THREE.CircleGeometry(0.34, 32),
+    new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(lc),roughness:0.7})
+  );
+  lm.rotation.x=-Math.PI/2; // горизонтально
+  lm.position.set(x, 1.06, z); // прямо на верхней плите
+  scene.add(lm);
 }
 
 // 3 тумбы в центре Зала II
