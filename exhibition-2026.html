@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Галина Гольтяпина — Выставка 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0a0b; color:#f0ece4; font-family:'Montserrat',sans-serif; overflow:hidden; }
+
+/* ── OVERLAY INTRO ── */
+#intro {
+  position:fixed; inset:0; z-index:100;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:#0a0a0b;
+  transition: opacity 1.2s ease;
+}
+#intro.fade-out { opacity:0; pointer-events:none; }
+
+.intro-year {
+  font-family:'Montserrat',sans-serif;
+  font-weight:200; font-size:0.65rem;
+  letter-spacing:0.5em; color:rgba(255,107,53,0.6);
+  text-transform:uppercase; margin-bottom:24px;
+}
+.intro-title {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300; font-size:clamp(3rem,8vw,6rem);
+  letter-spacing:0.08em; color:#f0ece4;
+  margin-bottom:8px; text-align:center;
+}
+.intro-author {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-size:1.1rem;
+  color:rgba(240,236,228,0.45); letter-spacing:0.2em;
+  margin-bottom:60px;
+}
+.intro-line {
+  width:1px; height:60px;
+  background:linear-gradient(to bottom, rgba(255,107,53,0.8), transparent);
+  margin-bottom:40px;
+  animation: line-grow 1.5s ease forwards;
+  transform-origin: top;
+}
+@keyframes line-grow { from{scaleY(0); opacity:0;} to{scaleY(1); opacity:1;} }
+
+#enter-btn {
+  font-family:'Montserrat',sans-serif;
+  font-weight:300; font-size:0.7rem;
+  letter-spacing:0.4em; text-transform:uppercase;
+  color:#f0ece4; background:transparent;
+  border:1px solid rgba(255,107,53,0.5);
+  padding:16px 48px; cursor:pointer;
+  transition: all 0.4s ease;
+  position:relative; overflow:hidden;
+}
+#enter-btn::before {
+  content:''; position:absolute; inset:0;
+  background:rgba(255,107,53,0.08);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform 0.4s ease;
+}
+#enter-btn:hover { border-color:rgba(255,107,53,0.9); color:#ff6b35; }
+#enter-btn:hover::before { transform:scaleX(1); }
+
+.intro-controls {
+  position:absolute; bottom:40px;
+  font-size:0.6rem; letter-spacing:0.25em;
+  color:rgba(240,236,228,0.25); text-align:center; line-height:2;
+}
+.intro-controls span { color:rgba(255,107,53,0.5); }
+
+/* ── HUD ── */
+#hud {
+  position:fixed; inset:0; z-index:10;
+  pointer-events:none; display:none;
+}
+#hud.active { display:block; }
+
+#hud-top {
+  position:absolute; top:28px; left:50%; transform:translateX(-50%);
+  font-size:0.55rem; letter-spacing:0.4em; color:rgba(255,107,53,0.4);
+  text-transform:uppercase;
+}
+#room-label {
+  position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:1rem; color:rgba(240,236,228,0.3); letter-spacing:0.15em;
+  transition:opacity 0.5s;
+}
+#crosshair {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:16px; height:16px;
+}
+#crosshair::before, #crosshair::after {
+  content:''; position:absolute; background:rgba(255,107,53,0.5);
+}
+#crosshair::before { width:1px; height:100%; left:50%; }
+#crosshair::after  { width:100%; height:1px; top:50%; }
+
+#interact-prompt {
+  position:absolute; bottom:80px; left:50%; transform:translateX(-50%);
+  font-size:0.6rem; letter-spacing:0.3em; color:rgba(255,107,53,0.7);
+  opacity:0; transition:opacity 0.3s;
+}
+
+/* ── ARTWORK PANEL ── */
+#artwork-panel {
+  position:fixed; inset:0; z-index:50;
+  display:none; align-items:center; justify-content:center;
+  background:rgba(10,10,11,0.92); backdrop-filter:blur(12px);
+  pointer-events:none;
+}
+#artwork-panel.open {
+  display:flex; pointer-events:all;
+}
+.panel-inner {
+  max-width:860px; width:90%;
+  display:flex; gap:48px; align-items:center;
+}
+.panel-img-wrap {
+  flex:0 0 auto; max-width:50%;
+  border:1px solid rgba(255,107,53,0.2);
+  position:relative;
+}
+.panel-img-wrap::before {
+  content:''; position:absolute; inset:-1px;
+  box-shadow: inset 0 0 40px rgba(255,107,53,0.06);
+}
+#panel-img { width:100%; display:block; }
+.panel-info { flex:1; }
+.panel-cat {
+  font-size:0.55rem; letter-spacing:0.4em;
+  color:rgba(255,107,53,0.6); text-transform:uppercase; margin-bottom:16px;
+}
+.panel-title {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300; font-size:2.2rem; line-height:1.15;
+  color:#f0ece4; margin-bottom:12px;
+}
+.panel-desc {
+  font-size:0.75rem; line-height:1.8;
+  color:rgba(240,236,228,0.5); margin-bottom:32px;
+}
+.panel-close {
+  font-size:0.6rem; letter-spacing:0.35em;
+  color:rgba(255,107,53,0.6); cursor:pointer;
+  background:none; border:none; font-family:'Montserrat',sans-serif;
+  text-transform:uppercase; padding:12px 0;
+  transition:color 0.3s;
+}
+.panel-close:hover { color:#ff6b35; }
+
+/* ── PAUSE ── */
+#pause-screen {
+  position:fixed; inset:0; z-index:80;
+  display:none; align-items:center; justify-content:center;
+  background:rgba(10,10,11,0.7); backdrop-filter:blur(4px);
+}
+#pause-screen.active { display:flex; }
+#pause-screen p {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:1.8rem; color:rgba(240,236,228,0.4); letter-spacing:0.1em;
+}
+
+canvas { display:block; }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <div class="intro-year">Онлайн-выставка · 2026</div>
+  <div class="intro-title">ГАЛЕРЕЯ</div>
+  <div class="intro-author">Galina Goltyapina</div>
+  <div class="intro-line"></div>
+  <button id="enter-btn">войти</button>
+  <div class="intro-controls">
+    <span>W A S D</span> — движение &nbsp;·&nbsp; <span>Мышь</span> — обзор<br>
+    <span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-top">Galina Goltyapina · Выставка 2026</div>
+  <div id="crosshair"></div>
+  <div id="interact-prompt">[ E ] — рассмотреть</div>
+  <div id="room-label"></div>
+</div>
+
+<!-- ARTWORK PANEL -->
+<div id="artwork-panel">
+  <div class="panel-inner">
+    <div class="panel-img-wrap">
+      <img id="panel-img" src="" alt="">
+    </div>
+    <div class="panel-info">
+      <div class="panel-cat" id="panel-cat"></div>
+      <div class="panel-title" id="panel-title"></div>
+      <div class="panel-desc" id="panel-desc"></div>
+      <button class="panel-close" id="panel-close">[ ESC ] закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div id="pause-screen">
+  <p>пауза · кликни чтобы продолжить</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+// ДАННЫЕ РАБОТ — замени src на свои файлы!
+// ═══════════════════════════════════════════════════════
+const ARTWORKS = [
+  // ЗАЛ 1 — Иллюстрации
+  { id:1,  room:0, wall:'N', pos:0,   title:'Работа 1',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:2,  room:0, wall:'N', pos:1,   title:'Работа 2',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:3,  room:0, wall:'N', pos:2,   title:'Работа 3',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:4,  room:0, wall:'S', pos:0,   title:'Работа 4',   cat:'Концепт-арт',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:5,  room:0, wall:'S', pos:1,   title:'Работа 5',   cat:'Концепт-арт',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:6,  room:0, wall:'S', pos:2,   title:'Работа 6',   cat:'Концепт-арт',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:7,  room:0, wall:'E', pos:0,   title:'Работа 7',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:8,  room:0, wall:'W', pos:0,   title:'Работа 8',   cat:'Иллюстрация',    desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  // ЗАЛ 2 — 3D и анимации
+  { id:9,  room:1, wall:'N', pos:0,   title:'3D Работа 1', cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:10, room:1, wall:'N', pos:1,   title:'3D Работа 2', cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:11, room:1, wall:'N', pos:2,   title:'3D Работа 3', cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:12, room:1, wall:'S', pos:0,   title:'Анимация 1',  cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:13, room:1, wall:'S', pos:1,   title:'Анимация 2',  cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:14, room:1, wall:'S', pos:2,   title:'Анимация 3',  cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:15, room:1, wall:'E', pos:0,   title:'Game UI',     cat:'UI Design',     desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:16, room:1, wall:'W', pos:0,   title:'Проект',      cat:'Game UI',       desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  // ЗАЛ 3 — Проекты
+  { id:17, room:2, wall:'N', pos:0,   title:'Проект 1',    cat:'Иллюстрация',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:18, room:2, wall:'N', pos:1,   title:'Проект 2',    cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:19, room:2, wall:'N', pos:2,   title:'Проект 3',    cat:'Концепт-арт',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:20, room:2, wall:'S', pos:0,   title:'Проект 4',    cat:'Spine · Unity', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:21, room:2, wall:'S', pos:1,   title:'Проект 5',    cat:'Иллюстрация',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:22, room:2, wall:'S', pos:2,   title:'Проект 6',    cat:'3D · Blender',  desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:23, room:2, wall:'E', pos:0,   title:'Проект 7',    cat:'Иллюстрация',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:24, room:2, wall:'W', pos:0,   title:'Проект 8',    cat:'Концепт-арт',   desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  // ЗАЛ 4 — Финальный
+  { id:25, room:3, wall:'N', pos:0,   title:'Итог 2026 · 1', cat:'Иллюстрация', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:26, room:3, wall:'N', pos:1,   title:'Итог 2026 · 2', cat:'3D · Blender',desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:27, room:3, wall:'N', pos:2,   title:'Итог 2026 · 3', cat:'Концепт-арт', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:28, room:3, wall:'S', pos:0,   title:'Итог 2026 · 4', cat:'Spine · Unity',desc:'Описание работы. Замени на своё.', src:null, type:'image' },
+  { id:29, room:3, wall:'S', pos:1,   title:'Итог 2026 · 5', cat:'Иллюстрация', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:30, room:3, wall:'S', pos:2,   title:'Итог 2026 · 6', cat:'3D · Blender',desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:31, room:3, wall:'E', pos:0,   title:'Итог 2026 · 7', cat:'Game UI',     desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+  { id:32, room:3, wall:'W', pos:0,   title:'Итог 2026 · 8', cat:'Концепт-арт', desc:'Описание работы. Замени на своё.',  src:null, type:'image' },
+];
+
+const ROOM_NAMES = [
+  'Зал I · Иллюстрации',
+  'Зал II · 3D и Анимации',
+  'Зал III · Проекты',
+  'Зал IV · Итоги 2026',
+];
+
+// ═══════════════════════════════════════════════════════
+// THREE.JS SETUP
+// ═══════════════════════════════════════════════════════
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.35; // 25% освещение
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x080809);
+scene.fog = new THREE.FogExp2(0x080809, 0.035);
+
+const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.05, 80);
+camera.position.set(0, 1.7, 2);
+
+// ═══════════════════════════════════════════════════════
+// МАТЕРИАЛЫ
+// ═══════════════════════════════════════════════════════
+const ROOM_W = 14, ROOM_H = 5, ROOM_D = 12;
+const CORRIDOR_D = 4;
+const NUM_ROOMS = 4;
+
+const matWall = new THREE.MeshStandardMaterial({
+  color: 0x1c1c1f,
+  roughness: 0.95,
+  metalness: 0.02
+});
+const matFloor = new THREE.MeshStandardMaterial({
+  color: 0x111113,
+  roughness: 0.8,
+  metalness: 0.05
+});
+const matCeil = new THREE.MeshStandardMaterial({
+  color: 0x0e0e10,
+  roughness: 1,
+  metalness: 0
+});
+const matFrame = new THREE.MeshStandardMaterial({
+  color: 0x2a2215,
+  roughness: 0.6,
+  metalness: 0.3
+});
+const matPlaceholder = new THREE.MeshStandardMaterial({
+  color: 0x1e1a16,
+  roughness: 0.9
+});
+const matPedestal = new THREE.MeshStandardMaterial({
+  color: 0x252525,
+  roughness: 0.7,
+  metalness: 0.1
+});
+
+// ═══════════════════════════════════════════════════════
+// СТРОИМ ЗАЛЫ
+// ═══════════════════════════════════════════════════════
+const allFrameMeshes = []; // { mesh, artwork }
+
+function buildRoom(roomIdx) {
+  const zOffset = roomIdx * (ROOM_D + CORRIDOR_D);
+
+  // Пол
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_D), matFloor);
+  floor.rotation.x = -Math.PI/2;
+  floor.position.set(0, 0, -zOffset);
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // Потолок
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_D), matCeil);
+  ceil.rotation.x = Math.PI/2;
+  ceil.position.set(0, ROOM_H, -zOffset);
+  scene.add(ceil);
+
+  // Стены
+  const wallGeo = [
+    // Левая (W)
+    { geo: new THREE.PlaneGeometry(ROOM_D, ROOM_H), pos:[-(ROOM_W/2), ROOM_H/2, -zOffset], rot:[0, Math.PI/2, 0] },
+    // Правая (E)
+    { geo: new THREE.PlaneGeometry(ROOM_D, ROOM_H), pos:[ ROOM_W/2, ROOM_H/2, -zOffset], rot:[0, -Math.PI/2, 0] },
+    // Дальняя (N)
+    { geo: new THREE.PlaneGeometry(ROOM_W, ROOM_H), pos:[0, ROOM_H/2, -zOffset - ROOM_D/2], rot:[0, 0, 0] },
+    // Ближняя (S)
+    { geo: new THREE.PlaneGeometry(ROOM_W, ROOM_H), pos:[0, ROOM_H/2, -zOffset + ROOM_D/2], rot:[0, Math.PI, 0] },
+  ];
+  wallGeo.forEach(w => {
+    const mesh = new THREE.Mesh(w.geo, matWall);
+    mesh.position.set(...w.pos);
+    mesh.rotation.set(...w.rot);
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+  });
+
+  // Плинтус — декоративная полоса снизу
+  const skirtGeo = new THREE.BoxGeometry(ROOM_W - 0.02, 0.15, 0.04);
+  [-ROOM_D/2, ROOM_D/2].forEach((z, i) => {
+    const s = new THREE.Mesh(skirtGeo, matFrame);
+    s.position.set(0, 0.075, -zOffset - z + (i===0?0.02:-0.02));
+    s.rotation.y = i===0 ? 0 : Math.PI;
+    scene.add(s);
+  });
+
+  // Коридор (кроме последнего зала)
+  if (roomIdx < NUM_ROOMS - 1) {
+    const cz = -zOffset - ROOM_D/2 - CORRIDOR_D/2;
+    const corrFloor = new THREE.Mesh(new THREE.PlaneGeometry(4, CORRIDOR_D), matFloor);
+    corrFloor.rotation.x = -Math.PI/2;
+    corrFloor.position.set(0, 0, cz);
+    corrFloor.receiveShadow = true;
+    scene.add(corrFloor);
+    const corrCeil = new THREE.Mesh(new THREE.PlaneGeometry(4, CORRIDOR_D), matCeil);
+    corrCeil.rotation.x = Math.PI/2;
+    corrCeil.position.set(0, ROOM_H, cz);
+    scene.add(corrCeil);
+    // Боковые стены коридора
+    [-2, 2].forEach(x => {
+      const cw = new THREE.Mesh(new THREE.PlaneGeometry(CORRIDOR_D, ROOM_H), matWall);
+      cw.position.set(x, ROOM_H/2, cz);
+      cw.rotation.y = x < 0 ? Math.PI/2 : -Math.PI/2;
+      cw.receiveShadow = true;
+      scene.add(cw);
+    });
+  }
+
+  // Основное освещение зала — очень слабое (25%)
+  const ambient = new THREE.AmbientLight(0x1a1510, 0.3);
+  scene.add(ambient);
+
+  // Потолочный рассеянный свет
+  const fill = new THREE.PointLight(0xfff5e0, 0.4, 20);
+  fill.position.set(0, ROOM_H - 0.3, -zOffset);
+  scene.add(fill);
+
+  // Размещаем работы
+  const roomArtworks = ARTWORKS.filter(a => a.room === roomIdx);
+  roomArtworks.forEach(art => placeArtwork(art, roomIdx, zOffset));
+}
+
+// ═══════════════════════════════════════════════════════
+// РАЗМЕЩЕНИЕ РАБОТЫ НА СТЕНЕ
+// ═══════════════════════════════════════════════════════
+const loader = new THREE.TextureLoader();
+
+function placeArtwork(art, roomIdx, zOffset) {
+  const W = 2.6, H = 2.0;
+  const FRAME = 0.07;
+  const frameW = W + FRAME*2, frameH = H + FRAME*2;
+  const wallY = 2.2;
+
+  // Позиции по стене
+  const slots = [-3.5, 0, 3.5];
+  const xPos = art.pos < 3 ? slots[art.pos] : 0;
+
+  let px, py = wallY, pz, rx = 0, ry = 0;
+
+  switch(art.wall) {
+    case 'N': px = xPos; pz = -zOffset - ROOM_D/2 + 0.05; ry = 0; break;
+    case 'S': px = xPos; pz = -zOffset + ROOM_D/2 - 0.05; ry = Math.PI; break;
+    case 'E': px = ROOM_W/2 - 0.05; pz = -zOffset; ry = -Math.PI/2; break;
+    case 'W': px = -ROOM_W/2 + 0.05; pz = -zOffset; ry = Math.PI/2; break;
+  }
+
+  // Рамка
+  const frameGeo = new THREE.BoxGeometry(frameW, frameH, 0.06);
+  const frameMesh = new THREE.Mesh(frameGeo, matFrame);
+  frameMesh.position.set(px, py, pz);
+  frameMesh.rotation.y = ry;
+  frameMesh.castShadow = true;
+  scene.add(frameMesh);
+
+  // Холст / изображение
+  const canvasMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(W, H),
+    art.src ? new THREE.MeshStandardMaterial({ roughness: 0.85 }) : matPlaceholder
+  );
+  const offset = 0.04;
+  canvasMesh.position.set(
+    px + (art.wall==='E'?-offset:art.wall==='W'?offset:0),
+    py,
+    pz + (art.wall==='N'?offset:art.wall==='S'?-offset:0)
+  );
+  canvasMesh.rotation.y = ry;
+  scene.add(canvasMesh);
+
+  // Заглушка — номер работы
+  if (!art.src) {
+    const canvas2d = document.createElement('canvas');
+    canvas2d.width = 512; canvas2d.height = 400;
+    const ctx = canvas2d.getContext('2d');
+    ctx.fillStyle = '#1a1714';
+    ctx.fillRect(0,0,512,400);
+    ctx.strokeStyle = 'rgba(255,107,53,0.15)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(20,20,472,360);
+    ctx.fillStyle = 'rgba(255,107,53,0.3)';
+    ctx.font = '80px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(art.id, 256, 190);
+    ctx.fillStyle = 'rgba(240,236,228,0.2)';
+    ctx.font = '18px sans-serif';
+    ctx.fillText(art.title, 256, 240);
+    ctx.fillStyle = 'rgba(255,107,53,0.2)';
+    ctx.font = '12px sans-serif';
+    ctx.fillText('[ замени src на путь к файлу ]', 256, 270);
+    const tex = new THREE.CanvasTexture(canvas2d);
+    canvasMesh.material = new THREE.MeshStandardMaterial({ map:tex, roughness:0.85 });
+  } else {
+    loader.load(art.src, tex => {
+      canvasMesh.material.map = tex;
+      canvasMesh.material.needsUpdate = true;
+    });
+  }
+
+  // Подсветка работы — спотлайт
+  const spot = new THREE.SpotLight(0xfff0d8, 2.5, 6, Math.PI/8, 0.5, 1.5);
+  spot.position.set(px, ROOM_H - 0.5, pz + (art.wall==='N'?1.2:art.wall==='S'?-1.2:0));
+  if (art.wall==='E') spot.position.set(px-1.2, ROOM_H-0.5, pz);
+  if (art.wall==='W') spot.position.set(px+1.2, ROOM_H-0.5, pz);
+  spot.target = canvasMesh;
+  spot.castShadow = false;
+  scene.add(spot);
+  scene.add(spot.target);
+
+  // Табличка с номером
+  const labelGeo = new THREE.PlaneGeometry(0.8, 0.12);
+  const lCanvas = document.createElement('canvas');
+  lCanvas.width = 256; lCanvas.height = 40;
+  const lc = lCanvas.getContext('2d');
+  lc.fillStyle = '#1c1c1f';
+  lc.fillRect(0,0,256,40);
+  lc.fillStyle = 'rgba(255,107,53,0.7)';
+  lc.font = '13px sans-serif';
+  lc.textAlign = 'center';
+  lc.fillText(art.cat, 128, 26);
+  const labelMesh = new THREE.Mesh(labelGeo, new THREE.MeshStandardMaterial({
+    map: new THREE.CanvasTexture(lCanvas), roughness:0.9
+  }));
+  labelMesh.position.set(
+    px + (art.wall==='E'?-0.04:art.wall==='W'?0.04:0),
+    wallY - H/2 - 0.15,
+    pz + (art.wall==='N'?0.04:art.wall==='S'?-0.04:0)
+  );
+  labelMesh.rotation.y = ry;
+  scene.add(labelMesh);
+
+  // Сохраняем для raycasting
+  allFrameMeshes.push({ mesh: canvasMesh, artwork: art });
+}
+
+// ═══════════════════════════════════════════════════════
+// 3D ТУМБЫ (педестали) — в каждом зале по 2
+// ═══════════════════════════════════════════════════════
+const spinningObjects = [];
+
+function buildPedestals(roomIdx, zOffset) {
+  [[-3, -zOffset + 1], [3, -zOffset - 1]].forEach(([x, z]) => {
+    // Тумба
+    const pedGeo = new THREE.CylinderGeometry(0.3, 0.35, 1.0, 16);
+    const ped = new THREE.Mesh(pedGeo, matPedestal);
+    ped.position.set(x, 0.5, z);
+    ped.receiveShadow = true;
+    scene.add(ped);
+
+    // Верхняя плита
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.05, 16), matPedestal);
+    top.position.set(x, 1.02, z);
+    scene.add(top);
+
+    // Объект на тумбе (placeholder — позже заменишь на GLB)
+    const objGeo = new THREE.TorusKnotGeometry(0.18, 0.06, 80, 12);
+    const objMat = new THREE.MeshStandardMaterial({
+      color: 0x2a1f0f,
+      roughness: 0.4,
+      metalness: 0.6,
+      emissive: 0x1a0800,
+      emissiveIntensity: 0.3
+    });
+    const obj = new THREE.Mesh(objGeo, objMat);
+    obj.position.set(x, 1.45, z);
+    obj.castShadow = true;
+    scene.add(obj);
+    spinningObjects.push(obj);
+
+    // Подсветка тумбы
+    const pedLight = new THREE.PointLight(0xff8844, 1.5, 3);
+    pedLight.position.set(x, 2.2, z);
+    scene.add(pedLight);
+  });
+}
+
+// Строим все залы
+for (let i = 0; i < NUM_ROOMS; i++) {
+  const zOffset = i * (ROOM_D + CORRIDOR_D);
+  buildRoom(i);
+  buildPedestals(i, zOffset);
+}
+
+// Ограждающий пол (общий)
+const bigFloor = new THREE.Mesh(
+  new THREE.PlaneGeometry(ROOM_W + 4, NUM_ROOMS * (ROOM_D + CORRIDOR_D) + 10),
+  matFloor
+);
+bigFloor.rotation.x = -Math.PI/2;
+bigFloor.position.set(0, -0.01, -NUM_ROOMS * (ROOM_D + CORRIDOR_D)/2);
+scene.add(bigFloor);
+
+// ═══════════════════════════════════════════════════════
+// УПРАВЛЕНИЕ
+// ═══════════════════════════════════════════════════════
+let isPlaying = false, isPaused = false, panelOpen = false;
+const keys = {};
+let yaw = 0, pitch = 0;
+const euler = new THREE.Euler(0,0,0,'YXZ');
+
+document.getElementById('enter-btn').addEventListener('click', () => {
+  document.getElementById('intro').classList.add('fade-out');
+  setTimeout(() => {
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('hud').classList.add('active');
+    renderer.domElement.requestPointerLock();
+    isPlaying = true;
+  }, 1200);
+});
+
+document.addEventListener('pointerlockchange', () => {
+  isPaused = !document.pointerLockElement;
+  document.getElementById('pause-screen').classList.toggle('active', isPaused && isPlaying);
+});
+
+document.getElementById('pause-screen').addEventListener('click', () => {
+  if (isPaused && isPlaying) renderer.domElement.requestPointerLock();
+});
+
+document.addEventListener('mousemove', e => {
+  if (!isPlaying || isPaused || panelOpen) return;
+  yaw   -= e.movementX * 0.0018;
+  pitch -= e.movementY * 0.0018;
+  pitch = Math.max(-Math.PI/3, Math.min(Math.PI/3, pitch));
+});
+
+document.addEventListener('keydown', e => { keys[e.code] = true; });
+document.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+// Закрыть панель
+document.getElementById('panel-close').addEventListener('click', closePanel);
+document.addEventListener('keydown', e => {
+  if (e.code === 'Escape' && panelOpen) { closePanel(); return; }
+  if (e.code === 'KeyE' && !panelOpen && isPlaying && !isPaused) tryInteract();
+  if (e.code === 'Escape' && isPlaying && !panelOpen) {
+    if (document.pointerLockElement) document.exitPointerLock();
+  }
+});
+
+function closePanel() {
+  document.getElementById('artwork-panel').classList.remove('open');
+  panelOpen = false;
+  renderer.domElement.requestPointerLock();
+}
+
+// ═══════════════════════════════════════════════════════
+// RAYCASTING — взаимодействие с работами
+// ═══════════════════════════════════════════════════════
+const raycaster = new THREE.Raycaster();
+const center = new THREE.Vector2(0,0);
+let nearbyArtwork = null;
+
+function checkInteraction() {
+  raycaster.setFromCamera(center, camera);
+  const meshes = allFrameMeshes.map(f => f.mesh);
+  const hits = raycaster.intersectObjects(meshes);
+  const prompt = document.getElementById('interact-prompt');
+  if (hits.length > 0 && hits[0].distance < 4) {
+    const found = allFrameMeshes.find(f => f.mesh === hits[0].object);
+    nearbyArtwork = found ? found.artwork : null;
+    prompt.style.opacity = nearbyArtwork ? '1' : '0';
+  } else {
+    nearbyArtwork = null;
+    prompt.style.opacity = '0';
+  }
+}
+
+function tryInteract() {
+  if (!nearbyArtwork) return;
+  const art = nearbyArtwork;
+  document.getElementById('panel-cat').textContent = art.cat;
+  document.getElementById('panel-title').textContent = art.title;
+  document.getElementById('panel-desc').textContent = art.desc;
+  const img = document.getElementById('panel-img');
+  img.src = art.src || '';
+  img.style.display = art.src ? 'block' : 'none';
+  document.getElementById('artwork-panel').classList.add('open');
+  panelOpen = true;
+  document.exitPointerLock();
+}
+
+// ═══════════════════════════════════════════════════════
+// ДВИЖЕНИЕ
+// ═══════════════════════════════════════════════════════
+const dir = new THREE.Vector3();
+const right = new THREE.Vector3();
+const SPEED = 0.06;
+
+// Границы
+const BOUNDS_X = ROOM_W/2 - 0.5;
+const BOUNDS_Z_MIN = -(NUM_ROOMS * (ROOM_D + CORRIDOR_D)) + 1;
+const BOUNDS_Z_MAX = ROOM_D/2 - 0.5;
+
+// Определяем зал по позиции камеры
+function getCurrentRoom() {
+  const z = camera.position.z;
+  for (let i = 0; i < NUM_ROOMS; i++) {
+    const zc = -(i * (ROOM_D + CORRIDOR_D));
+    if (z > zc - ROOM_D/2 - CORRIDOR_D && z < zc + ROOM_D/2) return i;
+  }
+  return -1;
+}
+
+let lastRoom = -1;
+
+// ═══════════════════════════════════════════════════════
+// ГЛАВНЫЙ ЦИКЛ
+// ═══════════════════════════════════════════════════════
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+
+  // Вращение тумб
+  spinningObjects.forEach((o, i) => {
+    o.rotation.y += 0.4 * dt;
+    o.rotation.x += 0.15 * dt;
+  });
+
+  if (isPlaying && !isPaused && !panelOpen) {
+    // Камера
+    euler.set(pitch, yaw, 0);
+    camera.quaternion.setFromEuler(euler);
+
+    // Движение
+    dir.set(0,0,0);
+    camera.getWorldDirection(dir);
+    dir.y = 0; dir.normalize();
+    right.crossVectors(dir, new THREE.Vector3(0,1,0)).normalize();
+
+    const move = new THREE.Vector3();
+    if (keys['KeyW'] || keys['ArrowUp'])    move.addScaledVector(dir,   SPEED);
+    if (keys['KeyS'] || keys['ArrowDown'])  move.addScaledVector(dir,  -SPEED);
+    if (keys['KeyA'] || keys['ArrowLeft'])  move.addScaledVector(right,-SPEED);
+    if (keys['KeyD'] || keys['ArrowRight']) move.addScaledVector(right,  SPEED);
+
+    camera.position.add(move);
+    camera.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, camera.position.x));
+    camera.position.z = Math.max(BOUNDS_Z_MIN, Math.min(BOUNDS_Z_MAX, camera.position.z));
+    camera.position.y = 1.7;
+
+    checkInteraction();
+
+    // Обновляем название зала
+    const room = getCurrentRoom();
+    if (room !== lastRoom) {
+      lastRoom = room;
+      const label = document.getElementById('room-label');
+      label.style.opacity = '0';
+      if (room >= 0) {
+        setTimeout(() => {
+          label.textContent = ROOM_NAMES[room];
+          label.style.opacity = '1';
+        }, 400);
+      }
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+animate();
+</script>
+</body>
+</html>
