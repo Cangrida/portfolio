@@ -598,11 +598,7 @@ const clock=new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
   const dt=clock.getDelta();
-  spinners.forEach(o=>{
-    o.rotation.x = 0; // фиксируем X
-    o.rotation.z = 0; // фиксируем Z
-    o.rotation.y += 0.5*dt; // только вертикальная ось
-  });
+  // вращение отключено
 
   // Парение 3D моделей
   if(window._floatingModels){
