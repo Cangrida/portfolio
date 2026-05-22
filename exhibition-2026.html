@@ -418,7 +418,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем арбалет над первой тумбой
 (function(){
   const gltfLoader = new THREE.GLTFLoader();
-  const targetX = -3, targetZ = H2_Z+3, floatY = 1.4;
+  const targetX = -3, targetZ = H2_Z+3, floatY = 1.8;
 
   gltfLoader.load(
     'арбалет.glb',
@@ -432,11 +432,13 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const scale = 0.8 / maxDim;
       model.scale.setScalar(scale);
 
-      // Центрируем по боксу
+      // Центрируем и поднимаем над тумбой
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
-      model.position.set(targetX, floatY, targetZ);
+      const sizeScaled = box.getSize(new THREE.Vector3());
+      model.position.x = targetX - center.x;
+      model.position.z = targetZ - center.z;
+      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
 
       // Материалы — принимаем освещение сцены
       model.traverse(child => {
@@ -478,7 +480,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем сани на вторую тумбу
 (function(){
   const gltfLoader2 = new THREE.GLTFLoader();
-  const targetX = 0, targetZ = H2_Z, floatY = 1.4;
+  const targetX = 0, targetZ = H2_Z, floatY = 1.8;
   gltfLoader2.load(
     'сани новый год.glb',
     (gltf) => {
@@ -490,8 +492,10 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
-      model.position.set(targetX, floatY, targetZ);
+      const sizeScaled = box.getSize(new THREE.Vector3());
+      model.position.x = targetX - center.x;
+      model.position.z = targetZ - center.z;
+      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
       model.traverse(child => {
         if(child.isMesh){ child.castShadow=true; child.receiveShadow=true; }
       });
@@ -515,7 +519,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем робота на третью тумбу
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  const targetX = 3, targetZ = H2_Z-3, floatY = 1.4;
+  const targetX = 3, targetZ = H2_Z-3, floatY = 1.8;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
@@ -526,8 +530,10 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
-      model.position.set(targetX, floatY, targetZ);
+      const sizeScaled = box.getSize(new THREE.Vector3());
+      model.position.x = targetX - center.x;
+      model.position.z = targetZ - center.z;
+      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
       model.traverse(child => {
         if(child.isMesh){ child.castShadow=true; child.receiveShadow=true; }
       });
