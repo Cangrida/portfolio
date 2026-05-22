@@ -643,7 +643,7 @@ function animate(){
   const dt=clock.getDelta();
   // вращение отключено
 
-  // Покачивание GLB моделей
+  // Покачивание GLB моделей — работает всегда
   if(window._glbModels){
     window._glbModels.forEach(fm=>{
       fm.phase += dt;
