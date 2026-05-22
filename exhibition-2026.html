@@ -374,18 +374,7 @@ function buildPedestal(x,z,art){
   const top=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.05,20),matPed);
   top.position.set(x,1.02,z); scene.add(top);
 
-  // Объект (заглушка — замени на GLTFLoader позже)
-  const geo = [
-    new THREE.TorusKnotGeometry(0.17,0.06,80,12),
-    new THREE.OctahedronGeometry(0.22),
-    new THREE.IcosahedronGeometry(0.2),
-  ][Math.floor(Math.random()*3)];
-  const obj=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({
-    color:0x2a1f0f,roughness:0.4,metalness:0.6,
-    emissive:0x1a0800,emissiveIntensity:0.4
-  }));
-  obj.position.set(x,1.5,z); scene.add(obj);
-  spinners.push(obj);
+  // место для GLB модели
 
   // Подсветка тумбы
   const pl=new THREE.PointLight(0xff8844,1.8,3.5);
@@ -474,6 +463,9 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       aLight.position.set(targetX, floatY + 1.2, targetZ);
       scene.add(aLight);
 
+      // Регистрируем для покачивания
+      window._glbModels = window._glbModels || [];
+      window._glbModels.push({ model, baseY: floatY, phase: 0 });
       console.log('Арбалет загружен!');
     },
     undefined,
@@ -481,8 +473,6 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
   );
 
   // Плавное парение — добавляем в animate через отдельный массив
-  window._floatingModels = window._floatingModels || [];
-  window._floatingModels.push({ x: targetX, baseY: floatY, z: targetZ, phase: 0 });
 })();
 
 // Загружаем сани на вторую тумбу
@@ -512,13 +502,14 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
       aLight.position.set(targetX, floatY+1.2, targetZ);
       scene.add(aLight);
+      // Регистрируем для покачивания
+      window._glbModels = window._glbModels || [];
+      window._glbModels.push({ model, baseY: floatY, phase: 1.5 });
       console.log('Сани загружены!');
     },
     undefined,
     (err)=>{ console.warn('Не удалось загрузить сани новый год.glb:', err); }
   );
-  window._floatingModels = window._floatingModels || [];
-  window._floatingModels.push({ baseY: floatY, phase: 1.5 });
 })();
 
 // ═══════════════════════════════════════════════════════
@@ -652,13 +643,12 @@ function animate(){
   const dt=clock.getDelta();
   // вращение отключено
 
-  // Парение 3D моделей
-  if(window._floatingModels){
-    window._floatingModels.forEach(fm=>{
+  // Покачивание GLB моделей
+  if(window._glbModels){
+    window._glbModels.forEach(fm=>{
       fm.phase += dt;
-      const obj = spinners[spinners.length-1]; // последний в массиве — GLB
-      if(obj && obj.isObject3D){
-        obj.position.y = fm.baseY + Math.sin(fm.phase * 1.2) * 0.08;
+      if(fm.model && fm.model.position){
+        fm.model.position.y = fm.baseY + Math.sin(fm.phase * 1.2) * 0.08;
       }
     });
   }
