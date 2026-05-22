@@ -153,14 +153,11 @@ const HALL1_W = 7, HALL1_H = 5;
 const SKETCH_SPACING = 3.4;
 const HALL1_LEN = SKETCH_SPACING * 9 + 3;
 
-const CORRIDOR_W = 4, CORRIDOR_LEN = 6, CORRIDOR_H = 5;
-
 const HALL2_W = 14, HALL2_H = 5, HALL2_LEN = 16;
 
-// Z-начало каждой части (камера идёт в минус Z)
-const H1_Z  = 0;                                   // центр Зала I
-const COR_Z = -(HALL1_LEN/2 + CORRIDOR_LEN/2);     // центр коридора
-const H2_Z  = -(HALL1_LEN/2 + CORRIDOR_LEN + HALL2_LEN/2); // центр Зала II
+// Залы вплотную без коридора
+const H1_Z  = 0;
+const H2_Z  = -(HALL1_LEN/2 + HALL2_LEN/2);
 
 // ═══════════════════════════════════════════════════════
 // RENDERER
@@ -211,8 +208,7 @@ function buildHall1(){
   addPlane(HALL1_W, HALL1_LEN, 0,HALL1_H,z, matCeil,Math.PI/2);
   addPlane(HALL1_LEN,HALL1_H, -HALL1_W/2, HALL1_H/2,z, matWall, 0,Math.PI/2);
   addPlane(HALL1_LEN,HALL1_H,  HALL1_W/2, HALL1_H/2,z, matWall, 0,-Math.PI/2);
-  // Торец дальний (куда идём)
-  addPlane(HALL1_W, HALL1_H, 0, HALL1_H/2, z-HALL1_LEN/2, matWall);
+  // Торец дальний убран — открытый проход в коридор
   // Торец ближний (вход/выход назад) — не рисуем, открыт
 
   // Освещение
@@ -224,17 +220,6 @@ function buildHall1(){
   }
 }
 
-// ── КОРИДОР ──
-function buildCorridor(){
-  const z = COR_Z;
-  addPlane(CORRIDOR_W, CORRIDOR_LEN, 0,0,z, matFloor,-Math.PI/2);
-  addPlane(CORRIDOR_W, CORRIDOR_LEN, 0,CORRIDOR_H,z, matCeil,Math.PI/2);
-  addPlane(CORRIDOR_LEN,CORRIDOR_H, -CORRIDOR_W/2, CORRIDOR_H/2,z, matWall,0,Math.PI/2);
-  addPlane(CORRIDOR_LEN,CORRIDOR_H,  CORRIDOR_W/2, CORRIDOR_H/2,z, matWall,0,-Math.PI/2);
-  // Подсветка в коридоре
-  const pt = new THREE.PointLight(0xff6b35,0.4,8);
-  pt.position.set(0,CORRIDOR_H-0.4,z); scene.add(pt);
-}
 
 // ── ЗАЛ II ──
 function buildHall2(){
@@ -254,8 +239,8 @@ function buildHall2(){
 }
 
 buildHall1();
-buildCorridor();
 buildHall2();
+
 
 // ═══════════════════════════════════════════════════════
 // УТИЛИТЫ ДЛЯ КАРТИН
@@ -362,35 +347,21 @@ SKETCHES.forEach((art,i)=>{
 // Дальняя стена (торец) — hero
 placeArtwork(ILLUSTRATIONS[0], 0, 2.2, H2_Z-HALL2_LEN/2+0.06, 0, 5.5, 3.0);
 
-// Левая стена: mantis, faina, пиратка
-const leftIllu = [ILLUSTRATIONS[1], ILLUSTRATIONS[2], ILLUSTRATIONS[6]];
-const leftZ = [H2_Z+4, H2_Z, H2_Z-4];
+// Левая стена: mantis, faina, пиратка, bach
+const leftIllu = [ILLUSTRATIONS[1], ILLUSTRATIONS[2], ILLUSTRATIONS[6], ILLUSTRATIONS[8]];
+const leftZ    = [H2_Z+5, H2_Z+1.5, H2_Z-2.5, H2_Z-6.5];
 leftIllu.forEach((art,i)=>{
   placeArtwork(art, -HALL2_W/2+0.05, 2.2, leftZ[i], Math.PI/2, 2.2, 2.6);
 });
 
-// Правая стена: lust, sloth, wrath (горизонтальные)
-const rightIllu1 = [ILLUSTRATIONS[3], ILLUSTRATIONS[4], ILLUSTRATIONS[5]];
-const rightZ1 = [H2_Z+5, H2_Z+1.5, H2_Z-2];
-rightIllu1.forEach((art,i)=>{
-  placeArtwork(art, HALL2_W/2-0.05, 2.2, rightZ1[i], -Math.PI/2, 2.8, 1.8);
+// Правая стена: lust, sloth, wrath, anatomy
+const rightIllu = [ILLUSTRATIONS[3], ILLUSTRATIONS[4], ILLUSTRATIONS[5], ILLUSTRATIONS[7]];
+const rightZ    = [H2_Z+5, H2_Z+1.5, H2_Z-2, H2_Z-5.5];
+rightIllu.forEach((art,i)=>{
+  placeArtwork(art, HALL2_W/2-0.05, 2.2, rightZ[i], -Math.PI/2, 2.8, 1.9);
 });
 
-// Правая стена продолжение: anatomy, bach
-const rightIllu2 = [ILLUSTRATIONS[7], ILLUSTRATIONS[8]];
-const rightZ2 = [H2_Z-5, H2_Z-7.5];
-rightIllu2.forEach((art,i)=>{
-  placeArtwork(art, HALL2_W/2-0.05, 2.2, rightZ2[i], -Math.PI/2, 2.8, 1.9);
-});
-
-// Анимации — на левой стене, дальняя часть (заглушки)
-ANIMATIONS.forEach((art,i)=>{
-  const az = H2_Z - 5.5 - i*3.5;
-  placeArtwork(
-    {...art, w:1, h:1, src:art.src||null},
-    -HALL2_W/2+0.05, 2.2, az, Math.PI/2, 2.0, 2.0
-  );
-});
+// GIF-анимации скрыты — добавим когда будут готовы файлы
 
 // ═══════════════════════════════════════════════════════
 // ТУМБЫ ДЛЯ 3D
@@ -537,14 +508,8 @@ const Z_MIN = H2_Z - HALL2_LEN/2 + 1.0;
 const Z_MAX = H1_Z + HALL1_LEN/2 - 1.0;
 
 function getXBound(z){
-  // В коридоре — узко
-  const corStart = H1_Z  - HALL1_LEN/2;
-  const corEnd   = H2_Z  + HALL2_LEN/2;
-  if(z < corStart && z > corEnd) return CORRIDOR_W/2-0.3;
-  // В Зале I
-  if(z >= H1_Z-HALL1_LEN/2) return HALL1_W/2-0.4;
-  // В Зале II
-  return HALL2_W/2-0.5;
+  if(z >= H1_Z - HALL1_LEN/2) return HALL1_W/2 - 0.4;
+  return HALL2_W/2 - 0.5;
 }
 
 // Метка зала
