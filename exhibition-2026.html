@@ -583,14 +583,14 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем робота на третью тумбу
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  const targetX = 3, targetZ = H2_Z-3, floatY = 1.8;
+  const targetX = 3, targetZ = H2_Z-3, floatY = 2.3;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 1.5 / Math.max(size.x, size.y, size.z);
+      const scale = 1.2 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
