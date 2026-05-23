@@ -32,20 +32,9 @@ body { background:#0a0a0b; color:#f0ece4; font-family:'Montserrat',sans-serif; o
 #crosshair::before,#crosshair::after { content:''; position:absolute; background:rgba(255,107,53,0.5); }
 #crosshair::before { width:1px; height:100%; left:50%; }
 #crosshair::after  { width:100%; height:1px; top:50%; }
-#interact-prompt { position:absolute; bottom:80px; left:50%; transform:translateX(-50%); font-size:0.6rem; letter-spacing:0.3em; color:rgba(255,107,53,0.8); opacity:0; transition:opacity 0.3s; }
 
-#artwork-panel { position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; background:rgba(10,10,11,0.92); backdrop-filter:blur(12px); pointer-events:none; }
-#artwork-panel.open { display:flex; pointer-events:all; }
-.panel-inner { max-width:900px; width:92%; display:flex; gap:48px; align-items:center; }
-.panel-img-wrap { flex:0 0 auto; max-width:55%; max-height:80vh; border:1px solid rgba(255,107,53,0.2); overflow:hidden; }
-#panel-img { width:100%; max-height:80vh; object-fit:contain; display:block; }
-#panel-video { width:100%; max-height:80vh; display:none; }
-.panel-info { flex:1; }
-.panel-cat { font-size:0.55rem; letter-spacing:0.4em; color:rgba(255,107,53,0.6); text-transform:uppercase; margin-bottom:16px; }
-.panel-title { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:2rem; line-height:1.2; color:#f0ece4; margin-bottom:12px; }
-.panel-desc { font-size:0.75rem; line-height:1.8; color:rgba(240,236,228,0.5); margin-bottom:32px; }
-.panel-close { font-size:0.6rem; letter-spacing:0.35em; color:rgba(255,107,53,0.6); cursor:pointer; background:none; border:none; font-family:'Montserrat',sans-serif; text-transform:uppercase; padding:12px 0; transition:color 0.3s; }
-.panel-close:hover { color:#ff6b35; }
+
+
 
 #pause-screen { position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center; background:rgba(10,10,11,0.7); backdrop-filter:blur(4px); }
 #pause-screen.active { display:flex; }
@@ -99,12 +88,7 @@ canvas { display:block; }
 #btn-interact:active { background:rgba(255,107,53,0.35); }
 #btn-interact.hidden { opacity:0; pointer-events:none; }
 
-/* Панель на мобильном — вертикально */
-@media (max-width:768px) {
-  .panel-inner { flex-direction:column; gap:24px; overflow-y:auto; max-height:90vh; }
-  .panel-img-wrap { max-width:100%; width:100%; }
-  .panel-title { font-size:1.4rem; }
-}
+
 </style>
 </head>
 <body>
@@ -125,24 +109,11 @@ canvas { display:block; }
 <div id="hud">
   <div id="hud-top">Galina Goltyapina · Выставка 2026</div>
   <div id="crosshair"></div>
-  <div id="interact-prompt">[ E ] — рассмотреть</div>
+  
   <div id="room-label"></div>
 </div>
 
-<div id="artwork-panel">
-  <div class="panel-inner">
-    <div class="panel-img-wrap">
-      <img id="panel-img" src="" alt="">
-      <video id="panel-video" autoplay loop muted playsinline></video>
-    </div>
-    <div class="panel-info">
-      <div class="panel-cat" id="panel-cat"></div>
-      <div class="panel-title" id="panel-title"></div>
-      <div class="panel-desc" id="panel-desc"></div>
-      <button class="panel-close" id="panel-close">[ ESC ] закрыть</button>
-    </div>
-  </div>
-</div>
+
 
 <div id="pause-screen"><p>пауза · кликни чтобы продолжить</p></div>
 
@@ -153,7 +124,7 @@ canvas { display:block; }
       <div id="joystick-stick"></div>
     </div>
   </div>
-  <div id="btn-interact" class="hidden">👁</div>
+  
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -604,7 +575,7 @@ buildPedestal( 4, H2_Z,   PEDESTALS_3D[1]); // правая
 // УПРАВЛЕНИЕ
 // ═══════════════════════════════════════════════════════
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-let isPlaying=false, isPaused=false, panelOpen=false;
+let isPlaying=false, isPaused=false, panelOpen=false; // panelOpen всегда false
 const keys={};
 let yaw=0, pitch=0;
 const euler=new THREE.Euler(0,0,0,'YXZ');
@@ -641,21 +612,14 @@ document.addEventListener('mousemove',e=>{
 document.addEventListener('keydown',e=>{ keys[e.code]=true; });
 document.addEventListener('keyup',  e=>{ keys[e.code]=false; });
 
-document.getElementById('panel-close').addEventListener('click',closePanel);
+
 document.addEventListener('keydown',e=>{
   if(e.code==='Escape'&&panelOpen){ closePanel(); return; }
-  if(e.code==='KeyE'&&!panelOpen&&isPlaying&&!isPaused) tryInteract();
+
   if(e.code==='Escape'&&isPlaying&&!panelOpen&&document.pointerLockElement) document.exitPointerLock();
 });
 
-function closePanel(){
-  document.getElementById('artwork-panel').classList.remove('open');
-  const vid=document.getElementById('panel-video');
-  vid.pause(); vid.src=''; vid.style.display='none';
-  document.getElementById('panel-img').style.display='block';
-  panelOpen=false; isPaused=false;
-  if(!isMobile) setTimeout(()=>{ try{renderer.domElement.requestPointerLock();}catch(e){} },80);
-}
+function closePanel(){}
 
 // ═══════════════════════════════════════════════════════
 // RAYCASTING
@@ -672,26 +636,10 @@ function checkInteraction(){
     const found=allMeshes.find(f=>f.mesh===hits[0].object);
     nearbyArtwork=found?found.artwork:null;
   } else { nearbyArtwork=null; }
-  prompt.style.opacity=nearbyArtwork?'1':'0';
+
 }
 
-function tryInteract(){
-  if(!nearbyArtwork) return;
-  const art=nearbyArtwork;
-  document.getElementById('panel-cat').textContent=art.cat;
-  document.getElementById('panel-title').textContent=art.title;
-  document.getElementById('panel-desc').textContent=art.desc;
-  const img=document.getElementById('panel-img');
-  const vid=document.getElementById('panel-video');
-  if(art.type==='video'&&art.src){
-    img.style.display='none'; vid.src=art.src; vid.style.display='block'; vid.play();
-  } else {
-    vid.style.display='none'; img.style.display='block';
-    img.src=art.src||'';
-  }
-  document.getElementById('artwork-panel').classList.add('open');
-  panelOpen=true; document.exitPointerLock();
-}
+function tryInteract(){}
 
 // ═══════════════════════════════════════════════════════
 // ДВИЖЕНИЕ + ЗОНЫ
@@ -883,21 +831,7 @@ renderer.domElement.addEventListener('touchend', e=>{
   }
 });
 
-// ── КНОПКА ВЗАИМОДЕЙСТВИЯ ──
-const btnInteract = document.getElementById('btn-interact');
-btnInteract.addEventListener('touchstart', e=>{
-  e.preventDefault();
-  tryInteract();
-}, {passive:false});
 
-// Показываем/прячем кнопку взаимодействия
-const _origCheckInteraction = checkInteraction;
-checkInteraction = function(){
-  _origCheckInteraction();
-  if(isMobile){
-    btnInteract.classList.toggle('hidden', !nearbyArtwork);
-  }
-};
 </script>
 </body>
 </html>
