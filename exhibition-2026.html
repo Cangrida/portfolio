@@ -400,6 +400,9 @@ SKETCHES.forEach((art,i)=>{
   const px   = side==='L' ? -HALL1_W/2+0.04 : HALL1_W/2-0.04;
   const ry   = side==='L' ? Math.PI/2 : -Math.PI/2;
   placeArtwork(art, px, 2.1, zPos, ry, 1.7, 2.05);
+  // Регистрируем последние добавленные meshes в зал 1
+  const last = allMeshes[allMeshes.length-1];
+  if(last) hall1Objects.push(last.mesh, last.mesh.parent);
 });
 
 // ═══════════════════════════════════════════════════════
@@ -411,6 +414,8 @@ SKETCHES.forEach((art,i)=>{
 
 // Дальняя стена (торец) — hero
 placeArtwork(ILLUSTRATIONS[0], 0, 2.2, H2_Z-HALL2_LEN/2+0.06, 0, 5.5, 3.0);
+// Все иллюстрации — зал 2
+const _h2start = allMeshes.length - 1;
 
 // Левая стена: mantis, faina, пиратка, bach
 const leftIllu = [ILLUSTRATIONS[1], ILLUSTRATIONS[2], ILLUSTRATIONS[6], ILLUSTRATIONS[8]];
@@ -427,6 +432,11 @@ rightIllu.forEach((art,i)=>{
 });
 
 // GIF-анимации скрыты — добавим когда будут готовы файлы
+
+// Регистрируем все иллюстрации в hall2Objects
+for(let i=_h2start; i<allMeshes.length; i++){
+  if(allMeshes[i]) hall2Objects.push(allMeshes[i].mesh);
+}
 
 // ═══════════════════════════════════════════════════════
 // ТУМБЫ ДЛЯ 3D
@@ -532,6 +542,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       // Регистрируем для покачивания
       window._glbModels = window._glbModels || [];
       window._glbModels.push({ model, baseY: floatY, phase: 0 });
+      hall2Objects.push(model);
       console.log('Арбалет загружен!');
     },
     undefined,
@@ -573,6 +584,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       // Регистрируем для покачивания
       window._glbModels = window._glbModels || [];
       window._glbModels.push({ model, baseY: floatY, phase: 1.5 });
+      hall2Objects.push(model);
       console.log('Сани загружены!');
     },
     undefined,
@@ -609,6 +621,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
       aLight.position.set(targetX, floatY+1.2, targetZ);
       scene.add(aLight);
+      hall2Objects.push(model);
       console.log('Робот загружен!');
     },
     undefined,
@@ -731,6 +744,9 @@ const ROOM_LABELS=[
   { name:'Зал I · Скетчи',        zMin:H1_Z-HALL1_LEN/2, zMax:H1_Z+HALL1_LEN/2 },
   { name:'Зал II · Иллюстрации',  zMin:H2_Z-HALL2_LEN/2, zMax:H2_Z+HALL2_LEN/2 },
 ];
+// Объекты по залам для управления видимостью
+const hall1Objects = [];
+const hall2Objects = [];
 let lastLabel='';
 function updateLabel(){
   const z=camera.position.z;
@@ -741,6 +757,12 @@ function updateLabel(){
     const el=document.getElementById('room-label');
     el.style.opacity='0';
     if(found) setTimeout(()=>{ el.textContent=found; el.style.opacity='1'; },400);
+
+    // Включаем/выключаем объекты по залам
+    const inHall1 = found.includes('I');
+    const inHall2 = found.includes('II');
+    hall1Objects.forEach(o=>{ if(o) o.visible = inHall1 || found===''; });
+    hall2Objects.forEach(o=>{ if(o) o.visible = inHall2 || found===''; });
   }
 }
 
@@ -764,6 +786,7 @@ function animate(){
   }
 
   if(isPlaying&&!isPaused&&!panelOpen){
+    if(isMobile && window._joyPatch) applyJoystick();
     euler.set(pitch,yaw,0);
     camera.quaternion.setFromEuler(euler);
     dir3.set(0,0,0);
@@ -859,12 +882,8 @@ function applyJoystick(){
   camera.position.y = 1.7;
 }
 
-// Патчим renderer loop — добавляем вызов джойстика
-const _raf = requestAnimationFrame;
+// Джойстик вызывается из основного animate() — см. ниже
 window._joyPatch = true;
-renderer.setAnimationLoop(()=>{
-  if(isPlaying && !isPaused && !panelOpen) applyJoystick();
-});
 
 // ── СВАЙП ДЛЯ ПОВОРОТА КАМЕРЫ ──
 const lookState = { active:false, id:null, lastX:0, lastY:0 };
