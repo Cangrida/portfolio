@@ -788,8 +788,9 @@ function updateLabel(){
     // Включаем/выключаем объекты по залам
     const inHall1 = found.includes('I') && !found.includes('II');
     const inHall2 = found.includes('II');
-    hall1Objects.forEach(o=>{ if(o) o.visible = inHall1 || found===''; });
-    hall2Objects.forEach(o=>{ if(o) o.visible = inHall2 || found===''; });
+    const inTransit = found === ''; // между залами — показываем всё
+    hall1Objects.forEach(o=>{ if(o) o.visible = inHall1 || inTransit; });
+    hall2Objects.forEach(o=>{ if(o) o.visible = inHall2 || inTransit; });
     // Робот всегда виден когда загружен
     if(window._robotModel) window._robotModel.visible = true;
   }
