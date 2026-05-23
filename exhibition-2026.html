@@ -609,9 +609,9 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       // Большой масштаб
-      const scale = 0.15;
+      const scale = 0.07;
       model.scale.setScalar(scale);
-      model.position.set(rX, 1.4, rZ);
+      model.position.set(rX, 2.2, rZ);
       model.traverse(child => {
         if(child.isMesh){
           child.castShadow = true;
