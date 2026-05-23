@@ -52,6 +52,59 @@ body { background:#0a0a0b; color:#f0ece4; font-family:'Montserrat',sans-serif; o
 #pause-screen p { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.8rem; color:rgba(240,236,228,0.4); letter-spacing:0.1em; }
 
 canvas { display:block; }
+
+/* ── МОБИЛЬНОЕ УПРАВЛЕНИЕ ── */
+#mobile-controls { display:none; }
+
+@media (pointer:coarse), (max-width:768px) {
+  #mobile-controls { display:block; }
+  .intro-controls { display:none; }
+}
+
+/* Джойстик движения — левый нижний угол */
+#joystick-zone {
+  position:fixed; left:24px; bottom:24px; z-index:20;
+  width:110px; height:110px;
+  pointer-events:all;
+}
+#joystick-base {
+  width:110px; height:110px; border-radius:50%;
+  background:rgba(255,107,53,0.12);
+  border:1px solid rgba(255,107,53,0.3);
+  position:relative;
+}
+#joystick-stick {
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(255,107,53,0.5);
+  border:1px solid rgba(255,107,53,0.8);
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  transition: box-shadow 0.1s;
+}
+
+/* Кнопка взаимодействия — правый нижний угол */
+#btn-interact {
+  position:fixed; right:24px; bottom:24px; z-index:20;
+  width:64px; height:64px; border-radius:50%;
+  background:rgba(255,107,53,0.15);
+  border:1px solid rgba(255,107,53,0.5);
+  color:rgba(255,107,53,0.9);
+  font-size:0.6rem; letter-spacing:0.1em;
+  font-family:'Montserrat',sans-serif;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:all; cursor:pointer;
+  transition: background 0.2s;
+}
+#btn-interact:active { background:rgba(255,107,53,0.35); }
+#btn-interact.hidden { opacity:0; pointer-events:none; }
+
+/* Панель на мобильном — вертикально */
+@media (max-width:768px) {
+  .panel-inner { flex-direction:column; gap:24px; overflow-y:auto; max-height:90vh; }
+  .panel-img-wrap { max-width:100%; width:100%; }
+  .panel-title { font-size:1.4rem; }
+}
 </style>
 </head>
 <body>
@@ -64,7 +117,8 @@ canvas { display:block; }
   <button id="enter-btn">войти</button>
   <div class="intro-controls">
     <span>W A S D</span> — движение &nbsp;·&nbsp; <span>Мышь</span> — обзор<br>
-    <span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза
+    <span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза<br>
+    <span style="color:rgba(255,107,53,0.3)">📱 на телефоне: джойстик + свайп</span>
   </div>
 </div>
 
@@ -91,6 +145,16 @@ canvas { display:block; }
 </div>
 
 <div id="pause-screen"><p>пауза · кликни чтобы продолжить</p></div>
+
+<!-- МОБИЛЬНОЕ УПРАВЛЕНИЕ -->
+<div id="mobile-controls">
+  <div id="joystick-zone">
+    <div id="joystick-base">
+      <div id="joystick-stick"></div>
+    </div>
+  </div>
+  <div id="btn-interact" class="hidden">👁</div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -249,6 +313,8 @@ buildHall2();
 const texLoader = new THREE.TextureLoader();
 const allMeshes = []; // { mesh, artwork }
 const spinners  = []; // тумбы
+const hall1Objects = []; // объекты Зала I
+const hall2Objects = []; // объекты Зала II
 
 function canvasFor(art, error=false){
   const ratio = art.w / art.h;
@@ -302,10 +368,10 @@ function placeArtwork(art, px, py, pz, ry, maxW=2.4, maxH=2.4){
   );
 
   // Спотлайт
-  const spot = new THREE.SpotLight(0xfff0d8,3,5.5,Math.PI/9,0.4,1.5);
-  const sx = ry===Math.PI/2?px+1.5:ry===-Math.PI/2?px-1.5:px;
-  const sz = ry===0?pz+1.5:ry===Math.PI?pz-1.5:pz;
-  spot.position.set(sx,HALL1_H-0.5,sz);
+  const spot = new THREE.SpotLight(0xfff0d8,2.5,8,Math.PI/5,0.25,1);
+  const sx = ry===Math.PI/2?px+2.0:ry===-Math.PI/2?px-2.0:px;
+  const sz = ry===0?pz+2.0:ry===Math.PI?pz-2.0:pz;
+  spot.position.set(sx,HALL1_H-0.3,sz);
   spot.target=mesh; scene.add(spot); scene.add(spot.target);
 
   // Табличка
@@ -336,6 +402,9 @@ SKETCHES.forEach((art,i)=>{
   const px   = side==='L' ? -HALL1_W/2+0.04 : HALL1_W/2-0.04;
   const ry   = side==='L' ? Math.PI/2 : -Math.PI/2;
   placeArtwork(art, px, 2.1, zPos, ry, 1.7, 2.05);
+  // Регистрируем последние добавленные meshes в зал 1
+  const last = allMeshes[allMeshes.length-1];
+  if(last) hall1Objects.push(last.mesh, last.mesh.parent);
 });
 
 // ═══════════════════════════════════════════════════════
@@ -347,6 +416,18 @@ SKETCHES.forEach((art,i)=>{
 
 // Дальняя стена (торец) — hero
 placeArtwork(ILLUSTRATIONS[0], 0, 2.2, H2_Z-HALL2_LEN/2+0.06, 0, 5.5, 3.0);
+// Дополнительный широкий спотлайт специально для hero
+(function(){
+  const heroZ = H2_Z-HALL2_LEN/2+0.06;
+  const heroSpot = new THREE.SpotLight(0xfff0d8, 2.625, 10, Math.PI/3.2, 0.2, 1);
+  heroSpot.position.set(0, HALL2_H-0.3, heroZ+3.5);
+  const heroTarget = new THREE.Object3D();
+  heroTarget.position.set(0, 2.2, heroZ);
+  scene.add(heroTarget); scene.add(heroSpot);
+  heroSpot.target = heroTarget;
+})();
+// Все иллюстрации — зал 2
+const _h2start = allMeshes.length - 1;
 
 // Левая стена: mantis, faina, пиратка, bach
 const leftIllu = [ILLUSTRATIONS[1], ILLUSTRATIONS[2], ILLUSTRATIONS[6], ILLUSTRATIONS[8]];
@@ -363,6 +444,11 @@ rightIllu.forEach((art,i)=>{
 });
 
 // GIF-анимации скрыты — добавим когда будут готовы файлы
+
+// Регистрируем все иллюстрации в hall2Objects
+for(let i=_h2start; i<allMeshes.length; i++){
+  if(allMeshes[i]) hall2Objects.push(allMeshes[i].mesh);
+}
 
 // ═══════════════════════════════════════════════════════
 // ТУМБЫ ДЛЯ 3D
@@ -418,7 +504,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем арбалет над первой тумбой
 (function(){
   const gltfLoader = new THREE.GLTFLoader();
-  const targetX = -3, targetZ = H2_Z+3, floatY = 0.95;
+  const targetX = -3, targetZ = H2_Z+3, floatY = 1.3;
 
   gltfLoader.load(
     'арбалет.glb',
@@ -432,11 +518,13 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const scale = 0.8 / maxDim;
       model.scale.setScalar(scale);
 
-      // Центрируем по боксу
+      // Центрируем и поднимаем над тумбой
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
-      model.position.set(targetX, floatY, targetZ);
+      const sizeScaled = box.getSize(new THREE.Vector3());
+      model.position.x = targetX - center.x;
+      model.position.z = targetZ - center.z;
+      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
 
       // Материалы — принимаем освещение сцены
       model.traverse(child => {
@@ -466,6 +554,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       // Регистрируем для покачивания
       window._glbModels = window._glbModels || [];
       window._glbModels.push({ model, baseY: floatY, phase: 0 });
+      hall2Objects.push(model);
       console.log('Арбалет загружен!');
     },
     undefined,
@@ -478,7 +567,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем сани на вторую тумбу
 (function(){
   const gltfLoader2 = new THREE.GLTFLoader();
-  const targetX = 0, targetZ = H2_Z, floatY = 0.95;
+  const targetX = 0, targetZ = H2_Z, floatY = 1.3;
   gltfLoader2.load(
     'сани новый год.glb',
     (gltf) => {
@@ -490,8 +579,10 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
-      model.position.set(targetX, floatY, targetZ);
+      const sizeScaled = box.getSize(new THREE.Vector3());
+      model.position.x = targetX - center.x;
+      model.position.z = targetZ - center.z;
+      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
       model.traverse(child => {
         if(child.isMesh){ child.castShadow=true; child.receiveShadow=true; }
       });
@@ -505,6 +596,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       // Регистрируем для покачивания
       window._glbModels = window._glbModels || [];
       window._glbModels.push({ model, baseY: floatY, phase: 1.5 });
+      hall2Objects.push(model);
       console.log('Сани загружены!');
     },
     undefined,
@@ -515,22 +607,34 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем робота на третью тумбу
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  const targetX = 3, targetZ = H2_Z-3, floatY = 0.95;
+  const targetX = 3, targetZ = H2_Z-3, floatY = 1.6;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 0.8 / Math.max(size.x, size.y, size.z);
+      const scale = 1.0 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
-      box.setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
+      // Просто ставим в нужную точку напрямую
       model.position.set(targetX, floatY, targetZ);
       model.traverse(child => {
-        if(child.isMesh){ child.castShadow=true; child.receiveShadow=true; }
+        if(child.isMesh){
+          child.castShadow=true;
+          child.receiveShadow=true;
+          child.visible=true;
+          if(child.material){
+            const mats = Array.isArray(child.material) ? child.material : [child.material];
+            mats.forEach(m=>{
+              m.side = THREE.DoubleSide;
+              m.transparent = false;
+              m.opacity = 1;
+              m.needsUpdate = true;
+            });
+          }
+        }
       });
+      model.visible=true;
       scene.add(model);
       if(spinners[2]){ scene.remove(spinners[2]); spinners[2]=model; }
       else spinners.push(model);
@@ -549,6 +653,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // ═══════════════════════════════════════════════════════
 // УПРАВЛЕНИЕ
 // ═══════════════════════════════════════════════════════
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 let isPlaying=false, isPaused=false, panelOpen=false;
 const keys={};
 let yaw=0, pitch=0;
@@ -559,18 +664,23 @@ document.getElementById('enter-btn').addEventListener('click',()=>{
   setTimeout(()=>{
     document.getElementById('intro').style.display='none';
     document.getElementById('hud').classList.add('active');
-    renderer.domElement.requestPointerLock();
     isPlaying=true;
+    isPaused=false;
+    // pointer lock только на десктопе, с защитой от ошибок
+    if(!isMobile){
+      try { renderer.domElement.requestPointerLock(); } catch(e){}
+    }
   },1200);
 });
 
 document.addEventListener('pointerlockchange',()=>{
-  if(panelOpen) return;
+  if(panelOpen || isMobile) return; // на мобиле pointer lock не используем
   isPaused=!document.pointerLockElement;
   document.getElementById('pause-screen').classList.toggle('active',isPaused&&isPlaying);
 });
 document.getElementById('pause-screen').addEventListener('click',()=>{
-  if(isPaused&&isPlaying) renderer.domElement.requestPointerLock();
+  if(isPaused&&isPlaying&&!isMobile){ try{renderer.domElement.requestPointerLock();}catch(e){} }
+  else if(isMobile){ isPaused=false; }
 });
 
 document.addEventListener('mousemove',e=>{
@@ -595,7 +705,7 @@ function closePanel(){
   vid.pause(); vid.src=''; vid.style.display='none';
   document.getElementById('panel-img').style.display='block';
   panelOpen=false; isPaused=false;
-  setTimeout(()=>renderer.domElement.requestPointerLock(),80);
+  if(!isMobile) setTimeout(()=>{ try{renderer.domElement.requestPointerLock();}catch(e){} },80);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -655,6 +765,7 @@ const ROOM_LABELS=[
   { name:'Зал I · Скетчи',        zMin:H1_Z-HALL1_LEN/2, zMax:H1_Z+HALL1_LEN/2 },
   { name:'Зал II · Иллюстрации',  zMin:H2_Z-HALL2_LEN/2, zMax:H2_Z+HALL2_LEN/2 },
 ];
+
 let lastLabel='';
 function updateLabel(){
   const z=camera.position.z;
@@ -665,6 +776,12 @@ function updateLabel(){
     const el=document.getElementById('room-label');
     el.style.opacity='0';
     if(found) setTimeout(()=>{ el.textContent=found; el.style.opacity='1'; },400);
+
+    // Включаем/выключаем объекты по залам
+    const inHall1 = found.includes('I');
+    const inHall2 = found.includes('II');
+    hall1Objects.forEach(o=>{ if(o) o.visible = inHall1 || found===''; });
+    hall2Objects.forEach(o=>{ if(o) o.visible = inHall2 || found===''; });
   }
 }
 
@@ -688,6 +805,7 @@ function animate(){
   }
 
   if(isPlaying&&!isPaused&&!panelOpen){
+    if(isMobile && window._joyPatch) applyJoystick();
     euler.set(pitch,yaw,0);
     camera.quaternion.setFromEuler(euler);
     dir3.set(0,0,0);
@@ -715,6 +833,125 @@ window.addEventListener('resize',()=>{
   renderer.setSize(innerWidth,innerHeight);
 });
 animate();
+
+// ═══════════════════════════════════════════════════════
+// МОБИЛЬНОЕ УПРАВЛЕНИЕ
+// ═══════════════════════════════════════════════════════
+// isMobile объявлен выше
+
+if(isMobile) {
+  // enter-btn уже обрабатывается выше универсально
+}
+
+// ── ДЖОЙСТИК ──
+const joystickZone  = document.getElementById('joystick-zone');
+const joystickStick = document.getElementById('joystick-stick');
+const joyState = { active:false, id:null, dx:0, dy:0, startX:0, startY:0 };
+const JOY_MAX = 38;
+
+joystickZone.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  joyState.active=true; joyState.id=t.identifier;
+  joyState.startX=t.clientX; joyState.startY=t.clientY;
+}, {passive:false});
+
+joystickZone.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier !== joyState.id) continue;
+    let dx = t.clientX - joyState.startX;
+    let dy = t.clientY - joyState.startY;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    if(dist > JOY_MAX){ dx=dx/dist*JOY_MAX; dy=dy/dist*JOY_MAX; }
+    joyState.dx=dx; joyState.dy=dy;
+    joystickStick.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  }
+}, {passive:false});
+
+['touchend','touchcancel'].forEach(ev=>{
+  joystickZone.addEventListener(ev, e=>{
+    joyState.active=false; joyState.dx=0; joyState.dy=0;
+    joystickStick.style.transform='translate(-50%,-50%)';
+  });
+});
+
+// Инжектим джойстик в движение — патчим keys через отдельный вектор
+const joyMove = { x:0, y:0 };
+const _origAnimate = animate; // уже запущен, просто добавляем в цикл
+
+// Переопределяем движение с учётом джойстика
+// Уже в animate есть keys — добавим туда через виртуальные клавиши
+function applyJoystick(){
+  if(!joyState.active) return;
+  const nx = joyState.dx / JOY_MAX; // -1..1
+  const ny = joyState.dy / JOY_MAX; // -1..1
+
+  dir3.set(0,0,0);
+  camera.getWorldDirection(dir3); dir3.y=0; dir3.normalize();
+  right3.crossVectors(dir3, new THREE.Vector3(0,1,0)).normalize();
+
+  const mv = new THREE.Vector3();
+  mv.addScaledVector(dir3,   -ny * SPEED * 1.4);
+  mv.addScaledVector(right3,  nx * SPEED * 1.4);
+  camera.position.add(mv);
+  const bx = getXBound(camera.position.z);
+  camera.position.x = Math.max(-bx, Math.min(bx, camera.position.x));
+  camera.position.z = Math.max(Z_MIN, Math.min(Z_MAX, camera.position.z));
+  camera.position.y = 1.7;
+}
+
+// Джойстик вызывается из основного animate() — см. ниже
+window._joyPatch = true;
+
+// ── СВАЙП ДЛЯ ПОВОРОТА КАМЕРЫ ──
+const lookState = { active:false, id:null, lastX:0, lastY:0 };
+const LOOK_SENS = 0.004;
+
+// Свайп только на правой половине экрана (левая — джойстик)
+renderer.domElement.addEventListener('touchstart', e=>{
+  for(const t of e.changedTouches){
+    if(t.clientX > window.innerWidth * 0.35 && !lookState.active){
+      lookState.active=true; lookState.id=t.identifier;
+      lookState.lastX=t.clientX; lookState.lastY=t.clientY;
+    }
+  }
+}, {passive:true});
+
+renderer.domElement.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier !== lookState.id) continue;
+    const dx = t.clientX - lookState.lastX;
+    const dy = t.clientY - lookState.lastY;
+    yaw   -= dx * LOOK_SENS;
+    pitch -= dy * LOOK_SENS;
+    pitch = Math.max(-Math.PI/3, Math.min(Math.PI/3, pitch));
+    lookState.lastX=t.clientX; lookState.lastY=t.clientY;
+  }
+}, {passive:false});
+
+renderer.domElement.addEventListener('touchend', e=>{
+  for(const t of e.changedTouches){
+    if(t.identifier===lookState.id) lookState.active=false;
+  }
+});
+
+// ── КНОПКА ВЗАИМОДЕЙСТВИЯ ──
+const btnInteract = document.getElementById('btn-interact');
+btnInteract.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  tryInteract();
+}, {passive:false});
+
+// Показываем/прячем кнопку взаимодействия
+const _origCheckInteraction = checkInteraction;
+checkInteraction = function(){
+  _origCheckInteraction();
+  if(isMobile){
+    btnInteract.classList.toggle('hidden', !nearbyArtwork);
+  }
+};
 </script>
 </body>
 </html>
