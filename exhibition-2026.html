@@ -607,14 +607,14 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем робота на третью тумбу
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  const targetX = 3, targetZ = H2_Z-3, floatY = 1.3;
+  const targetX = 3, targetZ = H2_Z-3, floatY = 1.6;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 1.2 / Math.max(size.x, size.y, size.z);
+      const scale = 1.8 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
@@ -633,7 +633,6 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
       aLight.position.set(targetX, floatY+1.2, targetZ);
       scene.add(aLight);
-      hall2Objects.push(model);
       console.log('Робот загружен!');
     },
     undefined,
