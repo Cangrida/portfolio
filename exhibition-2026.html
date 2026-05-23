@@ -590,7 +590,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 2.4 / Math.max(size.x, size.y, size.z);
+      const scale = 1.5 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
       box.setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
@@ -619,6 +619,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // ═══════════════════════════════════════════════════════
 // УПРАВЛЕНИЕ
 // ═══════════════════════════════════════════════════════
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 let isPlaying=false, isPaused=false, panelOpen=false;
 const keys={};
 let yaw=0, pitch=0;
@@ -629,18 +630,23 @@ document.getElementById('enter-btn').addEventListener('click',()=>{
   setTimeout(()=>{
     document.getElementById('intro').style.display='none';
     document.getElementById('hud').classList.add('active');
-    renderer.domElement.requestPointerLock();
     isPlaying=true;
+    isPaused=false;
+    // pointer lock только на десктопе, с защитой от ошибок
+    if(!isMobile){
+      try { renderer.domElement.requestPointerLock(); } catch(e){}
+    }
   },1200);
 });
 
 document.addEventListener('pointerlockchange',()=>{
-  if(panelOpen) return;
+  if(panelOpen || isMobile) return; // на мобиле pointer lock не используем
   isPaused=!document.pointerLockElement;
   document.getElementById('pause-screen').classList.toggle('active',isPaused&&isPlaying);
 });
 document.getElementById('pause-screen').addEventListener('click',()=>{
-  if(isPaused&&isPlaying) renderer.domElement.requestPointerLock();
+  if(isPaused&&isPlaying&&!isMobile){ try{renderer.domElement.requestPointerLock();}catch(e){} }
+  else if(isMobile){ isPaused=false; }
 });
 
 document.addEventListener('mousemove',e=>{
@@ -665,7 +671,7 @@ function closePanel(){
   vid.pause(); vid.src=''; vid.style.display='none';
   document.getElementById('panel-img').style.display='block';
   panelOpen=false; isPaused=false;
-  setTimeout(()=>renderer.domElement.requestPointerLock(),80);
+  if(!isMobile) setTimeout(()=>{ try{renderer.domElement.requestPointerLock();}catch(e){} },80);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -789,22 +795,10 @@ animate();
 // ═══════════════════════════════════════════════════════
 // МОБИЛЬНОЕ УПРАВЛЕНИЕ
 // ═══════════════════════════════════════════════════════
-const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+// isMobile объявлен выше
 
 if(isMobile) {
-  // На мобильном не нужен pointer lock
-  document.getElementById('enter-btn').addEventListener('click', ()=>{
-    document.getElementById('intro').classList.add('fade-out');
-    setTimeout(()=>{
-      document.getElementById('intro').style.display='none';
-      document.getElementById('hud').classList.add('active');
-      isPlaying = true;
-      isPaused  = false;
-    }, 1200);
-  }, { once: true });
-
-  // Убираем старый обработчик pointer lock для enter-btn на мобиле
-  // (он уже навешан выше — на мобиле просто игнорируем requestPointerLock)
+  // enter-btn уже обрабатывается выше универсально
 }
 
 // ── ДЖОЙСТИК ──
