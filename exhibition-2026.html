@@ -313,6 +313,8 @@ buildHall2();
 const texLoader = new THREE.TextureLoader();
 const allMeshes = []; // { mesh, artwork }
 const spinners  = []; // тумбы
+const hall1Objects = []; // объекты Зала I
+const hall2Objects = []; // объекты Зала II
 
 function canvasFor(art, error=false){
   const ratio = art.w / art.h;
@@ -744,9 +746,7 @@ const ROOM_LABELS=[
   { name:'Зал I · Скетчи',        zMin:H1_Z-HALL1_LEN/2, zMax:H1_Z+HALL1_LEN/2 },
   { name:'Зал II · Иллюстрации',  zMin:H2_Z-HALL2_LEN/2, zMax:H2_Z+HALL2_LEN/2 },
 ];
-// Объекты по залам для управления видимостью
-const hall1Objects = [];
-const hall2Objects = [];
+
 let lastLabel='';
 function updateLabel(){
   const z=camera.position.z;
