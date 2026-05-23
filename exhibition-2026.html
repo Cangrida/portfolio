@@ -368,10 +368,10 @@ function placeArtwork(art, px, py, pz, ry, maxW=2.4, maxH=2.4){
   );
 
   // Спотлайт
-  const spot = new THREE.SpotLight(0xfff0d8,3,5.5,Math.PI/9,0.4,1.5);
-  const sx = ry===Math.PI/2?px+1.5:ry===-Math.PI/2?px-1.5:px;
-  const sz = ry===0?pz+1.5:ry===Math.PI?pz-1.5:pz;
-  spot.position.set(sx,HALL1_H-0.5,sz);
+  const spot = new THREE.SpotLight(0xfff0d8,2.5,8,Math.PI/5,0.25,1);
+  const sx = ry===Math.PI/2?px+2.0:ry===-Math.PI/2?px-2.0:px;
+  const sz = ry===0?pz+2.0:ry===Math.PI?pz-2.0:pz;
+  spot.position.set(sx,HALL1_H-0.3,sz);
   spot.target=mesh; scene.add(spot); scene.add(spot.target);
 
   // Табличка
