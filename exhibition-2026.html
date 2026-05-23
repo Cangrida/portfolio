@@ -403,8 +403,7 @@ SKETCHES.forEach((art,i)=>{
   const ry   = side==='L' ? Math.PI/2 : -Math.PI/2;
   placeArtwork(art, px, 2.1, zPos, ry, 1.7, 2.05);
   // Регистрируем последние добавленные meshes в зал 1
-  const last = allMeshes[allMeshes.length-1];
-  if(last) hall1Objects.push(last.mesh, last.mesh.parent);
+
 });
 
 // ═══════════════════════════════════════════════════════
@@ -427,7 +426,7 @@ placeArtwork(ILLUSTRATIONS[0], 0, 2.2, H2_Z-HALL2_LEN/2+0.06, 0, 5.5, 3.0);
   heroSpot.target = heroTarget;
 })();
 // Все иллюстрации — зал 2
-const _h2start = allMeshes.length - 1;
+
 
 // Левая стена: mantis, faina, пиратка, bach
 const leftIllu = [ILLUSTRATIONS[1], ILLUSTRATIONS[2], ILLUSTRATIONS[6], ILLUSTRATIONS[8]];
@@ -445,10 +444,7 @@ rightIllu.forEach((art,i)=>{
 
 // GIF-анимации скрыты — добавим когда будут готовы файлы
 
-// Регистрируем все иллюстрации в hall2Objects
-for(let i=_h2start; i<allMeshes.length; i++){
-  if(allMeshes[i]) hall2Objects.push(allMeshes[i].mesh);
-}
+
 
 // ═══════════════════════════════════════════════════════
 // ТУМБЫ ДЛЯ 3D
@@ -554,7 +550,6 @@ buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
       // Регистрируем для покачивания
       window._glbModels = window._glbModels || [];
       window._glbModels.push({ model, baseY: floatY, phase: 0 });
-      hall2Objects.push(model);
       console.log('Арбалет загружен!');
     },
     undefined,
@@ -596,7 +591,6 @@ buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
       // Регистрируем для покачивания
       window._glbModels = window._glbModels || [];
       window._glbModels.push({ model, baseY: floatY, phase: 1.5 });
-      hall2Objects.push(model);
       console.log('Сани загружены!');
     },
     undefined,
