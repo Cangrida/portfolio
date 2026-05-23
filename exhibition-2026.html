@@ -494,7 +494,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем арбалет над первой тумбой
 (function(){
   const gltfLoader = new THREE.GLTFLoader();
-  const targetX = -3, targetZ = H2_Z+3, floatY = 1.8;
+  const targetX = -3, targetZ = H2_Z+3, floatY = 1.3;
 
   gltfLoader.load(
     'арбалет.glb',
@@ -557,7 +557,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем сани на вторую тумбу
 (function(){
   const gltfLoader2 = new THREE.GLTFLoader();
-  const targetX = 0, targetZ = H2_Z, floatY = 1.8;
+  const targetX = 0, targetZ = H2_Z, floatY = 1.3;
   gltfLoader2.load(
     'сани новый год.glb',
     (gltf) => {
@@ -597,7 +597,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 // Загружаем робота на третью тумбу
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  const targetX = 3, targetZ = H2_Z-3, floatY = 2.3;
+  const targetX = 3, targetZ = H2_Z-3, floatY = 1.3;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
