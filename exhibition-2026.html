@@ -785,13 +785,7 @@ function updateLabel(){
     el.style.opacity='0';
     if(found) setTimeout(()=>{ el.textContent=found; el.style.opacity='1'; },400);
 
-    // Включаем/выключаем объекты по залам
-    const inHall1 = found.includes('I') && !found.includes('II');
-    const inHall2 = found.includes('II');
-    const inTransit = found === ''; // между залами — показываем всё
-    hall1Objects.forEach(o=>{ if(o) o.visible = inHall1 || inTransit; });
-    hall2Objects.forEach(o=>{ if(o) o.visible = inHall2 || inTransit; });
-    // Робот всегда виден когда загружен
+    // Система видимости отключена — всё всегда видно
     if(window._robotModel) window._robotModel.visible = true;
   }
 }
