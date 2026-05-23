@@ -604,25 +604,32 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
   );
 })();
 
-// Загружаем робота на третью тумбу
+// Робот — в углу Зала II, на полу
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  const targetX = 3, targetZ = H2_Z-3, floatY = 1.6;
+  // Угол — правая дальняя стена
+  const rX = HALL2_W/2 - 1.5;
+  const rZ = H2_Z - HALL2_LEN/2 + 2.0;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 1.0 / Math.max(size.x, size.y, size.z);
+      // Большой масштаб
+      const scale = 3.0 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
-      // Просто ставим в нужную точку напрямую
-      model.position.set(targetX, floatY, targetZ);
+      // Пересчитываем bbox после масштаба
+      box.setFromObject(model);
+      const minY = box.min.y;
+      // Ставим нижнюю точку на пол (y=0)
+      model.position.set(rX, -minY, rZ);
+      model.rotation.y = -Math.PI / 4; // повёрнут к центру зала
       model.traverse(child => {
         if(child.isMesh){
-          child.castShadow=true;
-          child.receiveShadow=true;
-          child.visible=true;
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.visible = true;
           if(child.material){
             const mats = Array.isArray(child.material) ? child.material : [child.material];
             mats.forEach(m=>{
@@ -634,19 +641,16 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
           }
         }
       });
-      model.visible=true;
+      model.visible = true;
       scene.add(model);
-      if(spinners[2]){ scene.remove(spinners[2]); spinners[2]=model; }
-      else spinners.push(model);
-      window._glbModels = window._glbModels || [];
-      window._glbModels.push({ model, baseY: floatY, phase: 3.0 });
-      const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
-      aLight.position.set(targetX, floatY+1.2, targetZ);
+      // Подсветка
+      const aLight = new THREE.PointLight(0xffd0a0, 3.0, 6.0);
+      aLight.position.set(rX, 3.0, rZ);
       scene.add(aLight);
-      console.log('Робот загружен!');
+      console.log('Робот загружен! Размер:', size);
     },
     undefined,
-    (err)=>{ console.warn('Не удалось загрузить robot.glb:', err); }
+    (err) => { console.warn('Не удалось загрузить robot.glb:', err); }
   );
 })();
 
