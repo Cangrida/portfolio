@@ -499,7 +499,7 @@ function buildPedestal(x,z,art){
 // Тумба 1 — Арбалет (GLB)
 buildPedestal(-3, H2_Z+3, PEDESTALS_3D[0]);
 buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
-buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
+// третья тумба убрана
 
 // Загружаем арбалет над первой тумбой
 (function(){
@@ -617,7 +617,7 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       // Большой масштаб
-      const scale = 3.0 / Math.max(size.x, size.y, size.z);
+      const scale = 2.7 / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
       // Пересчитываем bbox после масштаба
       box.setFromObject(model);
