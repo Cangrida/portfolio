@@ -647,14 +647,11 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const aLight = new THREE.PointLight(0xffd0a0, 3.0, 6.0);
       aLight.position.set(rX, 3.0, rZ);
       scene.add(aLight);
-      console.log('Робот загружен! Размер до масштаба:', size.x.toFixed(2), size.y.toFixed(2), size.z.toFixed(2), 'scale:', scale.toFixed(4));
-      // Отладочный куб — показывает где стоит модель
-      const debugCube = new THREE.Mesh(
-        new THREE.BoxGeometry(0.3,0.3,0.3),
-        new THREE.MeshBasicMaterial({color:0xff0000, wireframe:true})
-      );
-      debugCube.position.set(rX, 1.0, rZ);
-      scene.add(debugCube);
+      // Принудительно показываем через 100мс — после того как updateLabel отработал
+      setTimeout(()=>{ model.visible=true; }, 100);
+      // Следим чтобы система видимости не скрыла робота
+      window._robotModel = model;
+      console.log('Робот загружен! scale:', scale.toFixed(4));
     },
     undefined,
     (err) => { console.warn('Не удалось загрузить robot.glb:', err); }
@@ -789,10 +786,12 @@ function updateLabel(){
     if(found) setTimeout(()=>{ el.textContent=found; el.style.opacity='1'; },400);
 
     // Включаем/выключаем объекты по залам
-    const inHall1 = found.includes('I');
+    const inHall1 = found.includes('I') && !found.includes('II');
     const inHall2 = found.includes('II');
     hall1Objects.forEach(o=>{ if(o) o.visible = inHall1 || found===''; });
     hall2Objects.forEach(o=>{ if(o) o.visible = inHall2 || found===''; });
+    // Робот всегда виден когда загружен
+    if(window._robotModel) window._robotModel.visible = true;
   }
 }
 
