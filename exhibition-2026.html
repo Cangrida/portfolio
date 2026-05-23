@@ -246,7 +246,7 @@ camera.position.set(0, 1.7, HALL1_LEN/2 - 1.5);
 // ═══════════════════════════════════════════════════════
 // МАТЕРИАЛЫ
 // ═══════════════════════════════════════════════════════
-const matWall  = new THREE.MeshStandardMaterial({ color:0x1c1c1f, roughness:0.95 });
+const matWall  = new THREE.MeshStandardMaterial({ color:0x1c1c1f, roughness:0.95, side:THREE.DoubleSide });
 const matFloor = new THREE.MeshStandardMaterial({ color:0x111113, roughness:0.85 });
 const matCeil  = new THREE.MeshStandardMaterial({ color:0x0e0e10, roughness:1.0  });
 const matFrame = new THREE.MeshStandardMaterial({ color:0x2a2215, roughness:0.6, metalness:0.3 });
@@ -495,7 +495,7 @@ function buildPedestal(x,z,art){
 // Тумба 1 — Арбалет (GLB)
 buildPedestal(-3, H2_Z+3, PEDESTALS_3D[0]);
 buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
-// третья тумба убрана
+buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
 
 // Загружаем арбалет над первой тумбой
 (function(){
@@ -598,12 +598,10 @@ buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
   );
 })();
 
-// Робот — в углу Зала II, на полу
+// Робот — на третьей тумбе
 (function(){
   const gltfLoader3 = new THREE.GLTFLoader();
-  // Угол — правая дальняя стена
-  const rX = HALL2_W/2 - 1.5;
-  const rZ = H2_Z - HALL2_LEN/2 + 2.0;
+  const rX = 3, rZ = H2_Z-3;
   gltfLoader3.load(
     'robot.glb',
     (gltf) => {
@@ -611,15 +609,9 @@ buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       // Большой масштаб
-      // scale: 0.1687 при 2.7 значит maxDim~16 — ставим фиксированно
-      const scale = 0.15; // фиксированный масштаб
+      const scale = 0.15;
       model.scale.setScalar(scale);
-      // Пересчитываем bbox после масштаба
-      box.setFromObject(model);
-      const minY = box.min.y;
-      // Ставим нижнюю точку на пол (y=0)
-      model.position.set(rX, -minY, rZ);
-      model.rotation.y = -Math.PI / 4; // повёрнут к центру зала
+      model.position.set(rX, 1.4, rZ);
       model.traverse(child => {
         if(child.isMesh){
           child.castShadow = true;
@@ -669,9 +661,8 @@ document.getElementById('enter-btn').addEventListener('click',()=>{
     document.getElementById('hud').classList.add('active');
     isPlaying=true;
     isPaused=false;
-    // pointer lock только на десктопе, с защитой от ошибок
     if(!isMobile){
-      try { renderer.domElement.requestPointerLock(); } catch(e){}
+      try { renderer.domElement.requestPointerLock(); } catch(e){ console.log('pointerlock unavailable'); }
     }
   },1200);
 });
