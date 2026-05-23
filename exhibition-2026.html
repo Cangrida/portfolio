@@ -52,6 +52,59 @@ body { background:#0a0a0b; color:#f0ece4; font-family:'Montserrat',sans-serif; o
 #pause-screen p { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.8rem; color:rgba(240,236,228,0.4); letter-spacing:0.1em; }
 
 canvas { display:block; }
+
+/* ── МОБИЛЬНОЕ УПРАВЛЕНИЕ ── */
+#mobile-controls { display:none; }
+
+@media (pointer:coarse), (max-width:768px) {
+  #mobile-controls { display:block; }
+  .intro-controls { display:none; }
+}
+
+/* Джойстик движения — левый нижний угол */
+#joystick-zone {
+  position:fixed; left:24px; bottom:24px; z-index:20;
+  width:110px; height:110px;
+  pointer-events:all;
+}
+#joystick-base {
+  width:110px; height:110px; border-radius:50%;
+  background:rgba(255,107,53,0.12);
+  border:1px solid rgba(255,107,53,0.3);
+  position:relative;
+}
+#joystick-stick {
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(255,107,53,0.5);
+  border:1px solid rgba(255,107,53,0.8);
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  transition: box-shadow 0.1s;
+}
+
+/* Кнопка взаимодействия — правый нижний угол */
+#btn-interact {
+  position:fixed; right:24px; bottom:24px; z-index:20;
+  width:64px; height:64px; border-radius:50%;
+  background:rgba(255,107,53,0.15);
+  border:1px solid rgba(255,107,53,0.5);
+  color:rgba(255,107,53,0.9);
+  font-size:0.6rem; letter-spacing:0.1em;
+  font-family:'Montserrat',sans-serif;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:all; cursor:pointer;
+  transition: background 0.2s;
+}
+#btn-interact:active { background:rgba(255,107,53,0.35); }
+#btn-interact.hidden { opacity:0; pointer-events:none; }
+
+/* Панель на мобильном — вертикально */
+@media (max-width:768px) {
+  .panel-inner { flex-direction:column; gap:24px; overflow-y:auto; max-height:90vh; }
+  .panel-img-wrap { max-width:100%; width:100%; }
+  .panel-title { font-size:1.4rem; }
+}
 </style>
 </head>
 <body>
@@ -64,7 +117,8 @@ canvas { display:block; }
   <button id="enter-btn">войти</button>
   <div class="intro-controls">
     <span>W A S D</span> — движение &nbsp;·&nbsp; <span>Мышь</span> — обзор<br>
-    <span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза
+    <span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза<br>
+    <span style="color:rgba(255,107,53,0.3)">📱 на телефоне: джойстик + свайп</span>
   </div>
 </div>
 
@@ -91,6 +145,16 @@ canvas { display:block; }
 </div>
 
 <div id="pause-screen"><p>пауза · кликни чтобы продолжить</p></div>
+
+<!-- МОБИЛЬНОЕ УПРАВЛЕНИЕ -->
+<div id="mobile-controls">
+  <div id="joystick-zone">
+    <div id="joystick-base">
+      <div id="joystick-stick"></div>
+    </div>
+  </div>
+  <div id="btn-interact" class="hidden">👁</div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -721,6 +785,141 @@ window.addEventListener('resize',()=>{
   renderer.setSize(innerWidth,innerHeight);
 });
 animate();
+
+// ═══════════════════════════════════════════════════════
+// МОБИЛЬНОЕ УПРАВЛЕНИЕ
+// ═══════════════════════════════════════════════════════
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+if(isMobile) {
+  // На мобильном не нужен pointer lock
+  document.getElementById('enter-btn').addEventListener('click', ()=>{
+    document.getElementById('intro').classList.add('fade-out');
+    setTimeout(()=>{
+      document.getElementById('intro').style.display='none';
+      document.getElementById('hud').classList.add('active');
+      isPlaying = true;
+      isPaused  = false;
+    }, 1200);
+  }, { once: true });
+
+  // Убираем старый обработчик pointer lock для enter-btn на мобиле
+  // (он уже навешан выше — на мобиле просто игнорируем requestPointerLock)
+}
+
+// ── ДЖОЙСТИК ──
+const joystickZone  = document.getElementById('joystick-zone');
+const joystickStick = document.getElementById('joystick-stick');
+const joyState = { active:false, id:null, dx:0, dy:0, startX:0, startY:0 };
+const JOY_MAX = 38;
+
+joystickZone.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  joyState.active=true; joyState.id=t.identifier;
+  joyState.startX=t.clientX; joyState.startY=t.clientY;
+}, {passive:false});
+
+joystickZone.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier !== joyState.id) continue;
+    let dx = t.clientX - joyState.startX;
+    let dy = t.clientY - joyState.startY;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    if(dist > JOY_MAX){ dx=dx/dist*JOY_MAX; dy=dy/dist*JOY_MAX; }
+    joyState.dx=dx; joyState.dy=dy;
+    joystickStick.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  }
+}, {passive:false});
+
+['touchend','touchcancel'].forEach(ev=>{
+  joystickZone.addEventListener(ev, e=>{
+    joyState.active=false; joyState.dx=0; joyState.dy=0;
+    joystickStick.style.transform='translate(-50%,-50%)';
+  });
+});
+
+// Инжектим джойстик в движение — патчим keys через отдельный вектор
+const joyMove = { x:0, y:0 };
+const _origAnimate = animate; // уже запущен, просто добавляем в цикл
+
+// Переопределяем движение с учётом джойстика
+// Уже в animate есть keys — добавим туда через виртуальные клавиши
+function applyJoystick(){
+  if(!joyState.active) return;
+  const nx = joyState.dx / JOY_MAX; // -1..1
+  const ny = joyState.dy / JOY_MAX; // -1..1
+
+  dir3.set(0,0,0);
+  camera.getWorldDirection(dir3); dir3.y=0; dir3.normalize();
+  right3.crossVectors(dir3, new THREE.Vector3(0,1,0)).normalize();
+
+  const mv = new THREE.Vector3();
+  mv.addScaledVector(dir3,   -ny * SPEED * 1.4);
+  mv.addScaledVector(right3,  nx * SPEED * 1.4);
+  camera.position.add(mv);
+  const bx = getXBound(camera.position.z);
+  camera.position.x = Math.max(-bx, Math.min(bx, camera.position.x));
+  camera.position.z = Math.max(Z_MIN, Math.min(Z_MAX, camera.position.z));
+  camera.position.y = 1.7;
+}
+
+// Патчим renderer loop — добавляем вызов джойстика
+const _raf = requestAnimationFrame;
+window._joyPatch = true;
+renderer.setAnimationLoop(()=>{
+  if(isPlaying && !isPaused && !panelOpen) applyJoystick();
+});
+
+// ── СВАЙП ДЛЯ ПОВОРОТА КАМЕРЫ ──
+const lookState = { active:false, id:null, lastX:0, lastY:0 };
+const LOOK_SENS = 0.004;
+
+// Свайп только на правой половине экрана (левая — джойстик)
+renderer.domElement.addEventListener('touchstart', e=>{
+  for(const t of e.changedTouches){
+    if(t.clientX > window.innerWidth * 0.35 && !lookState.active){
+      lookState.active=true; lookState.id=t.identifier;
+      lookState.lastX=t.clientX; lookState.lastY=t.clientY;
+    }
+  }
+}, {passive:true});
+
+renderer.domElement.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier !== lookState.id) continue;
+    const dx = t.clientX - lookState.lastX;
+    const dy = t.clientY - lookState.lastY;
+    yaw   -= dx * LOOK_SENS;
+    pitch -= dy * LOOK_SENS;
+    pitch = Math.max(-Math.PI/3, Math.min(Math.PI/3, pitch));
+    lookState.lastX=t.clientX; lookState.lastY=t.clientY;
+  }
+}, {passive:false});
+
+renderer.domElement.addEventListener('touchend', e=>{
+  for(const t of e.changedTouches){
+    if(t.identifier===lookState.id) lookState.active=false;
+  }
+});
+
+// ── КНОПКА ВЗАИМОДЕЙСТВИЯ ──
+const btnInteract = document.getElementById('btn-interact');
+btnInteract.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  tryInteract();
+}, {passive:false});
+
+// Показываем/прячем кнопку взаимодействия
+const _origCheckInteraction = checkInteraction;
+checkInteraction = function(){
+  _origCheckInteraction();
+  if(isMobile){
+    btnInteract.classList.toggle('hidden', !nearbyArtwork);
+  }
+};
 </script>
 </body>
 </html>
