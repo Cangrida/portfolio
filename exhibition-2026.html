@@ -617,7 +617,8 @@ buildPedestal( 0, H2_Z,   PEDESTALS_3D[1]);
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       // Большой масштаб
-      const scale = 2.7 / Math.max(size.x, size.y, size.z);
+      // scale: 0.1687 при 2.7 значит maxDim~16 — ставим фиксированно
+      const scale = 0.15; // фиксированный масштаб
       model.scale.setScalar(scale);
       // Пересчитываем bbox после масштаба
       box.setFromObject(model);
@@ -793,6 +794,11 @@ function updateLabel(){
 // ═══════════════════════════════════════════════════════
 // ГЛАВНЫЙ ЦИКЛ
 // ═══════════════════════════════════════════════════════
+// Принудительно показываем все объекты сцены при старте
+setTimeout(()=>{
+  scene.traverse(o=>{ if(o.isMesh || o.isGroup) o.visible=true; });
+}, 2000); // через 2 сек — после загрузки всех GLB
+
 const clock=new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
