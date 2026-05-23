@@ -130,6 +130,8 @@ canvas { display:block; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
 // ═══════════════════════════════════════════════════════
 // ДАННЫЕ РАБОТ
 // ═══════════════════════════════════════════════════════
@@ -198,10 +200,10 @@ const H2_Z  = -(HALL1_LEN/2 + HALL2_LEN/2);
 // ═══════════════════════════════════════════════════════
 // RENDERER
 // ═══════════════════════════════════════════════════════
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled = true;
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile });
+renderer.setPixelRatio(isMobile ? 1 : Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = !isMobile;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.4;
@@ -574,7 +576,6 @@ buildPedestal( 4, H2_Z,   PEDESTALS_3D[1]); // правая
 // ═══════════════════════════════════════════════════════
 // УПРАВЛЕНИЕ
 // ═══════════════════════════════════════════════════════
-const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 let isPlaying=false, isPaused=false, panelOpen=false; // panelOpen всегда false
 const keys={};
 let yaw=0, pitch=0;
