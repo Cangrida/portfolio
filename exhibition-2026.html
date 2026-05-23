@@ -647,7 +647,14 @@ buildPedestal( 3, H2_Z-3, PEDESTALS_3D[2]);
       const aLight = new THREE.PointLight(0xffd0a0, 3.0, 6.0);
       aLight.position.set(rX, 3.0, rZ);
       scene.add(aLight);
-      console.log('Робот загружен! Размер:', size);
+      console.log('Робот загружен! Размер до масштаба:', size.x.toFixed(2), size.y.toFixed(2), size.z.toFixed(2), 'scale:', scale.toFixed(4));
+      // Отладочный куб — показывает где стоит модель
+      const debugCube = new THREE.Mesh(
+        new THREE.BoxGeometry(0.3,0.3,0.3),
+        new THREE.MeshBasicMaterial({color:0xff0000, wireframe:true})
+      );
+      debugCube.position.set(rX, 1.0, rZ);
+      scene.add(debugCube);
     },
     undefined,
     (err) => { console.warn('Не удалось загрузить robot.glb:', err); }
