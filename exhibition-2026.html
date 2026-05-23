@@ -788,11 +788,6 @@ function updateLabel(){
 // ═══════════════════════════════════════════════════════
 // ГЛАВНЫЙ ЦИКЛ
 // ═══════════════════════════════════════════════════════
-// Принудительно показываем все объекты сцены при старте
-setTimeout(()=>{
-  scene.traverse(o=>{ if(o.isMesh || o.isGroup) o.visible=true; });
-}, 2000); // через 2 сек — после загрузки всех GLB
-
 const clock=new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
