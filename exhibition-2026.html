@@ -41,11 +41,8 @@ canvas { display:block; }
 
 /* ── МОБИЛЬНОЕ УПРАВЛЕНИЕ ── */
 #mobile-controls { display:none; }
-
-@media (pointer:coarse), (max-width:768px) {
-  #mobile-controls { display:block; }
-  .intro-controls { display:none; }
-}
+body.touch-device #mobile-controls { display:block; }
+body.touch-device .intro-controls  { display:none; }
 
 #joystick-zone {
   position:fixed; left:24px; bottom:24px; z-index:20;
@@ -121,6 +118,7 @@ canvas { display:block; }
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+if (isMobile) document.body.classList.add('touch-device');
 
 // ═══════════════════════════════════════════════════════
 // ДАННЫЕ РАБОТ
@@ -221,8 +219,8 @@ function loadNearbyTextures() {
 // ═══════════════════════════════════════════════════════
 // RENDERER
 // ═══════════════════════════════════════════════════════
-const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'low-power' });
-renderer.setPixelRatio(isMobile ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile });
+renderer.setPixelRatio(isMobile ? 1 : Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = false; // выключено везде для экономии памяти
 renderer.outputEncoding = THREE.sRGBEncoding;
@@ -463,60 +461,37 @@ function buildPedestal(x,z,art){
 buildPedestal(-4, H2_Z, PEDESTALS_3D[0]);
 buildPedestal( 4, H2_Z, PEDESTALS_3D[1]);
 
-// GLB модели — только на десктопе (на мобиле экономим память)
-if (!isMobile) {
-  const spinners = [];
-
-  (function(){
-    const gltfLoader = new THREE.GLTFLoader();
-    const targetX = -4, targetZ = H2_Z, floatY = 1.3;
-    gltfLoader.load('арбалет.glb', (gltf) => {
-      const model = gltf.scene;
-      const box = new THREE.Box3().setFromObject(model);
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      model.scale.setScalar(0.8 / maxDim);
-      box.setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      const sizeScaled = box.getSize(new THREE.Vector3());
-      model.position.x = targetX - center.x;
-      model.position.z = targetZ - center.z;
-      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
-      model.traverse(child => { if(child.isMesh){ child.castShadow=false; child.receiveShadow=false; } });
-      scene.add(model);
-      const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
-      aLight.position.set(targetX, floatY + 1.2, targetZ);
-      scene.add(aLight);
-      window._glbModels = window._glbModels || [];
-      window._glbModels.push({ model, baseY: floatY, phase: 0 });
-    }, undefined, (err) => { console.warn('Арбалет не загружен:', err); });
-  })();
-
-  (function(){
-    const gltfLoader2 = new THREE.GLTFLoader();
-    const targetX = 4, targetZ = H2_Z, floatY = 1.3;
-    gltfLoader2.load('сани новый год.glb', (gltf) => {
-      const model = gltf.scene;
-      const box = new THREE.Box3().setFromObject(model);
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      model.scale.setScalar(0.8 / maxDim);
-      box.setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      const sizeScaled = box.getSize(new THREE.Vector3());
-      model.position.x = targetX - center.x;
-      model.position.z = targetZ - center.z;
-      model.position.y = floatY - center.y + sizeScaled.y * 0.5;
-      model.traverse(child => { if(child.isMesh){ child.castShadow=false; child.receiveShadow=false; } });
-      scene.add(model);
-      const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
-      aLight.position.set(targetX, floatY+1.2, targetZ);
-      scene.add(aLight);
-      window._glbModels = window._glbModels || [];
-      window._glbModels.push({ model, baseY: floatY, phase: 1.5 });
-    }, undefined, (err) => { console.warn('Сани не загружены:', err); });
-  })();
+// GLB модели — на всех устройствах, грузим с небольшой задержкой
+function loadGLBModel(src, targetX, targetZ, floatY, phase) {
+  const loader = new THREE.GLTFLoader();
+  loader.load(src, (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    model.scale.setScalar(0.8 / maxDim);
+    box.setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const sizeScaled = box.getSize(new THREE.Vector3());
+    model.position.x = targetX - center.x;
+    model.position.z = targetZ - center.z;
+    model.position.y = floatY - center.y + sizeScaled.y * 0.5;
+    model.traverse(child => { if(child.isMesh){ child.castShadow=false; child.receiveShadow=false; } });
+    scene.add(model);
+    const aLight = new THREE.PointLight(0xffd0a0, 2.5, 4.0);
+    aLight.position.set(targetX, floatY + 1.2, targetZ);
+    scene.add(aLight);
+    window._glbModels = window._glbModels || [];
+    window._glbModels.push({ model, baseY: floatY, phase });
+  }, undefined, (err) => { console.warn('GLB не загружен:', src, err); });
 }
+
+// На мобиле грузим GLB после того как текстуры стартовали (через 2с)
+const glbDelay = isMobile ? 2000 : 0;
+setTimeout(() => {
+  loadGLBModel('арбалет.glb',        -4, H2_Z, 1.3, 0);
+  loadGLBModel('сани новый год.glb',  4, H2_Z, 1.3, 1.5);
+}, glbDelay);
 
 // ═══════════════════════════════════════════════════════
 // УПРАВЛЕНИЕ
@@ -613,18 +588,8 @@ function updateLabel(){
 // ГЛАВНЫЙ ЦИКЛ
 // ═══════════════════════════════════════════════════════
 const clock=new THREE.Clock();
-// Троттлинг рендера на мобиле — не быстрее 30fps
-let _lastFrame = 0;
-const TARGET_FPS = isMobile ? 30 : 60;
-const FRAME_MS   = 1000 / TARGET_FPS;
-
-function animate(now){
+function animate(){
   requestAnimationFrame(animate);
-
-  // Троттлинг на мобиле
-  if(isMobile && now - _lastFrame < FRAME_MS) return;
-  _lastFrame = now;
-
   const dt=clock.getDelta();
 
   // Ленивая загрузка текстур
@@ -668,7 +633,7 @@ window.addEventListener('resize',()=>{
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);
 });
-animate(0);
+animate();
 
 // ═══════════════════════════════════════════════════════
 // МОБИЛЬНОЕ УПРАВЛЕНИЕ
