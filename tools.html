@@ -19,7 +19,6 @@ body {
   padding: 60px 24px 80px;
 }
 
-/* ── BACK LINK ── */
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -38,21 +37,18 @@ body {
 .back-link:hover { color: #ff6b35; }
 .back-link svg { width: 14px; height: 14px; fill: currentColor; }
 
-/* ── HEADER ── */
 .page-header {
   text-align: center;
   margin-bottom: 56px;
   width: 100%;
   max-width: 900px;
 }
-
 .page-header .logo {
   height: 44px;
   width: auto;
   opacity: 0.9;
   margin-bottom: 28px;
 }
-
 .page-label {
   font-size: 0.65rem;
   letter-spacing: 3px;
@@ -60,7 +56,6 @@ body {
   color: #9d8b6f;
   margin-bottom: 16px;
 }
-
 .page-title {
   font-family: 'Playfair Display', serif;
   font-size: 2.4rem;
@@ -68,12 +63,10 @@ body {
   line-height: 1.15;
   color: #f5f0e8;
 }
-
 .page-title em {
   color: #ff6b35;
   font-style: italic;
 }
-
 .page-subtitle {
   margin-top: 14px;
   font-size: 0.85rem;
@@ -81,7 +74,6 @@ body {
   line-height: 1.6;
 }
 
-/* ── GRID ── */
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -90,7 +82,6 @@ body {
   max-width: 900px;
 }
 
-/* ── TOOL CARD ── */
 .tool-card {
   display: flex;
   flex-direction: column;
@@ -104,14 +95,11 @@ body {
   transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
-
 .tool-card:hover {
   border-color: rgba(255, 107, 53, 0.45);
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0,0,0,0.35);
 }
-
-/* accent glow on hover */
 .tool-card::before {
   content: '';
   position: absolute;
@@ -128,23 +116,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 110px;
+  height: 160px;
   background: rgba(255,107,53,0.05);
   border-bottom: 1px solid rgba(255,255,255,0.05);
   font-size: 48px;
   transition: transform 0.3s ease;
   overflow: hidden;
 }
-.tool-card:hover .tool-card-icon { transform: scale(1.08); }
+.tool-card:hover .tool-card-icon { transform: scale(1.05); }
 .tool-card-icon img {
-  width: 80px;
-  height: 80px;
+  width: 130px;
+  height: 130px;
   object-fit: contain;
-  filter: drop-shadow(0 0 12px rgba(255,107,53,0.5));
-  transition: filter 0.3s ease;
+  filter: drop-shadow(0 0 12px rgba(255,107,53,0.4));
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 .tool-card:hover .tool-card-icon img {
-  filter: drop-shadow(0 0 20px rgba(255,107,53,0.8));
+  filter: drop-shadow(0 0 22px rgba(255,107,53,0.75));
+  transform: scale(1.06);
 }
 
 .tool-card-body {
@@ -154,7 +143,6 @@ body {
   gap: 8px;
   flex: 1;
 }
-
 .tool-card-name {
   font-family: 'Playfair Display', serif;
   font-size: 1.2rem;
@@ -162,13 +150,11 @@ body {
   color: #f5f0e8;
   line-height: 1.25;
 }
-
 .tool-card-desc {
   font-size: 0.78rem;
   color: #9d8b6f;
   line-height: 1.6;
 }
-
 .tool-card-cta {
   display: inline-flex;
   align-items: center;
@@ -188,7 +174,6 @@ body {
 }
 .tool-card-cta svg { width: 12px; height: 12px; fill: currentColor; }
 
-/* ── COMING SOON CARD ── */
 .tool-card.soon {
   opacity: 0.45;
   pointer-events: none;
@@ -196,7 +181,6 @@ body {
 }
 .tool-card.soon:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.07); }
 .tool-card.soon::before { display: none; }
-
 .soon-badge {
   display: inline-block;
   font-size: 0.6rem;
@@ -211,7 +195,6 @@ body {
   align-self: flex-start;
 }
 
-/* ── FOOTER ── */
 .page-footer {
   margin-top: 72px;
   text-align: center;
@@ -232,13 +215,11 @@ body {
 </head>
 <body>
 
-<!-- BACK -->
 <a href="index.html" class="back-link">
   <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
   Назад на сайт
 </a>
 
-<!-- HEADER -->
 <div class="page-header">
   <img src="logo_cangrida_white.png" alt="Cangrida" class="logo">
   <p class="page-label">Полезное</p>
@@ -246,15 +227,6 @@ body {
   <p class="page-subtitle">Бесплатные инструменты — пополняются по мере создания</p>
 </div>
 
-<!-- TOOLS GRID -->
-<!--
-  ╔══════════════════════════════════════════════╗
-  ║  КАК ДОБАВИТЬ НОВЫЙ ИНСТРУМЕНТ:              ║
-  ║  Скопируй блок .tool-card ниже,              ║
-  ║  поменяй иконку, имя, описание и href.       ║
-  ║  Убери класс "soon" когда будет готов.       ║
-  ╚══════════════════════════════════════════════╝
--->
 <div class="tools-grid">
 
   <!-- ① Генератор идей -->
@@ -271,11 +243,11 @@ body {
   </a>
 
   <!-- ② Световой референс -->
-  <a href="light-reference.html" class="tool-card">
-    <div class="tool-card-icon">💡</div>
+  <a href="sphere-lighting-tool.html" class="tool-card">
+    <div class="tool-card-icon"><img src="icon-light-reference.png" alt="Световой референс"></div>
     <div class="tool-card-body">
       <div class="tool-card-name">Световой референс</div>
-      <div class="tool-card-desc">Визуальный справочник по типам освещения для художников и 3D-артистов.</div>
+      <div class="tool-card-desc">PBR-шар с цветовым кругом. Тёплый свет — холодная тень. Живая теория для художников.</div>
       <div class="tool-card-cta">
         Открыть
         <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
@@ -296,7 +268,7 @@ body {
     </div>
   </a>
 
-  <!-- ④ Заглушка — следующий инструмент -->
+  <!-- ④ Скоро -->
   <div class="tool-card soon">
     <div class="tool-card-icon">✦</div>
     <div class="tool-card-body">
