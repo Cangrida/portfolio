@@ -205,6 +205,37 @@ body {
 .page-footer a { color: #9d8b6f; text-decoration: none; }
 .page-footer a:hover { color: #ff6b35; }
 
+/* ===== LANGUAGE SWITCHER ===== */
+.lang-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  border: 1px solid rgba(255, 107, 53, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(26, 21, 16, 0.7);
+  backdrop-filter: blur(6px);
+}
+.lang-switch button {
+  padding: 8px 16px;
+  background: transparent;
+  color: #9d8b6f;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+.lang-switch button.active {
+  background: #ff6b35;
+  color: #1a1510;
+}
+.lang-switch button:not(.active):hover { color: #ff6b35; }
+
 @media (max-width: 600px) {
   body { padding: 40px 16px 60px; }
   .page-title { font-size: 1.8rem; }
@@ -215,16 +246,21 @@ body {
 </head>
 <body>
 
+<div class="lang-switch">
+  <button data-lang="ru" class="active">RU</button>
+  <button data-lang="en">EN</button>
+</div>
+
 <a href="index.html" class="back-link">
   <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-  Назад на сайт
+  <span data-i18n="back">Назад на сайт</span>
 </a>
 
 <div class="page-header">
   <img src="logo_cangrida_white.png" alt="Cangrida" class="logo">
-  <p class="page-label">Полезное</p>
-  <h1 class="page-title">Инструменты для <em>художников</em></h1>
-  <p class="page-subtitle">Бесплатные инструменты — пополняются по мере создания</p>
+  <p class="page-label" data-i18n="label">Полезное</p>
+  <h1 class="page-title" data-i18n="title">Инструменты для <em>художников</em></h1>
+  <p class="page-subtitle" data-i18n="subtitle">Бесплатные инструменты — пополняются по мере создания</p>
 </div>
 
 <div class="tools-grid">
@@ -233,10 +269,10 @@ body {
   <a href="idea-generator.html" class="tool-card">
     <div class="tool-card-icon"><img src="icon-generator.png" alt="Генератор идей"></div>
     <div class="tool-card-body">
-      <div class="tool-card-name">Генератор идей</div>
-      <div class="tool-card-desc">Миллиарды комбинаций для иллюстраций, 3D и концептов. С вызовами и настроениями.</div>
+      <div class="tool-card-name" data-i18n="t1_name">Генератор идей</div>
+      <div class="tool-card-desc" data-i18n="t1_desc">Миллиарды комбинаций для иллюстраций, 3D и концептов. С вызовами и настроениями.</div>
       <div class="tool-card-cta">
-        Открыть
+        <span data-i18n="open">Открыть</span>
         <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
       </div>
     </div>
@@ -246,34 +282,31 @@ body {
   <a href="sphere-lighting-tool.html" class="tool-card">
     <div class="tool-card-icon"><img src="icon-light-reference.png" alt="Световой референс"></div>
     <div class="tool-card-body">
-      <div class="tool-card-name">Световой референс</div>
-      <div class="tool-card-desc">PBR-шар с цветовым кругом. Тёплый свет — холодная тень. Живая теория для художников.</div>
+      <div class="tool-card-name" data-i18n="t2_name">Световой референс</div>
+      <div class="tool-card-desc" data-i18n="t2_desc">PBR-шар с цветовым кругом. Тёплый свет — холодная тень. Живая теория для художников.</div>
       <div class="tool-card-cta">
-        Открыть
+        <span data-i18n="open">Открыть</span>
         <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
       </div>
     </div>
   </a>
 
   <!-- ③ 3D Viewer -->
-  <a href="viewer3d.html" class="tool-card">
+  <div class="tool-card soon">
     <div class="tool-card-icon">🧊</div>
     <div class="tool-card-body">
       <div class="tool-card-name">3D Viewer</div>
-      <div class="tool-card-desc">Просмотр 3D-моделей прямо в браузере. Крути, масштабируй, изучай.</div>
-      <div class="tool-card-cta">
-        Открыть
-        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-      </div>
+      <div class="tool-card-desc" data-i18n="t3_desc">Скоро. В разработке.</div>
+      <span class="soon-badge">Coming soon</span>
     </div>
-  </a>
+  </div>
 
   <!-- ④ Скоро -->
   <div class="tool-card soon">
     <div class="tool-card-icon">✦</div>
     <div class="tool-card-body">
-      <div class="tool-card-name">Скоро</div>
-      <div class="tool-card-desc">Следующий инструмент — в разработке.</div>
+      <div class="tool-card-name" data-i18n="t4_name">Скоро</div>
+      <div class="tool-card-desc" data-i18n="t4_desc">Следующий инструмент — в разработке.</div>
       <span class="soon-badge">Coming soon</span>
     </div>
   </div>
@@ -283,6 +316,44 @@ body {
 <div class="page-footer">
   <a href="index.html">cangrida.com</a>
 </div>
+
+<script>
+const I18N = {
+  back:     { ru: 'Назад на сайт', en: 'Back to site' },
+  label:    { ru: 'Полезное', en: 'Useful' },
+  title:    { ru: 'Инструменты для <em>художников</em>', en: 'Tools for <em>artists</em>' },
+  subtitle: { ru: 'Бесплатные инструменты — пополняются по мере создания', en: 'Free tools — more added as they are built' },
+  open:     { ru: 'Открыть', en: 'Open' },
+  t1_name:  { ru: 'Генератор идей', en: 'Idea Generator' },
+  t1_desc:  { ru: 'Миллиарды комбинаций для иллюстраций, 3D и концептов. С вызовами и настроениями.', en: 'Billions of combinations for illustrations, 3D and concepts. With challenges and moods.' },
+  t2_name:  { ru: 'Световой референс', en: 'Lighting Reference' },
+  t2_desc:  { ru: 'PBR-шар с цветовым кругом. Тёплый свет — холодная тень. Живая теория для художников.', en: 'A PBR sphere with a color wheel. Warm light — cool shadow. Living theory for artists.' },
+  t3_desc:  { ru: 'Скоро. В разработке.', en: 'Coming soon. In development.' },
+  t4_name:  { ru: 'Скоро', en: 'Coming soon' },
+  t4_desc:  { ru: 'Следующий инструмент — в разработке.', en: 'The next tool is in development.' }
+};
+
+function applyLang(lang) {
+  document.documentElement.lang = lang;
+  document.title = lang === 'en' ? 'Tools — cangrida.com' : 'Инструменты — cangrida.com';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const t = I18N[el.dataset.i18n];
+    if (t && t[lang]) el.innerHTML = t[lang];
+  });
+  document.querySelectorAll('.lang-switch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  try { localStorage.setItem('lang', lang); } catch (e) {}
+}
+
+document.querySelectorAll('.lang-switch button').forEach(b => {
+  b.addEventListener('click', () => applyLang(b.dataset.lang));
+});
+
+let savedLang = 'ru';
+try { savedLang = localStorage.getItem('lang') || 'ru'; } catch (e) {}
+if (savedLang !== 'ru') applyLang(savedLang);
+</script>
 
 </body>
 </html>
