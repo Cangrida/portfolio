@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Генератор идей / Idea Generator — cangrida.com</title>
+<meta name="description" content="Free idea generator for artists and 3D artists. Characters, landscapes, interiors, fantasy, sci-fi and more. Billions of combinations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e10;--bg2:#18181b;--bg3:#27272a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#fafafa;--text2:#a1a1aa;--text3:#52525b;
+  --accent:#e8733a;--accent-bg:rgba(232,115,58,0.1);--accent-border:rgba(232,115,58,0.3);
+  --green-bg:rgba(52,211,153,0.09);--green:rgba(110,231,183,0.9);
+  --amber-bg:rgba(251,191,36,0.09);--amber:rgba(252,211,77,0.9);
+  --blue-bg:rgba(96,165,250,0.09);--blue:rgba(147,197,253,0.9);
+  --pink-bg:rgba(244,114,182,0.09);--pink:rgba(249,168,212,0.9);
+  --r:10px;--rl:14px;--rp:999px;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 4rem}
+.wrap{width:100%;max-width:680px}
+.header{text-align:center;margin-bottom:2.25rem;padding-top:.5rem;position:relative}
+.header-logo{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:.5rem}
+.header-logo img{height:48px;width:auto;opacity:.95}
+.header-sep{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(232,115,58,0.6);flex-shrink:0}
+.header h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:0;color:var(--text)}
+.header p{font-size:13px;color:var(--text3)}
+.lang-toggle{position:absolute;top:4px;right:0;display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rp);padding:3px}
+.lang-btn{font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--rp);border:none;cursor:pointer;background:transparent;color:var(--text3);transition:all .12s;letter-spacing:.04em}
+.lang-btn.on{background:var(--accent-bg);color:var(--accent)}
+.lang-btn:hover:not(.on){color:var(--text2)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+.f{font-size:12px;padding:5px 12px;border-radius:var(--rp);border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+.f:hover{border-color:var(--accent-border);color:var(--text)}
+.f.on{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent)}
+.counter{font-size:11px;color:var(--text3);text-align:right;margin-bottom:.6rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:2rem 1.75rem;min-height:220px;display:flex;flex-direction:column;gap:1.25rem;margin-bottom:.875rem}
+.card.filled{border-color:var(--border2)}
+.cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:600}
+.main-idea{font-size:21px;font-weight:600;color:var(--text);line-height:1.35;letter-spacing:-.01em;margin-top:.4rem}
+.detail{font-size:13.5px;color:var(--text2);line-height:1.7;margin-top:.5rem}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;padding:3px 10px;border-radius:var(--rp);font-weight:500}
+.t-m{background:var(--green-bg);color:var(--green)}
+.t-s{background:var(--amber-bg);color:var(--amber)}
+.t-l{background:var(--blue-bg);color:var(--blue)}
+.empty{color:var(--text3);font-size:15px;text-align:center;padding:3rem 0;align-self:center;width:100%}
+.twist-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.8rem 1rem;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:.875rem}
+.twist-row:hover{border-color:var(--border2)}
+.twist-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--pink);font-weight:600;white-space:nowrap;background:var(--pink-bg);padding:3px 8px;border-radius:var(--rp)}
+.twist-text{color:var(--text);flex:1}
+.actions{display:flex;gap:7px}
+.btn{flex:1;padding:11px 8px;font-size:13.5px;font-family:inherit;border-radius:var(--r);cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s;font-weight:500}
+.btn:hover{background:var(--bg3);color:var(--text);border-color:rgba(255,255,255,0.18)}
+.btn:active{transform:scale(.98)}
+.btn-main{flex:2;font-size:15px;background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent)}
+.btn-main:hover{background:rgba(232,115,58,0.18);color:var(--accent)}
+.btn-sm{flex:.7;font-size:12.5px}
+.btn.copied{background:var(--green-bg);border-color:rgba(52,211,153,0.25);color:var(--green)}
+.btn.twist-active{background:var(--pink-bg);border-color:rgba(244,114,182,0.25);color:var(--pink)}
+.footer{margin-top:2.5rem;text-align:center;font-size:12px;color:var(--text3)}
+.footer a{color:var(--accent);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .18s ease}
+
+/* ─── GUIDE SECTION ─── */
+.guide-wrap{margin-top:2rem}
+.guide-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:transparent;border:1px solid var(--border);border-radius:var(--r);
+  padding:.75rem 1rem;cursor:pointer;font-family:inherit;
+  color:var(--text3);font-size:12.5px;font-weight:500;
+  transition:border-color .15s, color .15s;
+  letter-spacing:.01em;
+}
+.guide-toggle:hover{border-color:var(--border2);color:var(--text2)}
+.guide-toggle i{font-size:14px;transition:transform .2s}
+.guide-toggle.open i.ti-chevron-down{transform:rotate(180deg)}
+.guide-body{
+  display:none;
+  border:1px solid var(--border);border-top:none;
+  border-radius:0 0 var(--r) var(--r);
+  padding:1rem;
+  background:var(--bg2);
+}
+.guide-body.open{display:block}
+.guide-steps{display:flex;flex-direction:column;gap:8px}
+.g-step{display:flex;align-items:flex-start;gap:12px;padding:.75rem .875rem;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:border-color .15s}
+.g-step:hover{border-color:var(--border2)}
+.g-num{width:24px;height:24px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.g-body{flex:1}
+.g-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:.2rem;line-height:1.3}
+.g-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:500;padding:2px 7px;border-radius:999px;vertical-align:middle;position:relative;top:-1px}
+.chip-acc{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent)}
+.chip-pink{background:var(--pink-bg);color:var(--pink)}
+.chip-dark{background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
+.g-divider{border:none;border-top:1px solid var(--border);margin:.875rem 0}
+.g-tip{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:.65rem .875rem;font-size:12px;color:var(--text2);line-height:1.6;display:flex;gap:8px;align-items:flex-start}
+.g-tip i{color:var(--accent);font-size:15px;flex-shrink:0;margin-top:1px}
+/* ─────────────────────── */
+
+@media(max-width:500px){
+  .header h1{font-size:20px}
+  .main-idea{font-size:17px}
+  .card{padding:1.5rem 1.25rem}
+  .lang-toggle{top:0;right:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-logo">
+      <img src="https://cangrida.com/logo_cangrida_white.png" alt="Cangrida">
+      <span class="header-sep"></span>
+      <h1><span id="uiTitle"></span></h1>
+    </div>
+    <p id="uiSubtitle"></p>
+    <div class="lang-toggle">
+      <button class="lang-btn on" id="btn-ru" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="counter" id="counter"></div>
+  <div class="card" id="card"><div class="empty" id="emptyMsg"></div></div>
+  <div class="twist-row" id="twistRow" style="display:none" onclick="newTwist()">
+    <span class="twist-label" id="twistLabel"></span>
+    <span class="twist-text" id="twistText"></span>
+    <i class="ti ti-refresh" style="font-size:14px;color:var(--text3);flex-shrink:0"></i>
+  </div>
+  <div class="actions">
+    <button class="btn btn-main" id="btnNew" onclick="generate()"><i class="ti ti-dice"></i> <span id="uiNew"></span></button>
+    <button class="btn btn-sm" id="copyBtn" onclick="copyIdea()"><i class="ti ti-copy"></i> <span id="uiCopy"></span></button>
+    <button class="btn btn-sm" id="twistBtn" onclick="toggleTwist()"><i class="ti ti-bolt"></i> <span id="uiTwist"></span></button>
+  </div>
+
+  <!-- ─── GUIDE ─── -->
+  <div class="guide-wrap">
+    <button class="guide-toggle" id="guideToggle" onclick="toggleGuide()">
+      <span id="guideToggleLabel"><i class="ti ti-help-circle" style="font-size:14px;vertical-align:middle;margin-right:5px"></i>Как пользоваться?</span>
+      <i class="ti ti-chevron-down"></i>
+    </button>
+    <div class="guide-body" id="guideBody">
+      <div class="guide-steps">
+        <div class="g-step">
+          <div class="g-num">1</div>
+          <div class="g-body">
+            <div class="g-title" id="g1t"></div>
+            <div class="g-desc" id="g1d"></div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-num">2</div>
+          <div class="g-body">
+            <div class="g-title" id="g2t"></div>
+            <div class="g-desc" id="g2d"></div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-num">3</div>
+          <div class="g-body">
+            <div class="g-title" id="g3t"></div>
+            <div class="g-desc" id="g3d"></div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-num">4</div>
+          <div class="g-body">
+            <div class="g-title" id="g4t"></div>
+            <div class="g-desc" id="g4d"></div>
+          </div>
+        </div>
+      </div>
+      <hr class="g-divider">
+      <div class="g-tip">
+        <i class="ti ti-language"></i>
+        <span id="gTip"></span>
+      </div>
+    </div>
+  </div>
+  <!-- ─────────────── -->
+
+  <div class="footer"><a href="https://cangrida.com" target="_blank">cangrida.com</a></div>
+</div>
+
+<script>
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+// ─── UI STRINGS ───────────────────────────────────────────────────────────────
+
+const UI={
+  ru:{title:'Генератор идей',subtitle:'для художников и 3D-художников · миллиарды комбинаций',
+      new:'Новая идея',copy:'Копировать',copied:'Скопировано',twist:'Вызов',
+      hint:'Нажми кнопку — получи идею',
+      guideToggle:'Как пользоваться?',
+      counter:(ch,mo,st,combo)=>`${ch} вызовов · ${mo} настроений · ${st} стилей · ${combo}+ млрд комбинаций`,
+      guide:{
+        g1t:'Выбери категорию — или оставь «Всё»',
+        g1d:'Над генератором — фильтры: <span class="chip chip-dark">Персонажи</span> <span class="chip chip-dark">Пейзажи</span> <span class="chip chip-dark">Фэнтези</span> и ещё 11. Если не знаешь с чего начать — просто оставь <span class="chip chip-dark">Всё</span>.',
+        g2t:'Нажми «Новая идея»',
+        g2d:'Большая кнопка <span class="chip chip-acc"><i class="ti ti-dice"></i> Новая идея</span>. Каждое нажатие — новая уникальная комбинация из миллиардов вариантов. Не понравилось — жми ещё раз.',
+        g3t:'Включи вызов, если хочется сложнее',
+        g3d:'<span class="chip chip-pink"><i class="ti ti-bolt"></i> Вызов</span> добавляет художественное ограничение — только цвет, свет, форма или композиция. Нажми снова на строку вызова — получишь другой.',
+        g4t:'Скопируй идею',
+        g4d:'<span class="chip chip-dark"><i class="ti ti-copy"></i> Копировать</span> — сохраняет тему, детали, настроение и освещение. Вставь в заметки или референс-борд.',
+        tip:'В правом верхнем углу — переключатель <strong style="color:var(--text)">RU / EN</strong>. Весь контент переключается на английский: идеи, теги, вызовы.',
+      }
+  },
+  en:{title:'Idea Generator',subtitle:'for artists & 3D artists · billions of combinations',
+      new:'New Idea',copy:'Copy',copied:'Copied',twist:'Challenge',
+      hint:'Press the button — get an idea',
+      guideToggle:'How to use?',
+      counter:(ch,mo,st,combo)=>`${ch} challenges · ${mo} moods · ${st} styles · ${combo}B+ combinations`,
+      guide:{
+        g1t:'Choose a category — or keep "All"',
+        g1d:'Filters above the generator: <span class="chip chip-dark">Characters</span> <span class="chip chip-dark">Landscapes</span> <span class="chip chip-dark">Fantasy</span> and 11 more. Not sure where to start — just leave <span class="chip chip-dark">All</span>.',
+        g2t:'Press "New Idea"',
+        g2d:'The big button <span class="chip chip-acc"><i class="ti ti-dice"></i> New Idea</span>. Every press — a unique combination from billions of variants. Don\'t like it — press again.',
+        g3t:'Turn on Challenge for extra difficulty',
+        g3d:'<span class="chip chip-pink"><i class="ti ti-bolt"></i> Challenge</span> adds an artistic constraint — color only, light, shape or composition. Click the challenge row again for a different one.',
+        g4t:'Copy the idea',
+        g4d:'<span class="chip chip-dark"><i class="ti ti-copy"></i> Copy</span> — saves the theme, details, mood and lighting. Paste into your notes or reference board.',
+        tip:'Top right corner — <strong style="color:var(--text)">RU / EN</strong> toggle. All content switches to English: ideas, tags, challenges.',
+      }
+  },
+};
+
+// ─── CATEGORIES ───────────────────────────────────────────────────────────────
+
+const CATS={
+  ru:[{id:'all',label:'Всё'},{id:'char',label:'Персонажи'},{id:'scene',label:'Сцены'},{id:'land',label:'Пейзажи'},{id:'int',label:'Интерьеры'},{id:'animal',label:'Животные'},{id:'arch',label:'Архитектура'},{id:'still',label:'Натюрморт'},{id:'fantasy',label:'Фэнтези'},{id:'scifi',label:'Sci-Fi'},{id:'horror',label:'Хоррор'},{id:'myth',label:'Мифология'},{id:'post',label:'Постапок'},{id:'daily',label:'Повседневность'},{id:'abstract',label:'Абстракция'}],
+  en:[{id:'all',label:'All'},{id:'char',label:'Characters'},{id:'scene',label:'Scenes'},{id:'land',label:'Landscapes'},{id:'int',label:'Interiors'},{id:'animal',label:'Animals'},{id:'arch',label:'Architecture'},{id:'still',label:'Still Life'},{id:'fantasy',label:'Fantasy'},{id:'scifi',label:'Sci-Fi'},{id:'horror',label:'Horror'},{id:'myth',label:'Mythology'},{id:'post',label:'Post-Apoc'},{id:'daily',label:'Everyday'},{id:'abstract',label:'Abstract'}],
+};
+
+const GEN_LABELS={
+  char:{ru:'Персонажи',en:'Characters'},scene:{ru:'Сцены',en:'Scenes'},land:{ru:'Пейзажи',en:'Landscapes'},
+  int:{ru:'Интерьеры',en:'Interiors'},animal:{ru:'Животные',en:'Animals'},arch:{ru:'Архитектура',en:'Architecture'},
+  still:{ru:'Натюрморт',en:'Still Life'},fantasy:{ru:'Фэнтези',en:'Fantasy'},scifi:{ru:'Sci-Fi',en:'Sci-Fi'},
+  horror:{ru:'Хоррор',en:'Horror'},myth:{ru:'Мифология',en:'Mythology'},post:{ru:'Постапок',en:'Post-Apoc'},
+  daily:{ru:'Повседневность',en:'Everyday'},abstract:{ru:'Абстракция',en:'Abstract'},
+};
+
+// ─── BUILD TEMPLATES ──────────────────────────────────────────────────────────
+
+const BUILD={
+  char(p){return{s:`${cap(pick(p.who))} ${pick(p.action)} — ${pick(p.where)}`,d:pick(p.detail)}},
+  scene(p){return{s:pick(p.setup),d:`${pick(p.moment)} ${pick(p.q)}`}},
+  land(p){return{s:`${cap(pick(p.what))} — ${pick(p.time)}, ${pick(p.weather)}`,d:`${cap(pick(p.detail))}.`}},
+  int(p){return{s:pick(p.room),d:`${pick(p.detail)} ${pick(p.feel)}`}},
+  animal(p){return{s:`${pick(p.who)} ${pick(p.action)} — ${pick(p.where)}`,d:pick(p.obs)}},
+  arch(p){return{s:pick(p.what),d:`${pick(p.state)} ${pick(p.detail)} ${pick(p.q)}`}},
+  still(p){return{s:pick(p.obj),d:`${pick(p.ctx)} ${pick(p.q)}`}},
+  fantasy(p){return{s:`${pick(p.who)} ${pick(p.situation)}`,d:pick(p.irony)}},
+  scifi(p){return{s:`${pick(p.who)} ${pick(p.situation)}`,d:pick(p.impl)}},
+  horror(p){return{s:pick(p.setup),d:`${pick(p.detail)} ${pick(p.wrong)}`}},
+  myth(p){return{s:`${pick(p.who)} ${pick(p.situation)}`,d:`${pick(p.detail)} ${pick(p.q)}`}},
+  post(p){return{s:pick(p.where),d:`${pick(p.human)} ${pick(p.point)}`}},
+  daily(p){return{s:`${pick(p.who)} ${pick(p.action)} — ${pick(p.where)}`,d:pick(p.sig)}},
+  abstract(p){return{s:pick(p.concept),d:pick(p.challenge)}},
+};
+
+// ─── POOLS ────────────────────────────────────────────────────────────────────
+
+const POOLS={
+
+char:{
+  ru:{
+    who:['старый рыбак','слепой художник','усталая ведьма','бывший солдат','маленький ребёнок','пожилой монах','последний маг','бог в изгнании','механик-призрак','слепая провидица','великан, боящийся высоты','бывший детектив','портной без заказов','танцовщица-ветеран','кочевник без карты','оракул на пенсии','хранитель архива снов','некромант-гуманист','охотник за монстрами','алхимик наполовину золотой','дирижёр мёртвого оркестра','поэт в осаждённом городе','полевой хирург','проигравший генерал','ребёнок, видящий лишнее','бессмертный, уставший от этого','страж у пустого порога','повар для умирающего','учитель без учеников','последний носитель мёртвого языка','художник, рисующий невидимых','хранительница чужих секретов','дракон в человеческом теле','призрак, не знающий что умер'],
+    action:['чинит что-то в последний раз','ждёт того, кто уже не придёт','молча наблюдает','уходит не оглядываясь','возвращается ни с чем','прячется от всего мира','создаёт невозможное','разговаривает с тенью','медленно забывает','вспоминает всё сразу','ищет то, что уже не найти','отказывается уходить','учит последнего ученика','хранит чужой секрет','пишет письмо никому','охраняет то, чего уже нет','прощается','смотрит на то, что уже не изменить','делает вид, что всё в порядке','считает оставшееся время','собирает осколки','рисует кого-то, кого больше нет'],
+    where:['в заброшенном маяке','на крыше старого дома','в библиотеке, которую затапливает','на пустой ночной станции','в лесу после пожара','на краю скалы над морем','в пустом театре','в мастерской вне времени','в разрушенном соборе','на вершине горы','в последнем работающем кафе','у развалин того, что было домом','на поле давно отгремевшей битвы','в конце длинного пустого коридора','среди городских руин','в саду, который давно не поливали','на пороге дома, куда страшно войти','в маленькой комнате с чужими вещами','в трюме корабля в шторм','на пустой дороге в конце ночи','в подвале, полном забытого','в пещере с единственной свечой'],
+    detail:['Всё давно сказано. И всё ещё нет.','Возможно, последний раз.','Никто не смотрит. Ему всё равно.','Смысл потерян, но привычка осталась.','Времени почти не осталось.','Это началось так давно, что он уже не помнит когда.','Конец близко. Или начало.','Единственный источник света. Пока хватает.','Тишина здесь особенная.','Решение уже принято. Просто ещё не осознано.','Это может занять вечность. Он не торопится.','Она знает. Просто ещё не говорит.','Никто не вернётся. Он продолжает всё равно.','Это было важным. Однажды.'],
+  },
+  en:{
+    who:['Old fisherman','Blind artist','Weary witch','Former soldier','Small child','Elderly monk','The last mage','God in exile','Ghost mechanic','Blind seer','Giant afraid of heights','Former detective','Tailor with no clients','Veteran dancer','Mapless wanderer','Retired oracle','Keeper of a dream archive','Pacifist necromancer','Monster hunter','Half-golden alchemist','Conductor of a dead orchestra','Poet in a besieged city','Field surgeon','Defeated general','Child who sees too much','Immortal grown weary','Guardian of an empty threshold','Cook for the dying','Teacher with no students','Last speaker of a dead language','Artist who paints the invisible','Keeper of strangers\'secrets','Dragon in a human body','Ghost who doesn\'t know they\'re dead'],
+    action:['repairs something for the last time','waits for someone who won\'t come','watches in silence','walks away without looking back','returns with nothing','hides from the world','creates the impossible','speaks to their own shadow','slowly forgets','suddenly remembers everything','searches for what can\'t be found','refuses to leave','teaches the last student','keeps a stranger\'s secret','writes a letter to no one','guards something that no longer exists','says goodbye','stares at what can no longer change','pretends everything is fine','counts the time remaining','gathers the pieces','paints someone who is gone'],
+    where:['in an abandoned lighthouse','on the roof of an old building','in a library being flooded','at an empty station at night','in a forest after the fire','at the edge of a cliff above the sea','in an empty theater','in a workshop outside of time','in a ruined cathedral','alone at the summit','in the last open café','among the ruins of what used to be home','on a battlefield long gone silent','at the end of a long empty corridor','amid the ruins of a city','in a garden no one has watered','on the threshold of a house too frightening to enter','in a small room full of someone else\'s things','in a ship\'s hold during a storm','on an empty road at the end of the night','in a basement full of the forgotten','in a cave with a single candle'],
+    detail:['Everything has been said. And still hasn\'t.','This may be the last time.','No one is watching. That\'s irrelevant.','The meaning is gone, but the habit remains.','Almost no time left.','It started so long ago he can no longer remember when.','The end is near. Or a beginning.','One light source. Enough for now.','The silence here is different.','The decision has already been made. Just not yet recognized.','This could take forever. He\'s not in a hurry.','She knows. She just hasn\'t spoken yet.','No one will return. He continues anyway.','It mattered once.'],
+  }
+},
+
+scene:{
+  ru:{
+    setup:['Две армии встречаются на мосту — ни одна не хочет первой','Рыбный рынок до рассвета — жизнь, которую никто не видит','Последний ужин перед тем, чего не избежать','Двое незнакомых под одним маленьким зонтом','Похороны существа, которое всех защищало','День после войны: никто не знает что делать с тишиной','Конкурс, на котором что-то пошло совсем не так','Встреча старых врагов через тридцать лет — случайно, в кафе','Аукцион воспоминаний в стеклянных шарах','Дети играют на руинах, не зная что это такое','Финал пьесы в абсолютно пустом зале — актёры всё равно кланяются','Волшебник стоит в очереди в супермаркете','Прощание на перроне — неизвестно кто уезжает','Свадьба двух незнакомцев по договору','Последний поезд ушёл без одного человека','Урок математики снаружи — конец света','Побег под дождём — один уже по ту сторону, ждёт','Двое говорят о разном, думая что об одном','Примирение, которое оба боялись','Момент, когда один человек сказал правду'],
+    moment:['Никто не произносит главного слова.','Пауза, которая длится слишком долго.','Один знает то, чего не знают остальные.','Всё идёт не по плану. К лучшему.','Всё идёт не по плану.','Молчание важнее слов.','Один жест меняет всё.','Случайный свидетель видит всё.','Ничего не происходит. Это и есть главное.','За секунду до или за секунду после.','Смех не вовремя.','Один уходит первым.'],
+    q:['Что будет дальше?','Кто прав?','Чего все хотят на самом деле?','Есть ли выход?','Что изменится?','Что не изменится никогда?','Стоило ли это того?','Кто виноват?','Чего не скажут вслух?','Что каждый из них думает?'],
+  },
+  en:{
+    setup:['Two armies meet on a bridge — neither wants to go first','A fish market before dawn — life most people never see','The last meal before something unavoidable','Two strangers under one small umbrella','The funeral of a creature that protected everyone','The day after the war — no one knows what to do with the silence','A contest where something went very wrong','Old enemies meet again after thirty years — by accident, in a café','An auction of memories sealed in glass spheres','Children play on ruins, unaware of what they are','The final act in a completely empty theater — the actors bow anyway','A wizard in a supermarket checkout line','A farewell on a platform — unclear who is leaving','A wedding between two strangers, arranged','The last train left without one person','A math lesson — outside, the world is ending','An escape in the rain — one already on the other side, waiting','Two people talking about different things, thinking they\'re discussing the same','A reconciliation both were afraid of','The moment one person finally told the truth'],
+    moment:['No one says the important word.','A pause that lasts too long.','One person knows what the others don\'t.','Everything goes wrong. For the better.','Everything goes wrong.','Silence matters more than words.','One gesture changes everything.','An accidental witness sees it all.','Nothing happens. That is the point.','One second before, or one second after.','Laughter at the wrong moment.','One person leaves first.'],
+    q:['What happens next?','Who is right?','What does everyone actually want?','Is there a way out?','What will change?','What will never change?','Was it worth it?','Who is to blame?','What won\'t be said aloud?','What is each of them thinking?'],
+  }
+},
+
+land:{
+  ru:{
+    what:['горное плато над облаками','замёрзший водопад','пустыня в первый день дождя','болото в рассветном тумане','берег моря','осенний лес','тундра','вулканический пляж с чёрным песком','поляна в ночи','поле после давней битвы','горная деревня','тропический лес','отступающий ледник','степь','подводный лес из ламинарии','ночной оазис','пещера с кристаллами','каньон','рисовые террасы','солончак','горное ущелье','дельта реки','мангровое болото','кратерное озеро'],
+    time:['на рассвете','в сумерках','в полдень','под звёздным небом','в час синего неба','в лунном свете','когда темнеет','в пасмурный день','в белую ночь','на закате','поздней осенью','зимним утром','когда туман стелется','перед первым снегом','в самый длинный день года'],
+    weather:['после ливня','во время снегопада','в сильный ветер','в полную тишину','во время грозы на горизонте','в жаркий день','в мороз','под затяжным дождём','после долгой засухи','в первый день оттепели','в густой туман','когда всё начинает замерзать','в час, когда жара наконец спадает','в штиль'],
+    detail:['с одиноким деревом на горизонте','с отражением неба в воде','со следами в снегу, которые внезапно обрываются','с дымом далеко вдали','с птицами, уходящими прочь','с цветущим кустом посреди пустоты','с руинами чего-то давнего','с одним источником света вдали','с дорогой, которая ведёт неизвестно куда','без признаков людей — и с одним следом','с тем, что выглядит почти знакомым'],
+  },
+  en:{
+    what:['a mountain plateau above the clouds','a frozen waterfall','a desert on the first day of rain','a marsh at dawn in the fog','a seashore','an autumn forest','tundra','a volcanic beach with black sand','a moonlit clearing','a field from a long-ago battle','a mountain village','tropical jungle','a retreating glacier','open steppe','an underwater kelp forest','a night oasis','a crystal cave','a canyon','rice terraces','a salt flat','a mountain gorge','a river delta','a mangrove swamp','a crater lake'],
+    time:['at dawn','at dusk','at noon','under a star-filled sky','in the blue hour','in moonlight','as darkness falls','on an overcast day','during a white night','at sunset','in late autumn','on a winter morning','when the fog rolls in','before the first snow','on the longest day of the year'],
+    weather:['after heavy rain','during a snowfall','in a strong wind','in complete silence','with a storm on the horizon','in intense heat','in freezing cold','under steady rain','after a long drought','on the first day of a thaw','in dense fog','as everything begins to freeze','in the hour when the heat finally breaks','in a dead calm'],
+    detail:['with a lone tree on the horizon','with the sky reflected in the water','with footprints in the snow that suddenly stop','with smoke far in the distance','with birds flying away','with a single flowering bush in the middle of emptiness','with ancient ruins','with one distant light source','with a road that leads nowhere','with no trace of people — and one single track','with something that looks almost familiar'],
+  }
+},
+
+int:{
+  ru:{
+    room:['Мастерская часовщика','Заброшенный театральный зал','Уютная библиотека','Каюта подводной лодки','Кухня ресторана в час пик','Кабинет учёного после неудавшегося эксперимента','Таверна у дороги','Оранжерея в заброшенном особняке','Кабина самолёта на закате','Пещера отшельника','Детская комната спустя двадцать лет','Японская баня рано утром','Чердак с чужим прошлым','Лаборатория на дне океана','Зал суда после последнего слова','Рубка старого корабля в шторм','Монастырская кухня на рассвете','Склад потерянных вещей','Зал ожидания ночной больницы','Комната, в которую давно не входили','Архив с запрещёнными документами','Мансарда художника в конце зимы'],
+    detail:['Пыль на всём, кроме одного предмета.','Окно не закрывается до конца.','На столе — недопитое.','Часы остановились на определённом времени.','Рисунок на стене, которого раньше не было.','Запах чего-то знакомого.','Одна вещь лишняя.','Чего-то не хватает, но непонятно чего.','Дверь в стене, которую раньше не замечали.','За окном — другое время суток.','Книга открыта на определённой странице.','Два набора следов. Один исчезает.','Письмо на полу. Не распечатано.','Свет из источника, которого не видно.'],
+    feel:['Кто-то только что ушёл.','Туда давно никто не заходил.','Всё замерло в одном моменте.','Кто-то уходил в спешке.','Время здесь идёт иначе.','Здесь хранят то, что нельзя выбросить.','Отсюда не хочется уходить. И непонятно почему.','Что-то здесь явно произошло.'],
+  },
+  en:{
+    room:['A clockmaker\'s workshop','An abandoned theater hall','A cozy library','A submarine bunk','A restaurant kitchen in the dinner rush','A scientist\'s study after a failed experiment','A roadside inn','A greenhouse in an abandoned manor','A cockpit at sunset','A hermit\'s cave','A child\'s bedroom, twenty years later','A Japanese bath at dawn','An attic full of someone else\'s past','An underwater laboratory','A courtroom after the final statement','An old ship\'s wheelhouse in a storm','A monastery kitchen at dawn','A warehouse of lost objects','A hospital waiting room at night','A room no one has entered in years','An archive of forbidden documents','An artist\'s attic studio at the end of winter'],
+    detail:['Dust on everything except one object.','The window won\'t close all the way.','Something unfinished on the table.','The clock stopped at a specific time.','A drawing on the wall that wasn\'t there before.','The smell of something familiar.','One object that doesn\'t belong.','Something is missing, but it\'s unclear what.','A door in the wall no one had noticed.','Outside the window — a different time of day.','A book open to a specific page.','Two sets of footprints. One disappears.','A letter on the floor. Unopened.','Light from a source that shouldn\'t be there.'],
+    feel:['Someone just left.','No one has been here in years.','Everything is frozen in a single moment.','Someone left in a hurry.','Time moves differently here.','This place holds what can\'t be thrown away.','You don\'t want to leave. You don\'t know why.','Something clearly happened here.'],
+  }
+},
+
+animal:{
+  ru:{
+    who:['Старый кит','Рыжая лиса','Медведь','Стая скворцов','Рысь','Осьминог','Слон','Мышь','Одинокий волк','Лошадь','Ворона','Кот','Черепаха','Лебедь','Попугай','Кролик','Олень','Сова','Пеликан','Лось','Кит в небе','Медуза в невесомости'],
+    action:['неподвижно смотрит вдаль','делает что-то неожиданное для своего вида','явно что-то помнит','оказался там, где его совсем не ждали','ведёт себя как человек','строит что-то','не боится там, где должен бояться','ждёт — без видимой причины','изучает незнакомый предмет','уходит и не оглядывается','охраняет что-то','находит то, что люди потеряли','реагирует на невидимое','слушает','делает что-то похожее на творчество','выбирает — очень тщательно'],
+    where:['в городе, где его быть не должно','в месте, куда обычно не добираются','там, где раньше было совсем другое','в полной тишине','пока люди не смотрят','в час, когда всё спит','на фоне чего-то огромного','рядом с чем-то человеческим','в месте которого нет на картах','среди своих — и при этом один','в месте, которое он выбрал сам'],
+    obs:['Что это значит — непонятно.','Он знает что-то.','Смотришь и не можешь уйти.','Это происходит уже давно.','Один наблюдатель. Никто не поверит.','Завтра здесь ничего не будет.','Это будет повторяться.'],
+  },
+  en:{
+    who:['An old whale','A red fox','A bear','A murmuration of starlings','A lynx','An octopus','An elephant','A mouse','A lone wolf','A horse','A crow','A cat','A tortoise','A swan','A parrot','A rabbit','A deer','An owl','A pelican','A moose','A whale in the sky','A jellyfish in weightlessness'],
+    action:['stands motionless, staring into the distance','does something unexpected for its species','clearly remembers something','appeared somewhere it has no business being','behaves exactly like a human','builds something','shows no fear where it should','waits — for no visible reason','studies an unfamiliar object','walks away without looking back','guards something','finds what humans have lost','reacts to something invisible','listens intently','does something resembling art','chooses — very deliberately'],
+    where:['in a city where it shouldn\'t exist','somewhere few ever reach','where something entirely different used to be','in complete silence','while no one is watching','at the hour when everything sleeps','against the backdrop of something enormous','beside something human','in a place not on any map','among its own kind — and yet alone','in a place it chose for itself'],
+    obs:['What this means is unclear.','It knows something.','You watch and can\'t look away.','This has been happening for a long time.','One witness. No one will believe them.','By tomorrow nothing will be here.','This will happen again.'],
+  }
+},
+
+arch:{
+  ru:{
+    what:['Старый маяк','Библиотека-башня высотой с гору','Город в кратере вулкана','Заброшенный отель на скале над морем','Маяк в пустыне','Монастырь на вертикальной скале','Подземный город под мегаполисом','Стеклянный собор в лесу','Дом, который достраивали сто лет','Арка между двумя несовместимыми мирами','Плавучий рынок','Крепость, осаждённая природой','Акведук, ставший жилым домом','Заброшенная фабрика как жильё','Мост в никуда','Башня, которая давно должна была упасть','Дворец без хозяина','Вокзал без расписания','Рынок под куполом','Собор без архитектора'],
+    state:['Стоит. Непонятно как.','Разрушается — очень медленно.','Всё ещё работает.','Заброшен — но не совсем.','Снаружи цел. Внутри — другой мир.','Стал чем-то другим.','Помнит другие времена.','Кто-то за ним следит.','Его достраивают — неизвестно кто.','Его разбирают по частям.'],
+    detail:['Следы жизни внутри.','Одна деталь не вписывается.','Кто-то недавно был здесь.','Растения внутри.','Надпись, которую сложно прочесть.','Дверь, которая открыта.','Звук изнутри.','Тишина, которая давит.','Свет из неожиданного места.'],
+    q:['Зачем это было построено?','Кто это сделал?','Кто-нибудь вернётся?','Это начало или конец?','Что было здесь до?','Что случится когда оно упадёт?','Что ему ещё нужно?'],
+  },
+  en:{
+    what:['An old lighthouse','A library tower as tall as a mountain','A city inside a volcano\'s crater','An abandoned hotel on a cliff above the sea','A lighthouse in a desert','A monastery on a sheer cliff face','An underground city beneath a metropolis','A glass cathedral in a forest','A house a hundred years in the building','An arch between two incompatible worlds','A floating market','A fortress being reclaimed by nature','An aqueduct turned into a home','An abandoned factory turned into housing','A bridge that leads nowhere','A tower that should have fallen long ago','A palace without an owner','A station without a schedule','A market under a dome','A cathedral built without an architect'],
+    state:['Still standing. Unclear how.','Collapsing — very slowly.','Still operational.','Abandoned — but not entirely.','Intact outside. A different world inside.','It has become something else.','It remembers other times.','Someone is watching over it.','Being built — by unknown hands.','Being taken apart piece by piece.'],
+    detail:['Signs of life inside.','One detail doesn\'t fit.','Someone was here recently.','Plants growing on the inside.','An inscription difficult to read.','A door that\'s open.','A sound from within.','A pressing silence.','Light from an unexpected place.'],
+    q:['Why was this built?','Who made this?','Will anyone return?','Is this a beginning or an end?','What was here before?','What happens when it falls?','What does it still need?'],
+  }
+},
+
+still:{
+  ru:{
+    obj:['Стакан воды с пузырьками','Старые письма, перевязанные лентой','Ключ без замка','Почти догоревшая свеча','Чашка с трещиной, склеенной золотом','Букет в банке из-под консервов','Разбитые часы','Детская игрушка','Зеркало лицом к стене','Пара старых ботинок','Чайник над огнём','Коллекция морских стёкол','Пустое птичье гнездо','Карта с многочисленными пометками','Книга, упавшая в лужу','Инструменты мастера после работы','Шахматы на полпути','Телефон с разбитым экраном','Коробка с чужими вещами','Записная книжка с вырванными страницами','Флакон духов почти пустой','Ключи от неизвестного'],
+    ctx:['Хозяин не вернётся.','Это хранили очень долго.','Нашли случайно.','Осталось от кого-то.','Это было важным.','Это забыли — намеренно или нет.','Этому здесь не место.','Это лежит здесь уже очень долго.','Кто-то только что ушёл.','За этим специально пришли.'],
+    q:['Чья это история?','Что было до?','Что будет после?','Чего не хватает рядом?','Что произошло?','Кто придёт за этим?'],
+  },
+  en:{
+    obj:['A glass of water with bubbles','Old letters bound with ribbon','A key without a lock','A nearly burned-out candle','A cup with a gold-repaired crack','Wildflowers in a tin can','A broken clock','A child\'s toy','A mirror facing the wall','A pair of old shoes','A kettle over a flame','A collection of sea glass','An empty bird\'s nest','A map covered in markings','A book that fell in a puddle','A craftsman\'s tools after work','A chess game mid-play','A phone with a shattered screen','A box of someone else\'s belongings','A notebook with torn-out pages','A near-empty perfume bottle','Keys to somewhere unknown'],
+    ctx:['The owner won\'t return.','This was kept for a long time.','Found by accident.','Left behind by someone.','It was important once.','Forgotten — deliberately or not.','This doesn\'t belong here.','This has been here for a very long time.','Someone just left.','Someone came specifically for this.'],
+    q:['Whose story is this?','What came before?','What comes after?','What\'s missing beside it?','What happened?','Who will come for this?'],
+  }
+},
+
+fantasy:{
+  ru:{
+    who:['Последний дракон','Маг, потерявший магию','Рыцарь без задания','Некромант-пацифист','Единорог','Великан-садовник','Феникс в клетке','Башня, которая падает уже тысячу лет','Дракон-библиотекарь','Карта, которая врёт','Богиня мести на заслуженном отдыхе','Голем, ставший скульптором','Пророчество, которое сбылось не так','Монстр, боящийся темноты','Оракул, уставший от правильных предсказаний','Волшебник в очереди','Город, где всегда утро','Лес, где деревья медленно ходят','Море из облаков','Рынок невозможного','Кузнец, кующий законы буквально','Феи, работающие в бухгалтерии'],
+    situation:['живёт совершенно обычной жизнью','столкнулся с чем-то банальным — и это страшнее всего','потерял то, что делало его особенным','нашёл что-то, что не должен был','пытается исправить старую ошибку','устал','встретил неожиданного союзника','переосмыслил всё','оказался не в своей истории','выполняет работу, которую никто не ценит','столкнулся с бюрократией','нашёл равного себе'],
+    irony:['Именно это делает ситуацию невозможной.','Все думают, что знают чем это кончится.','Он единственный, кто не понимает очевидного.','Конец этой истории известен. Но не ему.','Вся магия мира — и вот к чему пришло.','Это было бы смешно, если бы не было так важно.','Он справится. Но не так, как думал.','Самая обычная деталь меняет всё.','Это никому не кажется странным, кроме него.'],
+  },
+  en:{
+    who:['The last dragon','A mage who lost their magic','A knight without a quest','A pacifist necromancer','A unicorn','A giant who tends gardens','A phoenix in a cage','A tower that has been falling for a thousand years','A librarian dragon','A map that lies','The goddess of vengeance on a well-earned vacation','A golem turned sculptor','A prophecy that came true wrong','A monster afraid of the dark','An oracle tired of being right','A wizard in a queue','A village locked in eternal morning','A forest where trees slowly walk','A sea made of clouds','A market that sells the impossible','A blacksmith who literally forges laws','Fairies working in accounting'],
+    situation:['is living a completely ordinary life','encountered something mundane — and it\'s scarier than anything','lost what made them special','found something they shouldn\'t have','is trying to fix an old mistake','is exhausted','found an unlikely ally','has reconsidered everything','ended up in the wrong story','is doing work no one appreciates','ran into bureaucracy','finally met their equal'],
+    irony:['And that\'s exactly what makes it impossible.','Everyone thinks they know how this ends.','They\'re the only one who doesn\'t see the obvious.','The ending of this story is known. Not to them.','All the magic in the world — and it came to this.','It would be funny if it weren\'t so important.','They\'ll manage. Not the way they planned.','The most ordinary detail changes everything.','No one else finds this strange but them.'],
+  }
+},
+
+scifi:{
+  ru:{
+    who:['Последняя орбитальная станция','Рынок на нейтральной планете','Робот с устаревшим заданием','Первый контакт','Корабль поколений — четвёртое поколение','Клон, встречающий оригинал','ИИ, решивший стать художником','Город под вечным куполом','Планета с суточным циклом длиной в год','Дрон, отказавшийся выполнить приказ','Колония без связи с Землёй уже двести лет','Человек, загруженный в сеть','Археолог будущего на нашем слое','Космический мусорщик','Последний аналоговый человек','Машина для воспоминаний','Терраформирование, пошедшее не так','Биологический корабль','Планета, которую никто не заметил'],
+    situation:['обнаружил нечто неожиданное','оказался перед выбором без правильного ответа','потерял ориентиры','нашёл то, что искали давно','перестал выполнять функцию','столкнулся с человеческим в нечеловеческом','остался один','получил невыполнимое задание','нарушил протокол','изменился — и никто не заметил','сломался, но продолжает','понял что-то, о чём лучше не знать'],
+    impl:['Кто несёт за это ответственность?','Это ещё можно исправить. Или нет.','Правила здесь не работают.','Обратного пути нет.','Никто не знает что делать дальше.','Это происходит уже не первый раз.','Это важнее, чем кажется.','Это только начало.'],
+  },
+  en:{
+    who:['The last orbital station','A market on neutral ground','A robot with an outdated mission','A first contact','A generation ship — fourth generation','A clone meeting their original','An AI who decided to become an artist','A city under a permanent dome','A planet with a year-long day','A drone that refused its orders','A colony cut off from Earth for two hundred years','A person uploaded to the network','A future archaeologist at our layer','A space junk collector','The last analog human','A memory machine','Terraforming gone wrong','A biological ship','A planet no one noticed'],
+    situation:['discovered something unexpected','faced a choice with no right answer','lost all bearings','found what was sought for so long','stopped performing its function','encountered the human in the non-human','was left alone','received an impossible task','broke protocol','changed — and no one noticed','broke down but kept going','understood something better left unknown'],
+    impl:['Who is responsible for this?','It can still be fixed. Or not.','The rules don\'t apply here.','There is no going back.','No one knows what to do next.','This has happened before.','This matters more than it seems.','This is just the beginning.'],
+  }
+},
+
+horror:{
+  ru:{
+    setup:['Дверь, которой вчера не было','Зеркало с чуть другим отражением','Деревня, где все всегда улыбаются','Фотография незнакомца в каждом семейном снимке','Дом, который меньше снаружи, чем внутри','Рисунки, которые появляются сами по себе','Телефон, получающий сообщения от умершего','Шаги, которые опережают хозяина','Кукла в другой позе каждое утро','Город, где никто не стареет','Дорога, которая не заканчивается','Ребёнок, рисующий одно и то же снова и снова','Запах знакомого в совершенно незнакомом месте','Дата в чужом дневнике — это завтра','Голос без источника','Тень без человека','Соседская квартира','Письмо без отправителя'],
+    detail:['Это было всегда. Ты просто не замечал.','Это заметили все. Никто не говорит.','Это уже было. Давно.','Это можно объяснить. Но не хочется.','Это происходит только когда ты один.','Это нельзя сфотографировать.','На это невозможно не смотреть.','Это исчезает если смотреть прямо.','Это появилось после переезда.','С этим что-то не так с самого начала.','Это ждёт.','Это усиливается.'],
+    wrong:['Почему ты ещё здесь?','Выход есть. Где-то.','Ты не первый, кто это заметил.','Лучше не знать.','Правила изменились — ты пока не знаешь как.'],
+  },
+  en:{
+    setup:['A door that wasn\'t there yesterday','A mirror with a slightly different reflection','A village where everyone always smiles','A stranger in every family photo','A house smaller on the outside than the inside','Drawings that appear on their own','A phone receiving messages from the dead','Footsteps that arrive ahead of their owner','A doll in a different position each morning','A city where no one ages','A road that doesn\'t end','A child who draws the same thing over and over','The smell of something familiar in a completely unfamiliar place','A date in a stranger\'s diary — it\'s tomorrow','A voice without a source','A shadow without a person','The neighbor\'s apartment','A letter with no return address'],
+    detail:['It was always there. You just didn\'t notice.','Everyone noticed. No one\'s talking.','This has happened before. Long ago.','It can be explained. You\'d rather not.','It only happens when you\'re alone.','It can\'t be photographed.','It\'s impossible to look away.','It disappears if you look directly at it.','It started after the move.','Something was wrong from the very beginning.','It\'s waiting.','It\'s getting stronger.'],
+    wrong:['Why are you still here?','There\'s a way out. Somewhere.','You\'re not the first to notice.','Better not to know.','The rules have changed — you just don\'t know how yet.'],
+  }
+},
+
+myth:{
+  ru:{
+    who:['Прометей','Медуза — до Персея','Харон','Минотавр в центре лабиринта','Сизиф','Цирцея','Баба-Яга','Нептун','Валькирия','Орфей','Кассандра','Гефест','Персефона','Геракл после всех подвигов','Икар, выживший','Ариадна после Тезея','Хозяйка Медной горы','Жар-птица','Феникс разных культур','Дракон последнего рода'],
+    situation:['живёт в современном мире и не вписывается','забыт всеми — и доволен этим','работает на совершенно обычной работе','встречает кого-то из своего прошлого','сталкивается с ситуацией, которой не было в мифах','теряет то, что делало его богом','переосмысливает то, что сделал','встречает того, кого не ожидал','оказывается по другую сторону своей истории','находит покой в неожиданном месте','устаёт от своей роли','получает наконец то, о чём просил'],
+    detail:['Это не та история, которую рассказывают.','Его версия совершенно другая.','Миф — это только часть правды.','Никто не спрашивал, чего хотел он.','Время изменило всё, кроме одного.','Они это знали с самого начала.','Это случилось раньше. Случится снова.'],
+    q:['Что осталось?','Кем бы он был сейчас?','Что если история другая?','Чего ему так и не дали?','Что будет дальше?'],
+  },
+  en:{
+    who:['Prometheus','Medusa — before Perseus','Charon','The Minotaur at the center of the labyrinth','Sisyphus','Circe','Baba Yaga','Neptune','A valkyrie','Orpheus','Cassandra','Hephaestus','Persephone','Hercules after all the labors','Icarus — the one who survived','Ariadne after Theseus','The Mistress of the Copper Mountain','The Firebird','The phoenix across cultures','The last dragon of its lineage'],
+    situation:['lives in the modern world and doesn\'t fit','has been forgotten by everyone — and is at peace with it','is working a completely ordinary job','runs into someone from their past','faces a situation the myths never covered','loses what made them divine','reconsiders what they did','meets someone they didn\'t expect','finds themselves on the other side of their own story','finds peace in the most unexpected place','grows tired of their role','finally gets what they asked for'],
+    detail:['That\'s not the story they tell.','Their version is completely different.','The myth is only part of the truth.','No one ever asked what they wanted.','Time changed everything but one thing.','They knew from the beginning.','This has happened before. It will happen again.'],
+    q:['What remains?','Who would they be today?','What if the story is different?','What were they never given?','What comes next?'],
+  }
+},
+
+post:{
+  ru:{
+    where:['Торговый центр через пятьдесят лет','Старая библиотека — последний музей','Стадион как жилой квартал','Заросший ботанический сад','Школа в торговом центре','Кинотеатр как склад','Аэропорт как город','Парк аттракционов в запустении','Автозавод как огород','Вокзал как центр мира','Детская площадка посреди руин','Больница без врачей','Дерево, проросшее сквозь сейф банка','Мост как рынок','Метро как деревня'],
+    human:['Кто-то продолжает своё обычное дело.','Дети играют и не знают.','Один человек ведёт записи.','Кто-то рисует на стенах.','Старик помнит как было.','Ребёнок нашёл вещь из прошлого.','Двое поспорили о том, как это называлось.','Кто-то ухаживает за растением.','Свадьба. Всё как положено.','Кто-то чинит то, что, наверное, уже не нужно.','Ребёнок задаёт вопрос, на который никто не знает ответа.','Один уходит. Другой остаётся.'],
+    point:['Красота продолжается.','Люди умеют привыкнуть ко всему.','То, что казалось бессмысленным — имеет смысл.','Ничего не забыто окончательно.','Конец и начало — одно.','Жизнь настаивает на себе.','Этого никто не планировал. Так вышло.'],
+  },
+  en:{
+    where:['A shopping mall fifty years later','An old library — the last museum','A stadium as a residential quarter','An overgrown botanical garden','A school inside a shopping center','A cinema as a warehouse','An airport as a city','An abandoned amusement park','A car factory as a vegetable garden','A train station as the center of the world','A children\'s playground amid ruins','A hospital without doctors','A tree that grew through a bank vault','A bridge as a market','A metro as a village'],
+    human:['Someone is still doing their usual work.','Children are playing and don\'t know.','One person is keeping records.','Someone is painting the walls.','An old man remembers how it was.','A child found an object from before.','Two people argued about what it used to be called.','Someone is tending a plant.','A wedding. Everything as it should be.','Someone is fixing something that probably isn\'t needed anymore.','A child asks a question no one can answer.','One person is leaving. Another is staying.'],
+    point:['Beauty persists.','People can adapt to anything.','What seemed meaningless — has meaning.','Nothing is truly forgotten.','An end and a beginning are one.','Life insists on itself.','No one planned this. Yet here we are.'],
+  }
+},
+
+daily:{
+  ru:{
+    who:['Старик в очереди','Бариста до открытия кафе','Пожилая женщина в парке','Незнакомец в метро','Ночной санитар','Мужчина, плачущий в машине на парковке','Две подруги, не видевшиеся десять лет','Новый сотрудник в первый день','Дедушка с внуком','Последний посетитель кафе','Уличный художник','Дворник в пять утра','Таксист в три ночи','Кассир перед закрытием','Учительница после уроков','Пенсионер с газетой','Мать с коляской','Ночной охранник','Человек в очереди в поликлинике','Последний пассажир ночного автобуса'],
+    action:['делает что-то маленькое и важное','ждёт — без особой надежды','смотрит на что-то давно знакомое','разговаривает с незнакомым','делает вид, что всё в порядке','неожиданно смеётся','замечает что-то, чего не видят другие','вспоминает','пытается не плакать','звонит кому-то — долго молчит','делает это каждый день','делает это в последний раз','делает шаг, который боялся'],
+    where:['в пустом утреннем кафе','на скамейке в парке','в переполненном транспорте','в тихом углу шумного места','на остановке под дождём','в конце длинного дня','в начале нового утра','в чужом районе','в знакомом месте после долгого отсутствия','в очереди, которая не движется','на перроне'],
+    sig:['Это ничего особенного. Но не для него.','Этого никто не заметит.','Это происходит каждый день. И каждый раз иначе.','Маленькое. Настоящее.','Это весит больше, чем кажется.','Мимо — ещё тысяча таких историй.','Достаточно.','В этом есть что-то важное.'],
+  },
+  en:{
+    who:['An old man in line','A barista before opening','An elderly woman in the park','A stranger on the subway','A night-shift orderly','A man crying alone in his car in a parking lot','Two friends who haven\'t seen each other in ten years','A new employee on their first day','A grandfather with his grandchild','The last customer in a café','A street portrait artist','A janitor at five in the morning','A cab driver at three in the morning','A cashier before closing','A teacher after school','A pensioner with a newspaper','A mother with a stroller','A night security guard','A person in a clinic waiting room','The last passenger on the night bus'],
+    action:['does something small and important','waits — without much hope','looks at something long familiar','talks to a stranger','pretends everything is fine','laughs unexpectedly','notices something no one else does','remembers','tries not to cry','calls someone — then says nothing for a long time','does this every day','does this for the last time','takes a step they were afraid of'],
+    where:['in an empty morning café','on a park bench','in a crowded vehicle','in a quiet corner of a loud place','at a bus stop in the rain','at the end of a long day','at the start of a new morning','in an unfamiliar neighborhood','in a familiar place after a long absence','in a line that isn\'t moving','on a platform'],
+    sig:['It\'s nothing special. Not to them.','No one will notice.','This happens every day. Each time differently.','Small. Real.','This weighs more than it looks.','Past this — a thousand more stories just like it.','Enough.','There\'s something important in this.'],
+  }
+},
+
+abstract:{
+  ru:{
+    concept:['Тишина','Момент решения','Одиночество в толпе','Слово «почти»','Любопытство','Тускнеющая память','Граница между сном и бодрствованием','Расставание','Ожидание','Первый день после','Конец чего-то хорошего','Начало чего-то пугающего','Привычка','Невысказанное','Доверие','Сожаление','Облегчение','Предчувствие','Усталость как форма','Надежда без оснований','Стыд','Удивление'],
+    challenge:['Дай этому форму без людей и предметов.','Только цвет и движение — никакого нарратива.','Как это выглядит изнутри, не снаружи?','Без слов и символов — только линия и форма.','Что это на ощупь, если бы было материальным?','Как бы это звучало, если бы было музыкой? Нарисуй музыку.','Начало этого и конец — в одном кадре.','Как это меняется со временем? Покажи процесс.','Где граница между этим и противоположным?','Что остаётся, когда это уходит?','Цвет, который точнее всего передаёт это — и почему.','Как это выглядит для ребёнка? Для старика?'],
+  },
+  en:{
+    concept:['Silence','The moment of a decision','Loneliness in a crowd','The word "almost"','Curiosity','A fading memory','The edge between sleep and waking','A farewell','Waiting','The first day after','The end of something good','The start of something frightening','A habit','The unsaid','Trust','Regret','Relief','A premonition','Exhaustion as form','Hope without reason','Shame','Wonder'],
+    challenge:['Give this a shape without people or objects.','Color and movement only — no narrative.','What does this look like from inside, not outside?','No words or symbols — only line and form.','What would this feel like if it were material?','How would this sound if it were music? Draw the music.','The beginning and the end of this — in one frame.','How does this change over time? Show the process.','Where is the line between this and its opposite?','What remains when this passes?','The color that captures this most precisely — and why.','What does this look like to a child? To an old person?'],
+  }
+},
+
+}; // end POOLS
+
+// ─── MODIFIERS ────────────────────────────────────────────────────────────────
+
+const MODS={
+  ru:{
+    moods:['Меланхолия','Эпичность','Уют','Жуть','Радость','Тайна','Напряжение','Ностальгия','Абсурд','Нежность','Тревога','Покой','Ярость','Одиночество','Надежда','Ирония','Удивление','Горечь','Азарт','Усталость'],
+    styles:['Реализм','Импрессионизм','Графика','Аниме','Пиксель-арт','Масло','Акварель','Скетч','Концепт-арт','Комикс','Гравюра','Цифровая живопись','Loose Ink','Monoline','Барокко','Art Nouveau','Ретро','Коллаж','Гуашь','Пастель','Энкаустика','Линогравюра','Офорт','Sumi-e'],
+    lights:['Золотой час','Синий час','Контровой свет','Свечное пламя','Неон','Пасмурный день','Лунный свет','Подводный свет','Студийный свет','Рассвет','Открытый огонь','Люминесценция','Жёсткий полдень','Рассеянный туманный','Зимний дневной','Театральный прожектор','Отражённый от воды','Северное сияние','Закатный боковой','Аварийное освещение','Солнечный зайчик'],
+  },
+  en:{
+    moods:['Melancholy','Epic','Cozy','Dread','Joy','Mystery','Tension','Nostalgia','Absurdity','Tenderness','Anxiety','Calm','Rage','Loneliness','Hope','Irony','Wonder','Bitterness','Thrill','Exhaustion'],
+    styles:['Realism','Impressionism','Graphic Art','Anime','Pixel Art','Oil Paint','Watercolor','Sketch','Concept Art','Comics','Engraving','Digital Painting','Loose Ink','Monoline','Baroque','Art Nouveau','Retro','Collage','Gouache','Pastel','Encaustic','Linocut','Etching','Sumi-e'],
+    lights:['Golden Hour','Blue Hour','Rim Light','Candlelight','Neon','Overcast','Moonlight','Underwater Light','Studio Light','Dawn','Open Flame','Bioluminescence','Harsh Noon','Diffused Fog','Winter Daylight','Stage Spotlight','Water Reflection','Northern Lights','Low Sunset Side','Emergency Lighting','Sun Flare'],
+  }
+};
+
+// ─── TWISTS ───────────────────────────────────────────────────────────────────
+
+const TWISTS={
+ru:['Без линий — только цветовые пятна','Не больше трёх цветов — намеренно','Монохром: один цвет + белый. Только так.','Цвет передаёт эмоцию, не реальность — намеренно неправильные цвета','Только тёплые тона. Никакого синего.','Только холодные тона. Никакого красного.','Один акцентный цвет — всё остальное в серых тонах','Нарисуй негатив: тёмное там, где должно быть светлое','Максимально контрастные цвета — никаких полутонов','Один источник света — строго сзади. Контровой.','Добавь источник света, которого в сцене быть не может','Убери весь свет — только тени и силуэты','Рисуй от тёмного к светлому, не наоборот','Нарисуй только то, что освещено. Тени не существуют.','Только силуэты, никаких деталей','Одна непрерывная линия — ни разу не отрывая руку','Без прямых линий вообще','Без кривых линий вообще','Только геометрические формы — никакой органики','Только точки и штриховка — никаких сплошных заливок','Начни с текстуры, потом добавь форму поверх','Главный объект — строго не в центре','Без горизонта','Точка обзора — строго сверху','Точка обзора — строго снизу','Нарисуй только часть кадра — всё главное за границей','Нарисуй сцену через чужое окно или дверной проём','Покажи только деталь — самый крупный план','Продолжи рисунок за пределы формата','Убери один ключевой элемент — пусть угадывают','Максимально асимметричная композиция','Сделай знакомое огромным','Сделай огромное крошечным','Один элемент — гиперреалистично. Всё остальное — схематично.','Рисуй пространство вокруг объекта, не сам объект','Без лиц у всех персонажей','Только спины — ни одного повёрнутого к зрителю','Только руки. Людей нет.','Покажи эмоцию без единого лица','Нарисуй звук — без нот и наушников','Нарисуй запах — буквально дай ему форму','Нарисуй температуру — жару или мороз как форму','Нарисуй это как карту несуществующего места','Нарисуй это как техническую схему','«До» и «после» в одном кадре — граница между ними','Нарисуй с точки зрения персонажа, не зрителя','То же самое в двух эпохах — рядом','В 4 кадрах — без слов','Как рекламный плакат несуществующего бренда','Добавь один намеренный анахронизм','Два стиля в одном кадре — с видимой границей','Нарисуй в стиле, который ты никогда не используешь','Максимально плоско: ноль объёма, ноль теней','Максимально объёмно: забудь про силуэт','Нарисуй поверх текста — страница книги или газеты','Нарисуй трижды: быстро / медленно / иначе','Начни с заднего плана — передний план в самом конце','В жанре агитационного плаката','Один элемент абсурдно большой — нарочно','Строгая симметрия — или полностью сломанная. Одно из двух.','Меньший формат, чем привык','Больший формат, чем привык'],
+en:['No lines — color shapes only','No more than three colors — deliberately','Monochrome: one color + white. Only that.','Color conveys emotion, not reality — deliberately wrong colors','Warm tones only. No blue.','Cold tones only. No red.','One accent color — everything else in grayscale','Draw the negative: dark where light should be','Maximum contrast — no halftones','One light source — strictly from behind. Rim light.','Add a light source that can\'t exist in this scene','Remove all light — silhouettes and shadows only','Paint dark to light, not the reverse','Draw only what\'s lit. Shadows don\'t exist.','Silhouettes only, no detail','One continuous line — never lift the hand','No straight lines at all','No curved lines at all','Geometric shapes only — no organic forms','Dots and hatching only — no fills','Start with texture, then add form on top','Main subject — strictly off-center','No horizon','Viewpoint — strictly from above, bird\'s eye','Viewpoint — strictly from below, worm\'s eye','Show only part of the frame — the key is outside the border','Draw the scene through a window or doorway','Show only a detail — closest possible crop','Continue the drawing beyond the edge of the format','Remove one key element — let viewers guess','Maximally asymmetric composition','Make the familiar enormous','Make the enormous tiny','One detail — hyperrealistic. Everything else — schematic.','Draw the negative space around the object, not the object','No faces on any figure','Only backs — no one faces the viewer','Only hands. No people.','Show emotion without a single face','Draw sound — without notes or headphones','Draw smell — give it an actual shape','Draw temperature — heat or cold as form','Draw this as a map of a nonexistent place','Draw this as a technical diagram','"Before" and "after" in one frame — the border visible','Draw from the character\'s viewpoint, not the viewer\'s','Same thing in two eras — side by side','4 panels — no words','As a poster for a nonexistent brand','Add one deliberate anachronism','Two styles in one frame — with a visible boundary','Draw in a style you never use','Maximally flat: zero volume, zero shadows','Maximally volumetric: forget the silhouette','Draw over text — use a page from a book or newspaper','Draw it three times: fast / slow / differently','Start from the background — foreground last','In the style of propaganda poster art','One element absurdly large — on purpose','Strict symmetry — or completely broken. One or the other.','Smaller format than you\'re used to','Larger format than you\'re used to'],
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+
+let LANG='ru', active='all', twistOn=false, current=null, twistIdx=-1;
+
+// ─── GENERATE ─────────────────────────────────────────────────────────────────
+
+function generate(){
+  const keys=Object.keys(POOLS);
+  const key=active==='all'?keys[Math.floor(Math.random()*keys.length)]:active;
+  const p=POOLS[key][LANG];
+  const idea=BUILD[key](p);
+  const m=MODS[LANG];
+  current={...idea,cat:GEN_LABELS[key][LANG],mood:pick(m.moods),style:pick(m.styles),light:pick(m.lights)};
+  const card=document.getElementById('card');
+  card.className='card filled';
+  card.innerHTML=`<div class="anim"><div class="cat-badge"><i class="ti ti-tag" style="font-size:11px"></i>${current.cat}</div><div class="main-idea">${current.s}</div><div class="detail">${current.d}</div></div><div class="tags anim"><span class="tag t-m">${current.mood}</span><span class="tag t-l">${current.light}</span></div>`;
+  if(twistOn) newTwist();
+}
+
+function newTwist(){
+  const arr=TWISTS[LANG];
+  twistIdx=Math.floor(Math.random()*arr.length);
+  document.getElementById('twistText').textContent=arr[twistIdx];
+}
+
+function toggleTwist(){
+  twistOn=!twistOn;
+  document.getElementById('twistRow').style.display=twistOn?'flex':'none';
+  const btn=document.getElementById('twistBtn');
+  if(twistOn){btn.classList.add('twist-active');newTwist();}
+  else btn.classList.remove('twist-active');
+}
+
+function copyIdea(){
+  if(!current) return;
+  const u=UI[LANG];
+  const t=`${current.s}\n${current.d}\n\n${LANG==='ru'?'Настроение':'Mood'}: ${current.mood} · ${LANG==='ru'?'Стиль':'Style'}: ${current.style} · ${LANG==='ru'?'Освещение':'Light'}: ${current.light}`+(twistOn&&twistIdx>-1?`\n${LANG==='ru'?'Вызов':'Challenge'}: `+TWISTS[LANG][twistIdx]:'');
+  navigator.clipboard.writeText(t).then(()=>{
+    const b=document.getElementById('copyBtn');
+    b.classList.add('copied');
+    b.innerHTML=`<i class="ti ti-check"></i> ${u.copied}`;
+    setTimeout(()=>{b.classList.remove('copied');b.innerHTML=`<i class="ti ti-copy"></i> <span id="uiCopy">${u.copy}</span>`;},1800);
+  });
+}
+
+// ─── GUIDE TOGGLE ─────────────────────────────────────────────────────────────
+
+function toggleGuide(){
+  const body=document.getElementById('guideBody');
+  const toggle=document.getElementById('guideToggle');
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+  if(!isOpen) renderGuide();
+}
+
+function renderGuide(){
+  const g=UI[LANG].guide;
+  document.getElementById('g1t').textContent=g.g1t;
+  document.getElementById('g1d').innerHTML=g.g1d;
+  document.getElementById('g2t').textContent=g.g2t;
+  document.getElementById('g2d').innerHTML=g.g2d;
+  document.getElementById('g3t').textContent=g.g3t;
+  document.getElementById('g3d').innerHTML=g.g3d;
+  document.getElementById('g4t').textContent=g.g4t;
+  document.getElementById('g4d').innerHTML=g.g4d;
+  document.getElementById('gTip').innerHTML=g.tip;
+}
+
+// ─── LANGUAGE & UI ────────────────────────────────────────────────────────────
+
+function setLang(l){
+  LANG=l;
+  document.getElementById('htmlRoot').lang=l;
+  document.getElementById('btn-ru').className='lang-btn'+(l==='ru'?' on':'');
+  document.getElementById('btn-en').className='lang-btn'+(l==='en'?' on':'');
+  renderAll();
+  if(current) generate();
+}
+
+function renderAll(){
+  const u=UI[LANG];
+  document.getElementById('uiTitle').textContent=u.title;
+  document.getElementById('uiSubtitle').textContent=u.subtitle;
+  document.getElementById('uiNew').textContent=u.new;
+  document.getElementById('uiCopy').textContent=u.copy;
+  document.getElementById('uiTwist').textContent=u.twist;
+  document.getElementById('twistLabel').textContent=u.twist.toUpperCase();
+  document.getElementById('emptyMsg').textContent=u.hint;
+  document.getElementById('guideToggleLabel').innerHTML=`<i class="ti ti-help-circle" style="font-size:14px;vertical-align:middle;margin-right:5px"></i>${u.guideToggle}`;
+  const m=MODS[LANG];
+  const tw=TWISTS[LANG];
+  document.getElementById('counter').textContent=u.counter(tw.length,m.moods.length,m.styles.length,3);
+  renderFilters();
+  if(document.getElementById('guideBody').classList.contains('open')) renderGuide();
+  if(twistOn&&twistIdx>-1) document.getElementById('twistText').textContent=TWISTS[LANG][Math.floor(Math.random()*TWISTS[LANG].length)];
+}
+
+function renderFilters(){
+  document.getElementById('filters').innerHTML=CATS[LANG].map(c=>
+    `<span class="f${c.id===active?' on':''}" onclick="setcat('${c.id}')">${c.label}</span>`
+  ).join('');
+}
+
+function setcat(id){active=id;renderFilters();generate();}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
