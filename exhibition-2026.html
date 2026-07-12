@@ -84,13 +84,14 @@ body.touch-device .intro-controls  { display:none; }
 <body>
 
 <div id="intro">
-  <a href="https://cangrida.com" style="position:absolute;top:32px;left:40px;font-family:'Montserrat',sans-serif;font-weight:300;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:#ff6b35;text-decoration:none;border:1px solid rgba(255,107,53,0.5);padding:10px 24px;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,107,53,0.15)';this.style.borderColor='#ff6b35'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,107,53,0.5)'">← На сайт</a>
-  <div class="intro-year">Онлайн-выставка · 2026</div>
-  <div class="intro-title">ГАЛЕРЕЯ</div>
+  <a href="https://cangrida.com" id="back-link-intro" style="position:absolute;top:32px;left:40px;font-family:'Montserrat',sans-serif;font-weight:300;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:#ff6b35;text-decoration:none;border:1px solid rgba(255,107,53,0.5);padding:10px 24px;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,107,53,0.15)';this.style.borderColor='#ff6b35'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,107,53,0.5)'">← На сайт</a>
+  <button id="lang-btn" style="position:absolute;top:32px;right:40px;font-family:'Montserrat',sans-serif;font-weight:300;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:#ff6b35;background:transparent;border:1px solid rgba(255,107,53,0.5);padding:10px 24px;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,107,53,0.15)';this.style.borderColor='#ff6b35'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,107,53,0.5)'">EN</button>
+  <div class="intro-year" id="intro-year">Онлайн-выставка · 2026</div>
+  <div class="intro-title" id="intro-title">ГАЛЕРЕЯ</div>
   <div class="intro-author">Galina Goltyapina</div>
   <div class="intro-line"></div>
   <button id="enter-btn">войти</button>
-  <div class="intro-controls">
+  <div class="intro-controls" id="intro-controls">
     <span>W A S D</span> — движение &nbsp;·&nbsp; <span>Мышь</span> — обзор<br>
     <span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза<br>
     <span style="color:rgba(255,107,53,0.3)">📱 на телефоне: джойстик + свайп</span>
@@ -100,11 +101,11 @@ body.touch-device .intro-controls  { display:none; }
 <div id="hud">
   <div id="hud-top">Galina Goltyapina · Выставка 2026</div>
   <div id="crosshair"></div>
-  <a href="https://cangrida.com" style="position:absolute;top:24px;left:32px;font-family:'Montserrat',sans-serif;font-weight:300;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:#ff6b35;text-decoration:none;pointer-events:all;border:1px solid rgba(255,107,53,0.5);padding:10px 24px;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,107,53,0.15)';this.style.borderColor='#ff6b35'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,107,53,0.5)'">← На сайт</a>
+  <a href="https://cangrida.com" id="back-link-hud" style="position:absolute;top:24px;left:32px;font-family:'Montserrat',sans-serif;font-weight:300;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:#ff6b35;text-decoration:none;pointer-events:all;border:1px solid rgba(255,107,53,0.5);padding:10px 24px;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,107,53,0.15)';this.style.borderColor='#ff6b35'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,107,53,0.5)'">← На сайт</a>
   <div id="room-label"></div>
 </div>
 
-<div id="pause-screen"><p>пауза · кликни чтобы продолжить</p></div>
+<div id="pause-screen"><p id="pause-text">пауза · кликни чтобы продолжить</p></div>
 
 <div id="mobile-controls">
   <div id="joystick-zone">
@@ -119,6 +120,65 @@ body.touch-device .intro-controls  { display:none; }
 <script>
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 if (isMobile) document.body.classList.add('touch-device');
+
+// ═══════════════════════════════════════════════════════
+// ЯЗЫК (RU / EN)
+// ═══════════════════════════════════════════════════════
+var LANG = 'ru';
+try { LANG = localStorage.getItem('lang') || 'ru'; } catch(e){}
+if (LANG !== 'en') LANG = 'ru';
+document.documentElement.lang = LANG;
+
+const EX_I18N = {
+  ru: {
+    title: 'Галина Гольтяпина — Выставка 2026',
+    back: '← На сайт',
+    year: 'Онлайн-выставка · 2026',
+    gallery: 'ГАЛЕРЕЯ',
+    enter: 'войти',
+    controls: '<span>W A S D</span> — движение &nbsp;·&nbsp; <span>Мышь</span> — обзор<br><span>E</span> — рассмотреть работу &nbsp;·&nbsp; <span>ESC</span> — пауза<br><span style="color:rgba(255,107,53,0.3)">📱 на телефоне: джойстик + свайп</span>',
+    hud: 'Galina Goltyapina · Выставка 2026',
+    pause: 'пауза · кликни чтобы продолжить',
+    room1: 'Зал I · Скетчи',
+    room2: 'Зал II · Иллюстрации',
+    notFound: 'не найден: ',
+    langBtn: 'EN'
+  },
+  en: {
+    title: 'Galina Goltyapina — Exhibition 2026',
+    back: '← Back to site',
+    year: 'Online Exhibition · 2026',
+    gallery: 'GALLERY',
+    enter: 'enter',
+    controls: '<span>W A S D</span> — move &nbsp;·&nbsp; <span>Mouse</span> — look<br><span>E</span> — inspect artwork &nbsp;·&nbsp; <span>ESC</span> — pause<br><span style="color:rgba(255,107,53,0.3)">📱 on mobile: joystick + swipe</span>',
+    hud: 'Galina Goltyapina · Exhibition 2026',
+    pause: 'paused · click to continue',
+    room1: 'Hall I · Sketches',
+    room2: 'Hall II · Illustrations',
+    notFound: 'not found: ',
+    langBtn: 'RU'
+  }
+};
+const L = EX_I18N[LANG];
+
+document.title = L.title;
+document.getElementById('back-link-intro').textContent = L.back;
+document.getElementById('back-link-hud').textContent = L.back;
+document.getElementById('intro-year').textContent = L.year;
+document.getElementById('intro-title').textContent = L.gallery;
+document.getElementById('enter-btn').textContent = L.enter;
+document.getElementById('intro-controls').innerHTML = L.controls;
+document.getElementById('hud-top').textContent = L.hud;
+document.getElementById('pause-text').textContent = L.pause;
+document.getElementById('lang-btn').textContent = L.langBtn;
+
+document.getElementById('lang-btn').addEventListener('click', () => {
+  try { localStorage.setItem('lang', LANG === 'ru' ? 'en' : 'ru'); } catch(e){}
+  location.reload();
+});
+
+// Название работы с учётом языка
+function artTitle(art){ return (LANG === 'en' && art.en) ? art.en : art.title; }
 
 // ═══════════════════════════════════════════════════════
 // ДАННЫЕ РАБОТ
@@ -146,20 +206,20 @@ const SKETCHES = [
 ];
 
 const ILLUSTRATIONS = [
-  { id:'i1', title:'И даже смерть не разлучит нас. 2026', cat:'', desc:'', src:'hero.jpg',    w:2400, h:1476 },
-  { id:'i2', title:'Доктор Богомол. 2026',                 cat:'', desc:'', src:'mantis.jpg',  w:2500, h:2057 },
-  { id:'i3', title:'Fungi. Фаина с 14 февраля! 2026',      cat:'', desc:'', src:'faina.jpg',   w:1966, h:2079 },
-  { id:'i4', title:'Похоть. 2026',                         cat:'', desc:'', src:'lust.jpg',    w:1800, h:1050 },
-  { id:'i5', title:'Лень. 2026',                           cat:'', desc:'', src:'sloth.jpg',   w:1800, h:1050 },
-  { id:'i6', title:'Гнев. 2026',                           cat:'', desc:'', src:'wrath.jpg',   w:1800, h:1050 },
-  { id:'i7', title:'Вархаммер Пиратка. 2026',              cat:'', desc:'', src:'пиратка.jpg', w:1800, h:2500 },
-  { id:'i8', title:'Анатомия. 2026',                       cat:'', desc:'', src:'anatomy.jpg', w:2746, h:1795 },
-  { id:'i9', title:'Ричард Бах. 2026',                     cat:'', desc:'', src:'bach.jpg',    w:2746, h:1900 },
+  { id:'i1', title:'И даже смерть не разлучит нас. 2026', en:'And Even Death Will Not Part Us. 2026', cat:'', desc:'', src:'hero.jpg',    w:2400, h:1476 },
+  { id:'i2', title:'Доктор Богомол. 2026',                 en:'Doctor Mantis. 2026',                   cat:'', desc:'', src:'mantis.jpg',  w:2500, h:2057 },
+  { id:'i3', title:'Fungi. Фаина с 14 февраля! 2026',      en:'Fungi. Faina, Happy Feb 14! 2026',      cat:'', desc:'', src:'faina.jpg',   w:1966, h:2079 },
+  { id:'i4', title:'Похоть. 2026',                         en:'Lust. 2026',                            cat:'', desc:'', src:'lust.jpg',    w:1800, h:1050 },
+  { id:'i5', title:'Лень. 2026',                           en:'Sloth. 2026',                           cat:'', desc:'', src:'sloth.jpg',   w:1800, h:1050 },
+  { id:'i6', title:'Гнев. 2026',                           en:'Wrath. 2026',                           cat:'', desc:'', src:'wrath.jpg',   w:1800, h:1050 },
+  { id:'i7', title:'Вархаммер Пиратка. 2026',              en:'Warhammer Pirate Girl. 2026',           cat:'', desc:'', src:'пиратка.jpg', w:1800, h:2500 },
+  { id:'i8', title:'Анатомия. 2026',                       en:'Anatomy. 2026',                         cat:'', desc:'', src:'anatomy.jpg', w:2746, h:1795 },
+  { id:'i9', title:'Ричард Бах. 2026',                     en:'Richard Bach. 2026',                    cat:'', desc:'', src:'bach.jpg',    w:2746, h:1900 },
 ];
 
 const PEDESTALS_3D = [
-  { id:'3d1', title:'Арбалет. 14 февраля. 2026', cat:'3D · Blender' },
-  { id:'3d2', title:'Сани Санты. 2026',           cat:'3D · Blender' },
+  { id:'3d1', title:'Арбалет. 14 февраля. 2026', en:'Crossbow. February 14. 2026', cat:'3D · Blender' },
+  { id:'3d2', title:'Сани Санты. 2026',           en:"Santa's Sleigh. 2026",        cat:'3D · Blender' },
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -317,7 +377,7 @@ function canvasFor(art, error=false){
   cx.fillText(error ? '?' : art.id, cw/2, ch*0.45);
   cx.fillStyle='rgba(240,236,228,0.35)';
   cx.font=`${Math.min(ch*0.06,16)}px sans-serif`;
-  cx.fillText(error ? 'не найден: '+art.src : art.title, cw/2, ch*0.6);
+  cx.fillText(error ? L.notFound+art.src : artTitle(art), cw/2, ch*0.6);
   return new THREE.CanvasTexture(c);
 }
 
@@ -367,7 +427,7 @@ function placeArtwork(art, px, py, pz, ry, maxW=2.4, maxH=2.4){
   lx.fillStyle='rgba(255,107,53,0.8)'; lx.font='13px sans-serif'; lx.textAlign='center';
   lx.fillText(art.cat,180,18);
   lx.fillStyle='rgba(240,236,228,0.5)'; lx.font='12px sans-serif';
-  lx.fillText(art.title,180,36);
+  lx.fillText(artTitle(art),180,36);
   const lm=new THREE.Mesh(new THREE.PlaneGeometry(1.1,0.15),
     new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(lc),roughness:0.9}));
   lm.position.set(px+ox, py-h/2-0.13, pz+oz); lm.rotation.y=ry;
@@ -437,7 +497,7 @@ function buildPedestal(x,z,art){
   lx.strokeStyle='rgba(255,107,53,0.5)'; lx.lineWidth=2;
   lx.strokeRect(6,6,500,116);
   lx.fillStyle='rgba(255,107,53,0.9)'; lx.font='bold 32px Arial,sans-serif'; lx.textAlign='center';
-  const words = art.title.split(' ');
+  const words = artTitle(art).split(' ');
   let line1 = '', line2 = '';
   words.forEach(w => { if((line1+' '+w).length < 22) line1+=(line1?'  ':'')+w; else line2+=(line2?' ':'')+w; });
   if(line2){
@@ -445,7 +505,7 @@ function buildPedestal(x,z,art){
     lx.fillStyle='rgba(240,236,228,0.7)'; lx.font='24px Arial,sans-serif';
     lx.fillText(line2, 256, 90);
   } else {
-    lx.fillText(art.title, 256, 72);
+    lx.fillText(artTitle(art), 256, 72);
   }
   const lm=new THREE.Mesh(
     new THREE.PlaneGeometry(0.72, 0.18),
@@ -567,8 +627,8 @@ function getXBound(z){
 }
 
 const ROOM_LABELS=[
-  { name:'Зал I · Скетчи',        zMin:H1_Z-HALL1_LEN/2, zMax:H1_Z+HALL1_LEN/2 },
-  { name:'Зал II · Иллюстрации',  zMin:H2_Z-HALL2_LEN/2, zMax:H2_Z+HALL2_LEN/2 },
+  { name:L.room1, zMin:H1_Z-HALL1_LEN/2, zMax:H1_Z+HALL1_LEN/2 },
+  { name:L.room2, zMin:H2_Z-HALL2_LEN/2, zMax:H2_Z+HALL2_LEN/2 },
 ];
 
 let lastLabel='';

@@ -161,6 +161,42 @@
             transition-delay: calc(var(--i, 0) * 0.12s);
         }
 
+        /* ===== LANGUAGE SWITCHER ===== */
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            border: 1px solid rgba(255, 107, 53, 0.5);
+            border-radius: 6px;
+            overflow: hidden;
+            background: rgba(26, 21, 16, 0.7);
+            backdrop-filter: blur(6px);
+        }
+
+        .lang-switch button {
+            padding: 8px 16px;
+            background: transparent;
+            color: #9d8b6f;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .lang-switch button.active {
+            background: #ff6b35;
+            color: #1a1510;
+        }
+
+        .lang-switch button:not(.active):hover {
+            color: #ff6b35;
+        }
+
         /* Header */
         header {
             position: relative;
@@ -647,6 +683,10 @@
     </style>
 </head>
 <body>
+    <div class="lang-switch">
+        <button data-lang="ru" class="active">RU</button>
+        <button data-lang="en">EN</button>
+    </div>
     <div class="header-wrapper">
         <div class="header-noise"></div>
         <div class="orb orb-1"></div>
@@ -656,14 +696,14 @@
         <div class="hero">
             <img src="logo_cangrida_white.png" alt="Cangrida" class="logo reveal">
             <p class="subtitle reveal reveal-delay-1">2D / 3D Artist · Animator · Illustrator</p>
-            <h1 class="reveal reveal-delay-2">
+            <h1 class="reveal reveal-delay-2" data-i18n="hero_title">
                 Галина<br>
                 Гольтяпина —<br>
                 <span class="accent">художник</span>
             </h1>
             <div class="cta-buttons reveal reveal-delay-3">
-                <a href="#portfolio" class="btn btn-primary">Смотреть работы</a>
-                <a href="exhibition-2026.html" target="_blank" class="btn btn-secondary" style="border-color:rgba(255,107,53,0.5);color:#ff6b35;font-style:italic;letter-spacing:1px;">✦ Онлайн-выставка 2026</a>
+                <a href="#portfolio" class="btn btn-primary" data-i18n="btn_works">Смотреть работы</a>
+                <a href="exhibition-2026.html" target="_blank" class="btn btn-secondary" style="border-color:rgba(255,107,53,0.5);color:#ff6b35;font-style:italic;letter-spacing:1px;" data-i18n="btn_exhibition">✦ Онлайн-выставка 2026</a>
             </div>
             <div class="contact-cards reveal reveal-delay-4">
                 <a href="mailto:galina.goltiapina@gmail.com" class="contact-card">
@@ -700,19 +740,19 @@
         <div class="skills-sidebar">
             <div class="skill-item reveal reveal-right" style="--i:0">
                 <h3>7+</h3>
-                <p>Лет в геймдеве</p>
+                <p data-i18n="skill_1">Лет в геймдеве</p>
             </div>
             <div class="skill-item reveal reveal-right" style="--i:1">
                 <h3>2D·3D</h3>
-                <p>Иллюстрация, моделирование</p>
+                <p data-i18n="skill_2">Иллюстрация, моделирование</p>
             </div>
             <div class="skill-item reveal reveal-right" style="--i:2">
                 <h3>Spine</h3>
-                <p>Анимация персонажей 2D+СКА</p>
+                <p data-i18n="skill_3">Анимация персонажей 2D+СКА</p>
             </div>
             <div class="skill-item reveal reveal-right" style="--i:3">
                 <h3>UI/UX</h3>
-                <p>От концепта до анимаций</p>
+                <p data-i18n="skill_4">От концепта до анимаций</p>
             </div>
         </div>
     </div><!-- /container -->
@@ -722,24 +762,24 @@
 
     <section class="about-section" id="about">
       <div class="container">
-        <p class="section-label reveal">01 — О себе</p>
-        <h2 class="about-title reveal reveal-delay-1">Кто я и <span class="highlight">что делаю</span></h2>
-        
+        <p class="section-label reveal" data-i18n="about_label">01 — О себе</p>
+        <h2 class="about-title reveal reveal-delay-1" data-i18n="about_title">Кто я и <span class="highlight">что делаю</span></h2>
+
         <div class="about-text">
-            <p>
-                Я <strong>2D/3D-художник и иллюстратор</strong> с продуктовым опытом более 7 лет. 
+            <p data-i18n="about_p1">
+                Я <strong>2D/3D-художник и иллюстратор</strong> с продуктовым опытом более 7 лет.
                 Специализируюсь на графике для казуальных и мидкорных игр, интерфейсах и анимации персонажей.
             </p>
-            <p>
-                Имею уверенные навыки в <strong>3D-моделировании</strong> (Blender — более 3 лет), 
+            <p data-i18n="about_p2">
+                Имею уверенные навыки в <strong>3D-моделировании</strong> (Blender — более 3 лет),
                 <strong>2D-анимации в Spine</strong> (более 2 лет) и создании иллюстраций в Photoshop.
             </p>
-            <p>
-                Работаю с генеративным ИИ (Midjourney, Stable Diffusion) — использую для генерации 
+            <p data-i18n="about_p3">
+                Работаю с генеративным ИИ (Midjourney, Stable Diffusion) — использую для генерации
                 референсов и быстрой проверки концептов.
             </p>
-            <p>
-                Отличаюсь <strong>вниманием к деталям</strong>, самостоятельностью и хорошим 
+            <p data-i18n="about_p4">
+                Отличаюсь <strong>вниманием к деталям</strong>, самостоятельностью и хорошим
                 взаимодействием с командами на всех этапах разработки.
             </p>
         </div>
@@ -751,14 +791,14 @@
     <section class="portfolio-section" id="portfolio">
       <div class="container">
         <div class="portfolio-header">
-            <p class="section-label reveal">02 — Работы</p>
-            <h2 class="portfolio-title reveal reveal-delay-1">Избранные <span class="accent">проекты</span></h2>
+            <p class="section-label reveal" data-i18n="works_label">02 — Работы</p>
+            <h2 class="portfolio-title reveal reveal-delay-1" data-i18n="works_title">Избранные <span class="accent">проекты</span></h2>
             <div class="filter-buttons reveal reveal-delay-2">
-                <button class="filter-btn active" data-filter="all">Все</button>
-                <button class="filter-btn" data-filter="illustration">Иллюстрация</button>
-                <button class="filter-btn" data-filter="concept">Концепт</button>
+                <button class="filter-btn active" data-filter="all" data-i18n="f_all">Все</button>
+                <button class="filter-btn" data-filter="illustration" data-i18n="f_ill">Иллюстрация</button>
+                <button class="filter-btn" data-filter="concept" data-i18n="f_concept">Концепт</button>
                 <button class="filter-btn" data-filter="3d">3D</button>
-                <button class="filter-btn" data-filter="animation">Анимация</button>
+                <button class="filter-btn" data-filter="animation" data-i18n="f_anim">Анимация</button>
                 <button class="filter-btn" data-filter="gameui">Game UI</button>
             </div>
         </div>
@@ -766,71 +806,71 @@
         <div class="portfolio-grid">
             <!-- 1 --> <div class="portfolio-item" data-category="illustration">
                 <img src="bach.jpg" alt="Бах" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Портрет Баха</h3><p>Digital painting</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w1">Портрет Баха</h3><p>Digital painting</p></div>
             </div>
             <!-- 2 --> <div class="portfolio-item" data-category="illustration">
                 <img src="smert.jpg" alt="Смерть" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Смерть</h3><p>Dark illustration</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w2">Смерть</h3><p>Dark illustration</p></div>
             </div>
             <!-- 3 --> <div class="portfolio-item" data-category="illustration">
                 <img src="final.jpg" alt="Финал" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Финальный арт</h3><p>Illustration</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w3">Финальный арт</h3><p>Illustration</p></div>
             </div>
             <!-- 4 --> <div class="portfolio-item" data-category="illustration">
                 <img src="gnev.jpg" alt="Гнев" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Гнев — 7 грехов</h3><p>Character illustration</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w4">Гнев — 7 грехов</h3><p>Character illustration</p></div>
             </div>
             <!-- 5 --> <div class="portfolio-item" data-category="illustration">
                 <img src="len.jpg" alt="Лень" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Лень — 7 грехов</h3><p>Character design</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w5">Лень — 7 грехов</h3><p>Character design</p></div>
             </div>
             <!-- 6 --> <div class="portfolio-item" data-category="concept">
                 <img src="concept.jpg" alt="Концепт" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Концепт персонажа</h3><p>Character design</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w6">Концепт персонажа</h3><p>Character design</p></div>
             </div>
             <!-- 7 --> <div class="portfolio-item" data-category="concept">
                 <img src="zavist.jpg" alt="Зависть" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Зависть — 7 грехов</h3><p>Character concept</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w7">Зависть — 7 грехов</h3><p>Character concept</p></div>
             </div>
             <!-- 8 --> <div class="portfolio-item" data-category="concept">
                 <img src="sukkub.jpg" alt="Суккуб" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Суккуб</h3><p>Character art</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w8">Суккуб</h3><p>Character art</p></div>
             </div>
             <!-- 9 --> <div class="portfolio-item" data-category="illustration">
                 <img src="piratka.jpg" alt="Пиратка" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Пиратка</h3><p>Character concept</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w9">Пиратка</h3><p>Character concept</p></div>
             </div>
             <!-- 10 --> <div class="portfolio-item" data-category="3d">
                 <img src="pistol.jpg" alt="Пистолет" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>3D Пистолет</h3><p>Blender · hard surface</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w10">3D Пистолет</h3><p>Blender · hard surface</p></div>
             </div>
             <!-- 11 --> <div class="portfolio-item" data-category="3d">
                 <img src="robot.jpg" alt="Робот" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Робот</h3><p>3D character</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w11">Робот</h3><p>3D character</p></div>
             </div>
             <!-- 12 --> <div class="portfolio-item" data-category="3d">
                 <img src="bochka.jpg" alt="Бочка" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>3D Бочка</h3><p>Blender · текстурирование</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w12">3D Бочка</h3><p data-i18n="w12c">Blender · текстурирование</p></div>
             </div>
             <!-- 13 --> <div class="portfolio-item" data-category="3d">
                 <img src="arbalet.jpg" alt="Арбалет" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>3D Арбалет</h3><p>Blender · моделирование</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w13">3D Арбалет</h3><p data-i18n="w13c">Blender · моделирование</p></div>
             </div>
             <!-- 14 --> <div class="portfolio-item" data-category="animation">
                 <img src="fox.gif" alt="Лиса" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Fox анимация</h3><p>Spine animation</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w14">Fox анимация</h3><p>Spine animation</p></div>
             </div>
             <!-- 15 --> <div class="portfolio-item" data-category="animation">
                 <img src="idle.gif" alt="Idle" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Idle анимация</h3><p>Spine · персонаж</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w15">Idle анимация</h3><p data-i18n="w15c">Spine · персонаж</p></div>
             </div>
             <!-- 16 --> <div class="portfolio-item" data-category="animation">
                 <img src="krok.gif" alt="Крокодил" class="portfolio-img">
-                <div class="portfolio-overlay"><h3>Крокодил</h3><p>2D animation</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w16">Крокодил</h3><p>2D animation</p></div>
             </div>
             <!-- 17 --> <div class="portfolio-item" data-category="animation">
                 <video autoplay loop muted playsinline class="portfolio-img"><source src="крокодильчик актив.webm" type="video/webm"></video>
-                <div class="portfolio-overlay"><h3>Крокодильчик актив</h3><p>2D animation</p></div>
+                <div class="portfolio-overlay"><h3 data-i18n="w17">Крокодильчик актив</h3><p>2D animation</p></div>
             </div>
             <!-- 18 --> <div class="portfolio-item" data-category="animation">
                 <video autoplay loop muted playsinline class="portfolio-img"><source src="tiger dance.webm" type="video/webm"></video>
@@ -947,6 +987,93 @@
         lightbox.addEventListener('click', () => {
             lightbox.classList.remove('active');
         });
+
+        // ===== LANGUAGE SWITCHER =====
+        const I18N = {
+            hero_title: {
+                ru: 'Галина<br>Гольтяпина —<br><span class="accent">художник</span>',
+                en: 'Galina<br>Goltyapina —<br><span class="accent">artist</span>'
+            },
+            btn_works:      { ru: 'Смотреть работы', en: 'View works' },
+            btn_exhibition: { ru: '✦ Онлайн-выставка 2026', en: '✦ Online Exhibition 2026' },
+            skill_1: { ru: 'Лет в геймдеве', en: 'Years in game dev' },
+            skill_2: { ru: 'Иллюстрация, моделирование', en: 'Illustration, modeling' },
+            skill_3: { ru: 'Анимация персонажей 2D+СКА', en: '2D + skeletal character animation' },
+            skill_4: { ru: 'От концепта до анимаций', en: 'From concept to animation' },
+            about_label: { ru: '01 — О себе', en: '01 — About me' },
+            about_title: {
+                ru: 'Кто я и <span class="highlight">что делаю</span>',
+                en: 'Who I am and <span class="highlight">what I do</span>'
+            },
+            about_p1: {
+                ru: 'Я <strong>2D/3D-художник и иллюстратор</strong> с продуктовым опытом более 7 лет. Специализируюсь на графике для казуальных и мидкорных игр, интерфейсах и анимации персонажей.',
+                en: 'I am a <strong>2D/3D artist and illustrator</strong> with over 7 years of product experience. I specialize in art for casual and midcore games, interfaces and character animation.'
+            },
+            about_p2: {
+                ru: 'Имею уверенные навыки в <strong>3D-моделировании</strong> (Blender — более 3 лет), <strong>2D-анимации в Spine</strong> (более 2 лет) и создании иллюстраций в Photoshop.',
+                en: 'I have solid skills in <strong>3D modeling</strong> (Blender — 3+ years), <strong>2D animation in Spine</strong> (2+ years) and illustration in Photoshop.'
+            },
+            about_p3: {
+                ru: 'Работаю с генеративным ИИ (Midjourney, Stable Diffusion) — использую для генерации референсов и быстрой проверки концептов.',
+                en: 'I work with generative AI (Midjourney, Stable Diffusion) — for generating references and quickly testing concepts.'
+            },
+            about_p4: {
+                ru: 'Отличаюсь <strong>вниманием к деталям</strong>, самостоятельностью и хорошим взаимодействием с командами на всех этапах разработки.',
+                en: 'Known for <strong>attention to detail</strong>, self-sufficiency and smooth collaboration with teams at every stage of development.'
+            },
+            works_label: { ru: '02 — Работы', en: '02 — Works' },
+            works_title: {
+                ru: 'Избранные <span class="accent">проекты</span>',
+                en: 'Selected <span class="accent">projects</span>'
+            },
+            f_all:     { ru: 'Все', en: 'All' },
+            f_ill:     { ru: 'Иллюстрация', en: 'Illustration' },
+            f_concept: { ru: 'Концепт', en: 'Concept' },
+            f_anim:    { ru: 'Анимация', en: 'Animation' },
+            w1:  { ru: 'Портрет Баха', en: 'Bach Portrait' },
+            w2:  { ru: 'Смерть', en: 'Death' },
+            w3:  { ru: 'Финальный арт', en: 'Final Art' },
+            w4:  { ru: 'Гнев — 7 грехов', en: 'Wrath — 7 Sins' },
+            w5:  { ru: 'Лень — 7 грехов', en: 'Sloth — 7 Sins' },
+            w6:  { ru: 'Концепт персонажа', en: 'Character Concept' },
+            w7:  { ru: 'Зависть — 7 грехов', en: 'Envy — 7 Sins' },
+            w8:  { ru: 'Суккуб', en: 'Succubus' },
+            w9:  { ru: 'Пиратка', en: 'Pirate Girl' },
+            w10: { ru: '3D Пистолет', en: '3D Pistol' },
+            w11: { ru: 'Робот', en: 'Robot' },
+            w12: { ru: '3D Бочка', en: '3D Barrel' },
+            w12c:{ ru: 'Blender · текстурирование', en: 'Blender · texturing' },
+            w13: { ru: '3D Арбалет', en: '3D Crossbow' },
+            w13c:{ ru: 'Blender · моделирование', en: 'Blender · modeling' },
+            w14: { ru: 'Fox анимация', en: 'Fox Animation' },
+            w15: { ru: 'Idle анимация', en: 'Idle Animation' },
+            w15c:{ ru: 'Spine · персонаж', en: 'Spine · character' },
+            w16: { ru: 'Крокодил', en: 'Crocodile' },
+            w17: { ru: 'Крокодильчик актив', en: 'Croc Active' }
+        };
+
+        function applyLang(lang) {
+            document.documentElement.lang = lang;
+            document.title = lang === 'en'
+                ? 'Galina Goltyapina — Portfolio'
+                : 'Галина Гольтяпина — Портфолио';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const t = I18N[el.dataset.i18n];
+                if (t && t[lang]) el.innerHTML = t[lang];
+            });
+            document.querySelectorAll('.lang-switch button').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === lang);
+            });
+            try { localStorage.setItem('lang', lang); } catch (e) {}
+        }
+
+        document.querySelectorAll('.lang-switch button').forEach(b => {
+            b.addEventListener('click', () => applyLang(b.dataset.lang));
+        });
+
+        let savedLang = 'ru';
+        try { savedLang = localStorage.getItem('lang') || 'ru'; } catch (e) {}
+        if (savedLang !== 'ru') applyLang(savedLang);
     </script>
 </body>
 </html>
