@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>cangrida · статистика</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1115;--card:#181b22;--card2:#1e222b;--text:#e8eaed;--muted:#9aa0ab;
+    --line:#2a2f3a;--accent:#6c8cff;--good:#2ecc71;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:24px 16px 60px}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 6px;line-height:1.5}
+  .stamp{font-size:12px;color:var(--muted);margin:0 0 20px}
+  .stamp b{color:var(--good);font-weight:600}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:26px 0 10px;font-weight:600}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  input,select{background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--text);
+    padding:8px 11px;font-size:13px;outline:none;width:100%}
+  input:focus,select:focus{border-color:var(--accent)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .row > div{flex:1;min-width:110px}
+  button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 16px;
+    font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  button:hover{filter:brightness(1.1)}
+  button.ghost{background:var(--card2);border:1px solid var(--line);color:var(--text)}
+  .posts{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+  .postrow{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);
+    border-radius:9px;padding:9px 12px;cursor:pointer}
+  .postrow.sel{border-color:var(--accent);background:rgba(108,140,255,.1)}
+  .postrow .pt{flex:1;font-size:14px;font-weight:600}
+  .postrow .pd{font-size:11px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:20px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .chip{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+  .metric-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 12px}
+  .metric-tabs button{background:var(--card2);border:1px solid var(--line);color:var(--muted);font-weight:600}
+  .metric-tabs button.on{background:rgba(108,140,255,.15);border-color:var(--accent);color:var(--accent)}
+  .chartbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:4px}
+  .hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:8px}
+  .backup{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .del{color:#ff6b6b;cursor:pointer;font-size:15px;background:none;border:none;padding:0 4px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .kpi{flex:1;min-width:130px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+  .kpi .v{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  .kpi .d{font-size:11px;color:var(--muted);margin-top:2px}
+  .kpi .d.up{color:var(--good)}
+  .note{font-size:12px;color:var(--muted);line-height:1.6;background:var(--card2);
+    border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:11px 13px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Статистика · cangrida</h1>
+  <p class="sub">Посещаемость сайта и жизнь постов по площадкам. Цифры обновляются автоматически раз в неделю.</p>
+  <p class="stamp" id="stamp">Загружаю данные…</p>
+
+  <!-- SITE TRAFFIC -->
+  <h2>Сайт cangrida.com</h2>
+  <div class="panel">
+    <div class="kpis" id="site-kpis"></div>
+    <canvas id="site-chart" height="200"></canvas>
+    <div class="hint" id="site-hint"></div>
+  </div>
+
+  <!-- POSTS -->
+  <h2>1 · Работы и посты</h2>
+  <div class="panel">
+    <div class="row">
+      <div style="flex:3">
+        <label>Название работы</label>
+        <input id="np-title" placeholder="напр. Golden Hour" />
+      </div>
+      <div>
+        <label>Дата публикации</label>
+        <input id="np-date" type="date" />
+      </div>
+      <button onclick="addPost()">+ Добавить</button>
+    </div>
+    <div class="posts" id="post-list"></div>
+  </div>
+
+  <!-- ADD ENTRY -->
+  <h2>2 · Замеры <span id="sel-name" style="color:var(--accent);text-transform:none;letter-spacing:0"></span></h2>
+  <div class="panel" id="entry-panel">
+    <div class="empty" id="entry-empty">Выбери работу выше, чтобы посмотреть или внести цифры.</div>
+    <div id="entry-form" style="display:none">
+      <div class="row">
+        <div><label>Площадка</label>
+          <select id="ne-platform"></select></div>
+        <div><label>Дата замера</label><input id="ne-date" type="date" /></div>
+        <div><label>Просмотры</label><input id="ne-views" type="number" min="0" placeholder="0" /></div>
+        <div><label>Лайки</label><input id="ne-likes" type="number" min="0" placeholder="0" /></div>
+        <div><label>Сохранения</label><input id="ne-saves" type="number" min="0" placeholder="0" /></div>
+        <div><label>Комменты</label><input id="ne-comments" type="number" min="0" placeholder="0" /></div>
+        <button onclick="addEntry()">Записать</button>
+      </div>
+      <table id="entry-table"></table>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <h2>3 · Кривая интереса</h2>
+  <div class="metric-tabs" id="metric-tabs">
+    <button data-m="views" class="on" onclick="setMetric('views',this)">Просмотры</button>
+    <button data-m="likes" onclick="setMetric('likes',this)">Лайки</button>
+    <button data-m="saves" onclick="setMetric('saves',this)">Сохранения</button>
+    <button data-m="comments" onclick="setMetric('comments',this)">Комменты</button>
+  </div>
+  <div class="chartbox">
+    <canvas id="chart" height="240"></canvas>
+    <div class="hint" id="chart-hint">Выбери работу и внеси хотя бы два замера в разные дни — появится кривая.</div>
+  </div>
+
+  <!-- SERVICE -->
+  <h2>Служебное</h2>
+  <div class="panel">
+    <div class="backup">
+      <button class="ghost" onclick="pullRemote(true)">Обновить с сайта</button>
+      <button class="ghost" onclick="downloadBackup()">Скачать копию</button>
+      <button class="ghost" onclick="document.getElementById('restore').click()">Загрузить копию</button>
+      <input type="file" id="restore" accept=".json" style="display:none" onchange="restoreBackup(event)" />
+    </div>
+    <div class="hint" id="backup-hint"></div>
+    <div class="note">Основные цифры лежат в файле <b>lab-9f2c-data.json</b> рядом с этой страницей и обновляются раз в неделю. Если ты вносишь что-то руками, оно сохраняется только в этом браузере и живёт до следующего обновления с сайта. Хочешь, чтобы ручная правка сохранилась навсегда — нажми «Скачать копию» и пришли мне файл.</div>
+  </div>
+</div>
+
+<script>
+const KEY='cangrida_stats_v2';
+const DATA_URL='lab-9f2c-data.json';
+const PLATFORMS=[
+  {n:'ВКонтакте',c:'#4c75a3'},{n:'Instagram',c:'#e1306c'},{n:'TikTok',c:'#25f4ee'},
+  {n:'YouTube',c:'#ff0000'},{n:'Telegram',c:'#2aabee'},{n:'Cara',c:'#c99a3a'},
+  {n:'Facebook',c:'#1877f2'},{n:'LinkedIn',c:'#0a66c2'},{n:'ArtStation',c:'#13aff0'},
+  {n:'Behance',c:'#0057ff'},{n:'DeviantArt',c:'#05cc47'},{n:'Tumblr',c:'#8f6fd1'}
+];
+let state={updated:'',site:[],posts:[]};
+let selId=null, metric='views', chart=null, siteChart=null;
+
+function save(){try{state.updated=nowStamp();localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function nowStamp(){return new Date().toISOString()}
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function pColor(n){const p=PLATFORMS.find(x=>x.n===n);return p?p.c:'#888'}
+function normalize(d){
+  if(!d||typeof d!=='object')d={};
+  if(!Array.isArray(d.posts))d.posts=[];
+  if(!Array.isArray(d.site))d.site=[];
+  if(typeof d.updated!=='string')d.updated='';
+  d.posts.forEach(p=>{if(!Array.isArray(p.entries))p.entries=[];if(!p.id)p.id=uid();});
+  return d;
+}
+
+function initStatic(){
+  document.getElementById('np-date').value=todayStr();
+  document.getElementById('ne-platform').innerHTML=PLATFORMS.map(p=>`<option>${p.n}</option>`).join('');
+}
+
+// ---- loading: remote wins if newer ----
+function readLocal(){
+  try{return normalize(JSON.parse(localStorage.getItem(KEY)))}catch(e){return null}
+}
+async function pullRemote(force){
+  let remote=null;
+  try{
+    const r=await fetch(DATA_URL+'?t='+Date.now(),{cache:'no-store'});
+    if(r.ok)remote=normalize(await r.json());
+  }catch(e){}
+  const local=readLocal();
+  if(remote&&(force||!local||!local.updated||remote.updated>local.updated)){
+    state=remote;
+    try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+    stampMsg(remote.updated,true);
+  }else if(local){
+    state=local;
+    stampMsg(local.updated,false);
+  }else{
+    state=normalize(null);
+    stampMsg('',false);
+  }
+  render();
+}
+function stampMsg(iso,fromServer){
+  const el=document.getElementById('stamp');
+  if(!iso){el.textContent='Данных пока нет — первый замер появится после ближайшей проверки.';return;}
+  const d=new Date(iso);
+  const s=isNaN(d)?iso:d.toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
+  el.innerHTML='Обновлено: <b>'+s+'</b>'+(fromServer?'':' · локальная версия свежее серверной');
+}
+
+// ---- posts ----
+function addPost(){
+  const t=document.getElementById('np-title').value.trim();
+  const d=document.getElementById('np-date').value||todayStr();
+  if(!t){document.getElementById('np-title').focus();return;}
+  const id=uid();
+  state.posts.unshift({id,title:t,date:d,entries:[]});
+  save();
+  document.getElementById('np-title').value='';
+  selId=id;
+  render();
+}
+function deletePost(id,ev){
+  ev.stopPropagation();
+  if(!confirm('Удалить работу и все её замеры?'))return;
+  state.posts=state.posts.filter(p=>p.id!==id);
+  if(selId===id)selId=null;
+  save();render();
+}
+function selectPost(id){selId=id;render();}
+
+function addEntry(){
+  const p=state.posts.find(x=>x.id===selId);if(!p)return;
+  const g=id=>document.getElementById(id).value;
+  const num=v=>v===''?0:Math.max(0,parseInt(v)||0);
+  p.entries.push({
+    platform:g('ne-platform'),date:g('ne-date')||todayStr(),
+    views:num(g('ne-views')),likes:num(g('ne-likes')),
+    saves:num(g('ne-saves')),comments:num(g('ne-comments'))
+  });
+  p.entries.sort((a,b)=>a.date.localeCompare(b.date));
+  save();
+  ['ne-views','ne-likes','ne-saves','ne-comments'].forEach(i=>document.getElementById(i).value='');
+  render();
+}
+function deleteEntry(i,ev){
+  ev.stopPropagation();
+  const p=state.posts.find(x=>x.id===selId);if(!p)return;
+  p.entries.splice(i,1);save();render();
+}
+function setMetric(m,btn){
+  metric=m;
+  document.querySelectorAll('#metric-tabs button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  drawChart();
+}
+
+// ---- render ----
+function render(){
+  const pl=document.getElementById('post-list');
+  if(!state.posts.length){pl.innerHTML='<div class="empty">Пока нет работ. Добавь первую выше.</div>';}
+  else pl.innerHTML=state.posts.map(p=>`
+    <div class="postrow ${p.id===selId?'sel':''}" onclick="selectPost('${p.id}')">
+      <span class="pt">${esc(p.title)}</span>
+      <span class="pd">${p.date} · ${p.entries.length} замеров</span>
+      <button class="del" onclick="deletePost('${p.id}',event)">×</button>
+    </div>`).join('');
+
+  const p=state.posts.find(x=>x.id===selId);
+  document.getElementById('sel-name').textContent=p?('— '+p.title):'';
+  document.getElementById('entry-empty').style.display=p?'none':'block';
+  document.getElementById('entry-form').style.display=p?'block':'none';
+  if(p){
+    if(!document.getElementById('ne-date').value)document.getElementById('ne-date').value=todayStr();
+    const t=document.getElementById('entry-table');
+    if(!p.entries.length){t.innerHTML='<tr><td class="empty" colspan="7">Замеров пока нет.</td></tr>';}
+    else{
+      t.innerHTML='<tr><th>Дата</th><th>Площадка</th><th style="text-align:right">Просм.</th><th style="text-align:right">Лайки</th><th style="text-align:right">Сохр.</th><th style="text-align:right">Комм.</th><th></th></tr>'+
+        p.entries.map((e,i)=>`<tr>
+          <td>${e.date}</td>
+          <td><span class="chip" style="background:${pColor(e.platform)}22;color:${pColor(e.platform)}">${esc(e.platform)}</span></td>
+          <td class="num">${e.views}</td><td class="num">${e.likes}</td>
+          <td class="num">${e.saves}</td><td class="num">${e.comments}</td>
+          <td style="text-align:right"><button class="del" onclick="deleteEntry(${i},event)">×</button></td>
+        </tr>`).join('');
+    }
+  }
+  drawSite();
+  drawChart();
+}
+
+function drawSite(){
+  const box=document.getElementById('site-kpis');
+  const hint=document.getElementById('site-hint');
+  const rows=(state.site||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  if(siteChart){siteChart.destroy();siteChart=null;}
+  if(!rows.length){
+    box.innerHTML='';
+    hint.textContent='Первые цифры посещаемости появятся после ближайшей проверки Cloudflare.';
+    return;
+  }
+  const last=rows[rows.length-1], prev=rows.length>1?rows[rows.length-2]:null;
+  const delta=(a,b)=>{
+    if(b===null||b===undefined)return '';
+    const d=a-b;
+    if(d===0)return 'без изменений';
+    return (d>0?'+':'')+d+' к прошлой неделе';
+  };
+  const totalV=rows.reduce((s,r)=>s+(r.views||0),0);
+  box.innerHTML=`
+    <div class="kpi"><div class="k">Просмотры за неделю</div><div class="v">${last.views||0}</div>
+      <div class="d ${prev&&last.views>prev.views?'up':''}">${prev?delta(last.views||0,prev.views||0):'первый замер'}</div></div>
+    <div class="kpi"><div class="k">Визиты за неделю</div><div class="v">${last.visits||0}</div>
+      <div class="d ${prev&&last.visits>prev.visits?'up':''}">${prev?delta(last.visits||0,prev.visits||0):'первый замер'}</div></div>
+    <div class="kpi"><div class="k">Всего просмотров</div><div class="v">${totalV}</div>
+      <div class="d">за ${rows.length} ${rows.length===1?'неделю':'недель'} наблюдения</div></div>`;
+  hint.textContent=rows.length<2?'Через неделю здесь появится вторая точка и будет видна динамика.':'';
+  siteChart=new Chart(document.getElementById('site-chart'),{
+    type:'line',
+    data:{labels:rows.map(r=>r.date),datasets:[
+      {label:'Просмотры страниц',data:rows.map(r=>r.views||0),borderColor:'#6c8cff',backgroundColor:'#6c8cff',tension:.3,pointRadius:4,borderWidth:2},
+      {label:'Визиты',data:rows.map(r=>r.visits||0),borderColor:'#2ecc71',backgroundColor:'#2ecc71',tension:.3,pointRadius:4,borderWidth:2}
+    ]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#e8eaed'}}},
+      scales:{x:{ticks:{color:'#9aa0ab'},grid:{color:'#2a2f3a'}},
+        y:{ticks:{color:'#9aa0ab'},grid:{color:'#2a2f3a'},beginAtZero:true}}}});
+}
+
+function drawChart(){
+  const p=state.posts.find(x=>x.id===selId);
+  const hint=document.getElementById('chart-hint');
+  if(chart){chart.destroy();chart=null;}
+  if(!p||!p.entries.length){hint.style.display='block';
+    hint.textContent='Выбери работу и внеси хотя бы два замера в разные дни — появится кривая.';return;}
+  const dates=[...new Set(p.entries.map(e=>e.date))].sort();
+  const platforms=[...new Set(p.entries.map(e=>e.platform))];
+  const datasets=platforms.map(pl=>({
+    label:pl,
+    data:dates.map(d=>{const e=p.entries.filter(x=>x.platform===pl&&x.date===d).pop();return e?e[metric]:null;}),
+    borderColor:pColor(pl),backgroundColor:pColor(pl),
+    tension:.3,spanGaps:true,pointRadius:4,borderWidth:2
+  }));
+  hint.style.display=dates.length<2?'block':'none';
+  hint.textContent=dates.length<2?'Нужен замер ещё в другой день, чтобы увидеть динамику.':'';
+  const mName={views:'Просмотры',likes:'Лайки',saves:'Сохранения',comments:'Комменты'}[metric];
+  chart=new Chart(document.getElementById('chart'),{type:'line',data:{labels:dates,datasets},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#e8eaed'}},
+      title:{display:true,text:p.title+' — '+mName,color:'#9aa0ab'}},
+      scales:{x:{ticks:{color:'#9aa0ab'},grid:{color:'#2a2f3a'}},
+        y:{ticks:{color:'#9aa0ab'},grid:{color:'#2a2f3a'},beginAtZero:true}}}});
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function bh(m,c){const h=document.getElementById('backup-hint');h.textContent=m;h.style.color=c||'var(--muted)';}
+function downloadBackup(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='cangrida-stats-'+todayStr()+'.json';a.click();URL.revokeObjectURL(a.href);
+  bh('Копия сохранена в загрузки.','var(--good)');
+}
+function restoreBackup(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{try{
+    const d=normalize(JSON.parse(e.target.result));
+    state=d;save();selId=null;render();stampMsg(state.updated,false);
+    bh('Загружено работ: '+state.posts.length,'var(--good)');
+  }catch(err){bh('Не читается: '+err.message,'#ff6b6b');}ev.target.value='';};
+  r.readAsText(f);
+}
+
+initStatic();
+pullRemote(false);
+</script>
+</body>
+</html>

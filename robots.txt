@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /lab-9f2c.html
+Disallow: /lab-9f2c-data.json
 
 Sitemap: https://cangrida.com/sitemap.xml
