@@ -51,7 +51,7 @@
     }
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="fonts.css">
     <style>
         * {
             margin: 0;
@@ -1245,6 +1245,7 @@
         try { savedLang = localStorage.getItem('lang') || 'ru'; } catch (e) {}
         if (savedLang !== 'ru') applyLang(savedLang);
     </script>
+<footer style="text-align:center;padding:28px 16px 22px;font-size:11px;line-height:1.7;color:#8a8a8a;opacity:.8;">Статистика посещений — Cloudflare Web Analytics: без cookies и без сбора персональных данных.<br>Visitor stats by Cloudflare Web Analytics — no cookies, no personal data.</footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6cae0a70d4474688a8702682e8e27fd3"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
