@@ -1,0 +1,317 @@
+{
+  "updated": "2026-07-24T12:00:00.000Z",
+  "site": [
+    {
+      "date": "2026-07-23",
+      "views": 7,
+      "visits": 5
+    },
+    {
+      "date": "2026-07-24",
+      "views": 4,
+      "visits": 4
+    }
+  ],
+  "posts": [
+    {
+      "id": "p01",
+      "title": "Idea Generator / Out of ideas",
+      "date": "2026-07-22",
+      "entries": [
+        {
+          "platform": "LinkedIn",
+          "date": "2026-07-24",
+          "views": 56,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 287,
+          "likes": 4,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "Tumblr",
+          "date": "2026-07-24",
+          "views": 0,
+          "likes": 1,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p02",
+      "title": "Frau Perchta",
+      "date": "2026-07-20",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 270,
+          "likes": 25,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p03",
+      "title": "Tavern keeper",
+      "date": "2026-07-16",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 822,
+          "likes": 50,
+          "saves": 0,
+          "comments": 2
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 67,
+          "likes": 0,
+          "saves": 0,
+          "comments": 2
+        }
+      ]
+    },
+    {
+      "id": "p04",
+      "title": "Summer! Sun!",
+      "date": "2026-07-13",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 273,
+          "likes": 32,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 353,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p05",
+      "title": "Off we go! / Kosmic girl",
+      "date": "2026-07-11",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 275,
+          "likes": 27,
+          "saves": 0,
+          "comments": 5
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 67,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p06",
+      "title": "A little demon",
+      "date": "2026-07-10",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 273,
+          "likes": 18,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 78,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p07",
+      "title": "A jester",
+      "date": "2026-07-09",
+      "entries": [
+        {
+          "platform": "LinkedIn",
+          "date": "2026-07-24",
+          "views": 575,
+          "likes": 14,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 296,
+          "likes": 27,
+          "saves": 0,
+          "comments": 2
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 174,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p08",
+      "title": "Today's sketch",
+      "date": "2026-07-08",
+      "entries": [
+        {
+          "platform": "LinkedIn",
+          "date": "2026-07-24",
+          "views": 137,
+          "likes": 4,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p09",
+      "title": "Don't give up / redraw",
+      "date": "2026-07-07",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 292,
+          "likes": 20,
+          "saves": 0,
+          "comments": 2
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 159,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p10",
+      "title": "Medusa Gorgon / Dark world",
+      "date": "2026-07-06",
+      "entries": [
+        {
+          "platform": "LinkedIn",
+          "date": "2026-07-24",
+          "views": 233,
+          "likes": 10,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 282,
+          "likes": 27,
+          "saves": 0,
+          "comments": 1
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 18,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "ArtStation",
+          "date": "2026-07-24",
+          "views": 0,
+          "likes": 107,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p11",
+      "title": "Golden Hour",
+      "date": "2026-07-05",
+      "entries": [
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 288,
+          "likes": 28,
+          "saves": 0,
+          "comments": 1
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 362,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "id": "p12",
+      "title": "One day - one sketch",
+      "date": "2026-07-04",
+      "entries": [
+        {
+          "platform": "LinkedIn",
+          "date": "2026-07-24",
+          "views": 97,
+          "likes": 3,
+          "saves": 0,
+          "comments": 1
+        },
+        {
+          "platform": "TikTok",
+          "date": "2026-07-24",
+          "views": 283,
+          "likes": 4,
+          "saves": 0,
+          "comments": 0
+        },
+        {
+          "platform": "YouTube",
+          "date": "2026-07-24",
+          "views": 5,
+          "likes": 0,
+          "saves": 0,
+          "comments": 0
+        }
+      ]
+    }
+  ]
+}
