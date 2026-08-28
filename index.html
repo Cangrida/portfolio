@@ -498,7 +498,7 @@
             margin-top: 120px;
         }
 
-        .skill-item h3 {
+        .skill-item .skill-num {
             font-family: 'Playfair Display', serif;
             font-size: 2.2rem;
             color: #ff6b35;
@@ -823,6 +823,7 @@
         <button data-lang="ru" class="active">RU</button>
         <button data-lang="en">EN</button>
     </div>
+    <main id="main">
     <div class="header-wrapper">
         <div class="header-noise"></div>
         <div class="orb orb-1"></div>
@@ -830,7 +831,7 @@
         <div class="orb orb-3"></div>
     <div class="container">
         <div class="hero">
-            <img src="logo_cangrida_white.png" alt="Cangrida" class="logo reveal">
+            <img src="logo_cangrida_white_small.png" alt="Cangrida" class="logo reveal" width="360" height="209" fetchpriority="high" decoding="async">
             <p class="subtitle reveal reveal-delay-1">2D / 3D Artist · Animator · Illustrator</p>
             <h1 class="reveal reveal-delay-2" data-i18n="hero_title">
                 Галина<br>
@@ -887,19 +888,19 @@
 
         <div class="skills-sidebar">
             <div class="skill-item reveal reveal-right" style="--i:0">
-                <h3>7+</h3>
+                <span class="skill-num">7+</span>
                 <p data-i18n="skill_1">Лет в геймдеве</p>
             </div>
             <div class="skill-item reveal reveal-right" style="--i:1">
-                <h3>2D·3D</h3>
+                <span class="skill-num">2D·3D</span>
                 <p data-i18n="skill_2">Иллюстрация, моделирование</p>
             </div>
             <div class="skill-item reveal reveal-right" style="--i:2">
-                <h3>Spine</h3>
+                <span class="skill-num">Spine</span>
                 <p data-i18n="skill_3">Анимация персонажей 2D+СКА</p>
             </div>
             <div class="skill-item reveal reveal-right" style="--i:3">
-                <h3>UI/UX</h3>
+                <span class="skill-num">UI/UX</span>
                 <p data-i18n="skill_4">От концепта до анимаций</p>
             </div>
         </div>
@@ -953,98 +954,98 @@
 
         <div class="portfolio-grid">
             <!-- 1 --> <div class="portfolio-item" data-category="illustration">
-                <img src="friends.jpg" alt="Friends: The Meeting" class="portfolio-img">
+                <img src="thumbs/friends.jpg" data-full="friends.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Friends: The Meeting" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w20">Friends: Встреча</h3><p>Illustration</p></div>
             </div>
             <!-- 2 --> <div class="portfolio-item" data-category="concept">
-                <img src="meduza.jpg" alt="Medusa Gorgon" class="portfolio-img">
+                <img src="thumbs/meduza.jpg" data-full="meduza.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Medusa Gorgon" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w21">Медуза Горгона</h3><p>Character design</p></div>
             </div>
             <!-- 3 --> <div class="portfolio-item" data-category="illustration">
-                <img src="notevendeath.jpg" alt="Not Even Death Will Part Us" class="portfolio-img">
+                <img src="thumbs/notevendeath.jpg" data-full="notevendeath.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Not Even Death Will Part Us" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w22">И даже смерть не разлучит</h3><p>Splash art</p></div>
             </div>
             <!-- 4 --> <div class="portfolio-item" data-category="concept">
-                <img src="mantis.jpg" alt="Mantis Sorcerer" class="portfolio-img">
+                <img src="thumbs/mantis.jpg" data-full="mantis.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Mantis Sorcerer" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w23">Мантис-колдун</h3><p>Creature concept</p></div>
             </div>
             <!-- 5 --> <div class="portfolio-item" data-category="illustration">
-                <img src="altantuya.jpg" alt="Altantuya — Golden Dawn" class="portfolio-img">
+                <img src="thumbs/altantuya.jpg" data-full="altantuya.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Altantuya — Golden Dawn" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w24">Алтантуя — Золотой рассвет</h3><p>Character illustration</p></div>
             </div>
             <!-- 6 --> <div class="portfolio-item" data-category="illustration">
-                <img src="charon.jpg" alt="Charon's Boat" class="portfolio-img">
+                <img src="thumbs/charon.jpg" data-full="charon.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Charon's Boat" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w25">Лодка Харона</h3><p>Illustration</p></div>
             </div>
             <!-- 7 --> <div class="portfolio-item" data-category="illustration">
-                <img src="final.jpg" alt="Похоть — 7 грехов" class="portfolio-img">
+                <img src="thumbs/final.jpg" data-full="final.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Похоть — 7 грехов" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w27">Похоть — 7 грехов</h3><p>Character illustration</p></div>
             </div>
             <!-- 8 --> <div class="portfolio-item" data-category="illustration">
-                <img src="gnev.jpg" alt="Гнев" class="portfolio-img">
+                <img src="thumbs/gnev.jpg" data-full="gnev.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Гнев" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w4">Гнев — 7 грехов</h3><p>Character illustration</p></div>
             </div>
             <!-- 9 --> <div class="portfolio-item" data-category="illustration">
-                <img src="len.jpg" alt="Лень" class="portfolio-img">
+                <img src="thumbs/len.jpg" data-full="len.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Лень" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w5">Лень — 7 грехов</h3><p>Character design</p></div>
             </div>
             <!-- 9b --> <div class="portfolio-item" data-category="concept">
-                <img src="zavist.jpg" alt="Зависть" class="portfolio-img">
+                <img src="thumbs/zavist.jpg" data-full="zavist.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Зависть" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w7">Зависть — 7 грехов</h3><p>Character concept</p></div>
             </div>
             <!-- 9c --> <div class="portfolio-item" data-category="concept">
-                <img src="piratka.jpg" alt="Rogue Trader Pirate" class="portfolio-img">
+                <img src="thumbs/piratka.jpg" data-full="piratka.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Rogue Trader Pirate" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w28">Пират Rogue Trader</h3><p>Character design</p></div>
             </div>
             <!-- 9e --> <div class="portfolio-item" data-category="illustration">
-                <img src="bach.jpg" alt="Танец у самолёта" class="portfolio-img">
+                <img src="thumbs/bach.jpg" data-full="bach.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Танец у самолёта" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w26">Танец у самолёта</h3><p>Digital painting</p></div>
             </div>
             <!-- 10 --> <div class="portfolio-item" data-category="3d">
-                <img src="pistol.jpg" alt="Пистолет" class="portfolio-img">
+                <img src="thumbs/pistol.jpg" data-full="pistol.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Пистолет" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w10">3D Пистолет</h3><p>Blender · hard surface</p></div>
             </div>
             <!-- 11 --> <div class="portfolio-item" data-category="3d">
-                <img src="robot.jpg" alt="Робот" class="portfolio-img">
+                <img src="thumbs/robot.jpg" data-full="robot.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Робот" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w11">Робот</h3><p>3D character</p></div>
             </div>
             <!-- 12 --> <div class="portfolio-item" data-category="3d">
-                <img src="bochka.jpg" alt="Бочка" class="portfolio-img">
+                <img src="thumbs/bochka.jpg" data-full="bochka.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Бочка" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w12">3D Бочка</h3><p data-i18n="w12c">Blender · текстурирование</p></div>
             </div>
             <!-- 13 --> <div class="portfolio-item" data-category="3d">
-                <img src="arbalet.jpg" alt="Арбалет" class="portfolio-img">
+                <img src="thumbs/arbalet.jpg" data-full="arbalet.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Арбалет" class="portfolio-img">
                 <div class="portfolio-overlay"><h3 data-i18n="w13">3D Арбалет</h3><p data-i18n="w13c">Blender · моделирование</p></div>
             </div>
             <!-- 14 --> <div class="portfolio-item" data-category="animation">
-                <img src="fox.gif" alt="Лиса" class="portfolio-img">
+                <video class="portfolio-img" poster="posters/fox.jpg" preload="none" loop muted playsinline width="800" height="800" aria-label="Лиса"><source src="fox.mp4" type="video/mp4"><source src="fox.webm" type="video/webm"></video>
                 <div class="portfolio-overlay"><h3 data-i18n="w14">Fox анимация</h3><p>Spine animation</p></div>
             </div>
             <!-- 15 --> <div class="portfolio-item" data-category="animation">
-                <img src="idle.gif" alt="Idle" class="portfolio-img">
+                <video class="portfolio-img" poster="posters/idle.jpg" preload="none" loop muted playsinline width="800" height="800" aria-label="Idle"><source src="idle.mp4" type="video/mp4"><source src="idle.webm" type="video/webm"></video>
                 <div class="portfolio-overlay"><h3 data-i18n="w15">Idle анимация</h3><p data-i18n="w15c">Spine · персонаж</p></div>
             </div>
             <!-- 16 --> <div class="portfolio-item" data-category="animation">
-                <img src="krok.gif" alt="Крокодил" class="portfolio-img">
+                <video class="portfolio-img" poster="posters/krok.jpg" preload="none" loop muted playsinline width="800" height="800" aria-label="Крокодил"><source src="krok.mp4" type="video/mp4"><source src="krok.webm" type="video/webm"></video>
                 <div class="portfolio-overlay"><h3 data-i18n="w16">Крокодил</h3><p>2D animation</p></div>
             </div>
             <!-- 17 --> <div class="portfolio-item" data-category="animation">
-                <video autoplay loop muted playsinline class="portfolio-img"><source src="крокодильчик актив.webm" type="video/webm"></video>
+                <video class="portfolio-img" poster="posters/krokodilchik-activ.jpg" preload="none" loop muted playsinline width="800" height="800"><source src="крокодильчик актив.webm" type="video/webm"></video>
                 <div class="portfolio-overlay"><h3 data-i18n="w17">Крокодильчик актив</h3><p>2D animation</p></div>
             </div>
             <!-- 18 --> <div class="portfolio-item" data-category="animation">
-                <video autoplay loop muted playsinline class="portfolio-img"><source src="tiger dance.webm" type="video/webm"></video>
+                <video class="portfolio-img" poster="posters/tiger-dance.jpg" preload="none" loop muted playsinline width="800" height="800"><source src="tiger dance.webm" type="video/webm"></video>
                 <div class="portfolio-overlay"><h3>Tiger Dance</h3><p>2D animation</p></div>
             </div>
             <!-- 19 --> <div class="portfolio-item" data-category="animation">
-                <video autoplay loop muted playsinline class="portfolio-img"><source src="tiger drink.webm" type="video/webm"></video>
+                <video class="portfolio-img" poster="posters/tiger-drink.jpg" preload="none" loop muted playsinline width="800" height="800"><source src="tiger drink.webm" type="video/webm"></video>
                 <div class="portfolio-overlay"><h3>Tiger Drink</h3><p>2D animation</p></div>
             </div>
         </div>
 
         <!-- 20 — Game UI на всю ширину -->
         <div class="portfolio-item-fullwidth" data-category="gameui">
-            <video src="βνξθ 2025.mp4" autoplay loop muted playsinline></video>
+            <video poster="posters/gameui-2025.jpg" preload="none" loop muted playsinline width="1152" height="648" aria-label="Game UI"><source src="gameui-2025.mp4" type="video/mp4"></video>
             <div class="portfolio-overlay">
                 <h3>Game UI</h3>
                 <p>Interface Design</p>
@@ -1052,6 +1053,8 @@
         </div>
       </div><!-- /container -->
     </section>
+    </main>
+
     <div class="lightbox" id="lightbox">
         <span class="lightbox-close" id="lightbox-close">&times;</span>
         <img class="lightbox-content" id="lightbox-img">
@@ -1130,15 +1133,36 @@
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         const lightboxClose = document.getElementById('lightbox-close');
-        const portfolioImages = document.querySelectorAll('.portfolio-img');
+        const portfolioImages = document.querySelectorAll('img.portfolio-img');
 
         portfolioImages.forEach(img => {
             img.addEventListener('click', (e) => {
                 e.stopPropagation();
                 lightbox.classList.add('active');
-                lightboxImg.src = img.src;
+                lightboxImg.src = img.dataset.full || img.src;
+                lightboxImg.alt = img.alt || '';
             });
         });
+
+        // ===== Видео в галерее: грузим и запускаем только когда попали в кадр =====
+        const lazyVideos = document.querySelectorAll('video[preload="none"]');
+        if ('IntersectionObserver' in window) {
+            const vo = new IntersectionObserver((entries) => {
+                entries.forEach(en => {
+                    const v = en.target;
+                    if (en.isIntersecting) {
+                        if (!v.dataset.started) { v.dataset.started = '1'; v.load(); }
+                        const p = v.play();
+                        if (p && p.catch) p.catch(() => {});
+                    } else if (!v.paused) {
+                        v.pause();
+                    }
+                });
+            }, { rootMargin: '200px 0px' });
+            lazyVideos.forEach(v => vo.observe(v));
+        } else {
+            lazyVideos.forEach(v => { v.load(); v.play().catch(() => {}); });
+        }
 
         lightboxClose.addEventListener('click', () => {
             lightbox.classList.remove('active');
