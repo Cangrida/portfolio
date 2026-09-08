@@ -623,6 +623,23 @@
             border-color: #ff6b35;
         }
 
+        .filter-link {
+            text-decoration: none;
+            color: #ff6b35;
+            border-color: rgba(255, 107, 53, 0.5);
+            margin-left: 10px;
+        }
+
+        .filter-link:hover {
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .filter-link:first-of-type { margin-left: 20px; }
+
+        @media (max-width: 768px) {
+            .filter-link, .filter-link:first-of-type { margin-left: 0; }
+        }
+
         .filter-btn.active {
             background: #ff6b35;
             color: #1a1510;
@@ -1263,6 +1280,8 @@
                 <button class="filter-btn" data-filter="3d">3D</button>
                 <button class="filter-btn" data-filter="animation" data-i18n="f_anim">Анимация</button>
                 <button class="filter-btn" data-filter="gameui">Game UI</button>
+                <a href="#video" class="filter-btn filter-link"><span data-i18n="btn_video">Видео</span> ↓</a>
+                <a href="#games" class="filter-btn filter-link"><span data-i18n="btn_games">Игры</span> ↓</a>
             </div>
         </div>
 
@@ -1502,7 +1521,7 @@
         });
 
         // ===== Portfolio Filter =====
-        const filterButtons = document.querySelectorAll('.filter-btn');
+        const filterButtons = document.querySelectorAll('.filter-btn:not(.filter-link)');
         const portfolioItems = document.querySelectorAll('.portfolio-item, .portfolio-item-fullwidth');
 
         filterButtons.forEach(button => {
