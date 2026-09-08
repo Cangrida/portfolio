@@ -1382,6 +1382,24 @@
         </div>
 
         <div class="video-grid">
+            <!-- v3 --> <a class="video-card reveal" data-src="videos/robot-nosok-ru.mp4" data-src-en="videos/robot-nosok-en.mp4" data-ratio="4/3">
+                <img src="posters/v-robot-nosok.jpg" width="1184" height="896" loading="lazy" decoding="async" alt="Охота">
+                <span class="video-dur">0:53</span>
+                <span class="play-badge"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg></span>
+                <div class="video-meta"><h3 data-i18n="v3">Охота</h3><p data-i18n="v3c">Робот-пылесос и носок · пластилиновая история</p></div>
+            </a>
+            <!-- v4 --> <a class="video-card reveal reveal-delay-1" data-src="videos/kotofon.mp4" data-ratio="16/9">
+                <img src="posters/v-kotofon.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="Котофон">
+                <span class="video-dur">0:53</span>
+                <span class="play-badge"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg></span>
+                <div class="video-meta"><h3 data-i18n="v4">Котофон</h3><p data-i18n="v4c">Рекламный ролик</p></div>
+            </a>
+            <!-- v5 --> <a class="video-card reveal reveal-delay-2" data-src="videos/doma-v2.mp4" data-ratio="9/16">
+                <img src="posters/v-doma.jpg" width="480" height="864" loading="lazy" decoding="async" alt="Дома">
+                <span class="video-dur">0:35</span>
+                <span class="play-badge"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg></span>
+                <div class="video-meta"><h3 data-i18n="v5">Дома</h3><p data-i18n="v5c">Из цикла «Ожидание»</p></div>
+            </a>
             <!-- v1 --> <a class="video-card reveal" data-src="videos/gnev-taverna.mp4" data-ratio="16/9">
                 <img src="posters/v-gnev-taverna.jpg" width="1280" height="763" loading="lazy" decoding="async" alt="Гнев — таверна">
                 <span class="video-dur">0:07</span>
@@ -1585,9 +1603,11 @@
                     vlbPlayer.appendChild(f);
                 } else {
                     const v = document.createElement('video');
-                    v.src = card.dataset.src;
+                    const lang = document.documentElement.lang;
+                    v.src = (lang === 'en' && card.dataset.srcEn) ? card.dataset.srcEn : card.dataset.src;
                     v.controls = true; v.autoplay = true; v.playsInline = true;
                     if (vertical) v.classList.add('vertical');
+                    else if (card.dataset.ratio) v.style.aspectRatio = card.dataset.ratio;
                     vlbPlayer.appendChild(v);
                 }
                 vlb.classList.add('active');
@@ -1682,6 +1702,12 @@
                 ru: 'Короткие ролики, в которых мои персонажи оживают. Рисую персонажей и опорные кадры сама, движение генерирую нейросетями, монтаж и звук собираю руками.',
                 en: 'Short films where my characters come alive. I draw the characters and key frames myself, generate the motion with neural networks, and cut the edit and sound by hand.'
             },
+            v3:  { ru: 'Охота', en: 'The Hunt' },
+            v3c: { ru: 'Робот-пылесос и носок · пластилиновая история', en: 'A robot vacuum and a sock · a claymation story' },
+            v4:  { ru: 'Котофон', en: 'Kotofon' },
+            v4c: { ru: 'Рекламный ролик', en: 'Commercial' },
+            v5:  { ru: 'Дома', en: 'Home' },
+            v5c: { ru: 'Из цикла «Ожидание»', en: 'From the “Waiting” series' },
             v1:  { ru: 'Гнев — таверна', en: 'Wrath — The Tavern' },
             v1c: { ru: '7 грехов · айдл-петли персонажей', en: '7 Sins · character idle loops' },
             v2c: { ru: 'Промо игры-тамагочи', en: 'Tamagotchi game promo' },
