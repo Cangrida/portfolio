@@ -5,6 +5,10 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://cangrida.com/en.html</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>https://cangrida.com/exhibition-2026.html</loc>
     <priority>0.8</priority>
   </url>
