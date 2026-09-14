@@ -103,7 +103,13 @@ body {
 .fh p { color: #cbbba3; font-size: 0.88rem; line-height: 1.7; }
 .fh a.inline { color: #ff6b35; text-decoration: none; }
 .fh a.inline:hover { text-decoration: underline; }
-.fh-note { background: #1e1810; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px 18px; }
+.fh-faq { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 18px; }
+.fh-faq summary { cursor: pointer; color: #9d8b6f; font-size: 0.82rem; list-style: none; }
+.fh-faq summary::-webkit-details-marker { display: none; }
+.fh-faq summary::before { content: '+ '; color: #ff6b35; }
+.fh-faq[open] summary::before { content: '− '; }
+.fh-faq summary:hover { color: #ff6b35; }
+.fh-faq p { margin-top: 10px; font-size: 0.82rem; }
 @media (max-width: 760px) {
   .fh { grid-template-columns: 1fr; gap: 32px; }
   .fh-video { max-width: 360px; margin: 0 auto; height: auto; min-height: 0; aspect-ratio: 9/16; }
@@ -187,7 +193,7 @@ body {
       <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18l-1.41 1.41L16.17 9H13V2h-2v7H7.83l5.58-5.59L12 2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
       <span data-i18n="download">Скачать бесплатно</span>
     </a>
-    <p class="fh-meta" data-i18n="meta">Windows 10 и 11 · без установки · архив около 140 МБ</p>
+    <p class="fh-meta" data-i18n="meta">Windows 10 и 11 · без установки · бесплатно</p>
 
     <div>
       <h2 data-i18n="what_h">Что умеет</h2>
@@ -212,14 +218,15 @@ body {
       </ol>
     </div>
 
-    <div class="fh-note">
-      <p data-i18n="warn">Если Windows покажет окно «Система Windows защитила ваш компьютер», нажмите «Подробнее», затем «Выполнить в любом случае». Так бывает с программами без платной подписи издателя. Вся ваша информация остаётся на вашем компьютере.</p>
-    </div>
-
     <div>
       <h2 data-i18n="fb_h">Чего не хватает?</h2>
       <p data-i18n="fb">Напишите прямо из программы: Настройки → Обратная связь. Или в <a class="inline" href="https://t.me/cangrida">телеграм</a>.</p>
     </div>
+
+    <details class="fh-faq">
+      <summary data-i18n="faq_q">Windows показывает предупреждение?</summary>
+      <p data-i18n="faq_a">Windows так встречает любую новую программу без платной подписи издателя. Нажмите «Подробнее», затем «Выполнить в любом случае». Лисёнок не просит прав администратора, ничего не устанавливает в систему, а всё, что он о вас знает, хранится обычными файлами в одной папке на вашем компьютере.</p>
+    </details>
   </div>
 </div>
 
@@ -234,7 +241,7 @@ const I18N = {
   title:    { ru: 'Лисёнок-<em>помощник</em>', en: 'Fox <em>Helper</em>' },
   subtitle: { ru: 'Милый персонаж, который живёт на рабочем столе, заботится о вашем распорядке дня и помогает с мелочами.', en: 'A cute character who lives on your desktop, looks after your daily routine and helps with the little things.' },
   download: { ru: 'Скачать бесплатно', en: 'Download for free' },
-  meta:     { ru: 'Windows 10 и 11 · без установки · архив около 140 МБ', en: 'Windows 10 and 11 · no installation · about 140 MB archive' },
+  meta:     { ru: 'Windows 10 и 11 · без установки · бесплатно', en: 'Windows 10 and 11 · no installation · free' },
   what_h:   { ru: 'Что умеет', en: 'What it does' },
   f1: { ru: 'Живёт по вашему расписанию дня и заранее предупреждает об обеде и перерывах', en: 'Follows your daily schedule and warns you ahead about lunch and breaks' },
   f2: { ru: 'Напоминает о важном через 15 минут, час или три', en: 'Reminds you of important things in 15 minutes, an hour or three' },
@@ -248,10 +255,11 @@ const I18N = {
   s1: { ru: 'Скачайте архив и распакуйте его в любую папку на своём диске', en: 'Download the archive and unpack it to any folder on your drive' },
   s2: { ru: 'Запустите FoxHelper.exe', en: 'Run FoxHelper.exe' },
   s3: { ru: 'Лисёнок познакомится, спросит имя и сам найдёт ваши программы', en: 'The fox will introduce itself, ask your name and find your programs' },
-  warn: { ru: 'Если Windows покажет окно «Система Windows защитила ваш компьютер», нажмите «Подробнее», затем «Выполнить в любом случае». Так бывает с программами без платной подписи издателя. Вся ваша информация остаётся на вашем компьютере.',
-          en: 'If Windows shows “Windows protected your PC”, click “More info”, then “Run anyway”. This happens with programs that have no paid publisher signature. All your information stays on your computer.' },
   fb_h: { ru: 'Чего не хватает?', en: 'Missing something?' },
   fb:   { ru: 'Напишите прямо из программы: Настройки → Обратная связь. Или в <a class="inline" href="https://t.me/cangrida">телеграм</a>.', en: 'Write right from the app: Settings → Feedback. Or on <a class="inline" href="https://t.me/cangrida">Telegram</a>.' },
+  faq_q: { ru: 'Windows показывает предупреждение?', en: 'Windows shows a warning?' },
+  faq_a: { ru: 'Windows так встречает любую новую программу без платной подписи издателя. Нажмите «Подробнее», затем «Выполнить в любом случае». Лисёнок не просит прав администратора, ничего не устанавливает в систему, а всё, что он о вас знает, хранится обычными файлами в одной папке на вашем компьютере.',
+           en: 'Windows greets every new program without a paid publisher signature this way. Click “More info”, then “Run anyway”. The fox asks for no administrator rights, installs nothing into the system, and everything it knows about you is kept as plain files in one folder on your computer.' },
   rights: { ru: 'персонаж и анимации © Cangrida', en: 'character and animations © Cangrida' }
 };
 function applyLang(lang) {
