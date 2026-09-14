@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Лисёнок-помощник для Windows · cangrida.com</title>
+<meta name="description" content="Милый лисёнок на рабочем столе: следит за распорядком дня, напоминает, открывает программы и подкидывает идеи. Бесплатно для Windows.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cangrida.com/fox-helper.html">
+<meta property="og:title" content="Лисёнок-помощник для Windows">
+<meta property="og:description" content="Милый лисёнок на рабочем столе: следит за распорядком дня и помогает с мелочами. Бесплатно.">
+<meta property="og:image" content="https://cangrida.com/posters/v-foxhelper.jpg">
+<link rel="stylesheet" href="fonts.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #1a1510;
+  color: #f5f0e8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #9d8b6f;
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: color 0.25s;
+  margin-bottom: 60px;
+  align-self: flex-start;
+  max-width: 900px;
+  width: 100%;
+}
+.back-link:hover { color: #ff6b35; }
+.back-link svg { width: 14px; height: 14px; fill: currentColor; }
+
+.page-header {
+  text-align: center;
+  margin-bottom: 56px;
+  width: 100%;
+  max-width: 900px;
+}
+.page-header .logo {
+  height: 44px;
+  width: auto;
+  opacity: 0.9;
+  margin-bottom: 28px;
+}
+.page-label {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #9d8b6f;
+  margin-bottom: 16px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+  line-height: 1.15;
+  color: #f5f0e8;
+}
+.page-title em {
+  color: #ff6b35;
+  font-style: italic;
+}
+.page-subtitle {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: #9d8b6f;
+  line-height: 1.6;
+}
+
+
+.fh { width: 100%; max-width: 900px; display: grid; grid-template-columns: minmax(0, 360px) 1fr; gap: 48px; align-items: start; }
+.fh-video { width: 100%; aspect-ratio: 9/16; border-radius: 16px; overflow: hidden; background: #0f0c09;
+  border: 1px solid rgba(255,107,53,0.35); box-shadow: 0 16px 50px rgba(0,0,0,0.45); }
+.fh-video video { width: 100%; height: 100%; display: block; object-fit: cover; }
+.fh-side { display: flex; flex-direction: column; gap: 28px; }
+.fh-download { display: inline-flex; align-items: center; justify-content: center; gap: 10px; align-self: flex-start;
+  background: #ff6b35; color: #1a1510; text-decoration: none; font-weight: 600; font-size: 1rem; letter-spacing: 0.3px;
+  padding: 16px 30px; border-radius: 999px; transition: transform 0.2s, box-shadow 0.2s; }
+.fh-download:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,107,53,0.35); }
+.fh-download svg { width: 20px; height: 20px; fill: currentColor; }
+.fh-meta { font-size: 0.78rem; color: #9d8b6f; margin-top: -16px; }
+.fh h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.3rem; color: #f5f0e8; margin-bottom: 12px; }
+.fh ul, .fh ol { padding-left: 20px; color: #cbbba3; font-size: 0.88rem; line-height: 1.75; }
+.fh li::marker { color: #ff6b35; }
+.fh p { color: #cbbba3; font-size: 0.88rem; line-height: 1.7; }
+.fh a.inline { color: #ff6b35; text-decoration: none; }
+.fh a.inline:hover { text-decoration: underline; }
+.fh-note { background: #1e1810; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px 18px; }
+@media (max-width: 760px) {
+  .fh { grid-template-columns: 1fr; gap: 32px; }
+  .fh-video { max-width: 360px; margin: 0 auto; }
+  .fh-download { align-self: stretch; }
+}
+.page-footer {
+  margin-top: 72px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #52525b;
+  letter-spacing: 0.5px;
+}
+.page-footer a { color: #9d8b6f; text-decoration: none; }
+.page-footer a:hover { color: #ff6b35; }
+
+/* ===== LANGUAGE SWITCHER ===== */
+.lang-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  border: 1px solid rgba(255, 107, 53, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(26, 21, 16, 0.7);
+  backdrop-filter: blur(6px);
+}
+.lang-switch button {
+  padding: 8px 16px;
+  background: transparent;
+  color: #9d8b6f;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+.lang-switch button.active {
+  background: #ff6b35;
+  color: #1a1510;
+}
+.lang-switch button:not(.active):hover { color: #ff6b35; }
+
+@media (max-width: 600px) {
+  body { padding: 40px 16px 60px; }
+  .page-title { font-size: 1.8rem; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .back-link { margin-bottom: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="lang-switch">
+  <button data-lang="ru" class="active">RU</button>
+  <button data-lang="en">EN</button>
+</div>
+
+<a href="tools.html" class="back-link">
+  <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  <span data-i18n="back">Все инструменты</span>
+</a>
+
+<div class="page-header">
+  <img src="logo_cangrida_white_small.png" alt="Cangrida" class="logo" width="360" height="209" decoding="async">
+  <p class="page-label" data-i18n="label">Для Windows</p>
+  <h1 class="page-title" data-i18n="title">Лисёнок-<em>помощник</em></h1>
+  <p class="page-subtitle" data-i18n="subtitle">Милый персонаж, который живёт на рабочем столе, заботится о вашем распорядке дня и помогает с мелочами.</p>
+</div>
+
+<div class="fh">
+  <div class="fh-video">
+    <video src="videos/foxhelper-short.mp4" poster="posters/v-foxhelper.jpg" muted loop autoplay playsinline controls preload="metadata"></video>
+  </div>
+
+  <div class="fh-side">
+    <a class="fh-download" href="https://github.com/Cangrida/foxhelper/releases/latest/download/FoxHelper-win64.zip">
+      <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18l-1.41 1.41L16.17 9H13V2h-2v7H7.83l5.58-5.59L12 2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+      <span data-i18n="download">Скачать бесплатно</span>
+    </a>
+    <p class="fh-meta" data-i18n="meta">Windows 10 и 11 · без установки · архив около 140 МБ</p>
+
+    <div>
+      <h2 data-i18n="what_h">Что умеет</h2>
+      <ul>
+        <li data-i18n="f1">Живёт по вашему расписанию дня и заранее предупреждает об обеде и перерывах</li>
+        <li data-i18n="f2">Напоминает о важном через 15 минут, час или три</li>
+        <li data-i18n="f3">Открывает программы: достаточно написать название</li>
+        <li data-i18n="f4">Подкидывает идеи для рисунков, когда вы застряли</li>
+        <li data-i18n="f5">Записывает мысли, пока они не убежали</li>
+        <li data-i18n="f6">Таймбокс: работа без отвлечений 15, 25, 45 или 60 минут</li>
+        <li data-i18n="f7">Меняет настроение по клику и просто радует</li>
+        <li data-i18n="f8">Говорит по-русски и по-английски, обновляется сам</li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 data-i18n="how_h">Как установить</h2>
+      <ol>
+        <li data-i18n="s1">Скачайте архив и распакуйте его в любую папку на своём диске</li>
+        <li data-i18n="s2">Запустите FoxHelper.exe</li>
+        <li data-i18n="s3">Лисёнок познакомится, спросит имя и сам найдёт ваши программы</li>
+      </ol>
+    </div>
+
+    <div class="fh-note">
+      <p data-i18n="warn">Если Windows покажет окно «Система Windows защитила ваш компьютер», нажмите «Подробнее», затем «Выполнить в любом случае». Так бывает с программами без платной подписи издателя. Вся ваша информация остаётся на вашем компьютере.</p>
+    </div>
+
+    <div>
+      <h2 data-i18n="fb_h">Чего не хватает?</h2>
+      <p data-i18n="fb">Напишите прямо из программы: Настройки → Обратная связь. Или в <a class="inline" href="https://t.me/cangrida">телеграм</a>.</p>
+    </div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <a href="index.html">cangrida.com</a> · <span data-i18n="rights">персонаж и анимации © Cangrida</span>
+</div>
+
+<script>
+const I18N = {
+  back:     { ru: 'Все инструменты', en: 'All tools' },
+  label:    { ru: 'Для Windows', en: 'For Windows' },
+  title:    { ru: 'Лисёнок-<em>помощник</em>', en: 'Fox <em>Helper</em>' },
+  subtitle: { ru: 'Милый персонаж, который живёт на рабочем столе, заботится о вашем распорядке дня и помогает с мелочами.', en: 'A cute character who lives on your desktop, looks after your daily routine and helps with the little things.' },
+  download: { ru: 'Скачать бесплатно', en: 'Download for free' },
+  meta:     { ru: 'Windows 10 и 11 · без установки · архив около 140 МБ', en: 'Windows 10 and 11 · no installation · about 140 MB archive' },
+  what_h:   { ru: 'Что умеет', en: 'What it does' },
+  f1: { ru: 'Живёт по вашему расписанию дня и заранее предупреждает об обеде и перерывах', en: 'Follows your daily schedule and warns you ahead about lunch and breaks' },
+  f2: { ru: 'Напоминает о важном через 15 минут, час или три', en: 'Reminds you of important things in 15 minutes, an hour or three' },
+  f3: { ru: 'Открывает программы: достаточно написать название', en: 'Opens programs: just type the name' },
+  f4: { ru: 'Подкидывает идеи для рисунков, когда вы застряли', en: 'Tosses you drawing ideas when you are stuck' },
+  f5: { ru: 'Записывает мысли, пока они не убежали', en: 'Jots down thoughts before they run away' },
+  f6: { ru: 'Таймбокс: работа без отвлечений 15, 25, 45 или 60 минут', en: 'Timebox: distraction-free work for 15, 25, 45 or 60 minutes' },
+  f7: { ru: 'Меняет настроение по клику и просто радует', en: 'Changes mood on click and simply cheers you up' },
+  f8: { ru: 'Говорит по-русски и по-английски, обновляется сам', en: 'Speaks Russian and English, updates itself' },
+  how_h:    { ru: 'Как установить', en: 'How to install' },
+  s1: { ru: 'Скачайте архив и распакуйте его в любую папку на своём диске', en: 'Download the archive and unpack it to any folder on your drive' },
+  s2: { ru: 'Запустите FoxHelper.exe', en: 'Run FoxHelper.exe' },
+  s3: { ru: 'Лисёнок познакомится, спросит имя и сам найдёт ваши программы', en: 'The fox will introduce itself, ask your name and find your programs' },
+  warn: { ru: 'Если Windows покажет окно «Система Windows защитила ваш компьютер», нажмите «Подробнее», затем «Выполнить в любом случае». Так бывает с программами без платной подписи издателя. Вся ваша информация остаётся на вашем компьютере.',
+          en: 'If Windows shows “Windows protected your PC”, click “More info”, then “Run anyway”. This happens with programs that have no paid publisher signature. All your information stays on your computer.' },
+  fb_h: { ru: 'Чего не хватает?', en: 'Missing something?' },
+  fb:   { ru: 'Напишите прямо из программы: Настройки → Обратная связь. Или в <a class="inline" href="https://t.me/cangrida">телеграм</a>.', en: 'Write right from the app: Settings → Feedback. Or on <a class="inline" href="https://t.me/cangrida">Telegram</a>.' },
+  rights: { ru: 'персонаж и анимации © Cangrida', en: 'character and animations © Cangrida' }
+};
+function applyLang(lang) {
+  document.documentElement.lang = lang;
+  document.title = lang === 'en' ? 'Fox Helper for Windows · cangrida.com' : 'Лисёнок-помощник для Windows · cangrida.com';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const t = I18N[el.dataset.i18n];
+    if (t && t[lang]) el.innerHTML = t[lang];
+  });
+  document.querySelectorAll('.lang-switch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  try { localStorage.setItem('lang', lang); } catch (e) {}
+}
+
+document.querySelectorAll('.lang-switch button').forEach(b => {
+  b.addEventListener('click', () => applyLang(b.dataset.lang));
+});
+
+let savedLang = 'ru';
+try { savedLang = localStorage.getItem('lang') || 'ru'; } catch (e) {}
+if (savedLang !== 'ru') applyLang(savedLang);
+</script>
+
+<footer style="text-align:center;padding:28px 16px 22px;font-size:11px;line-height:1.7;color:#8a8a8a;opacity:.8;"><style>html[lang=en] .pn-ru{display:none}html:not([lang=en]) .pn-en{display:none}</style><span class="pn-ru">Статистика посещений — Cloudflare Web Analytics: без cookies и без сбора персональных данных.</span><span class="pn-en">Visitor stats by Cloudflare Web Analytics — no cookies, no personal data.</span></footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6cae0a70d4474688a8702682e8e27fd3"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

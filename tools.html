@@ -301,15 +301,18 @@ body {
     </div>
   </div>
 
-  <!-- ④ Скоро -->
-  <div class="tool-card soon">
-    <div class="tool-card-icon">✦</div>
+  <!-- ④ Лисёнок-помощник -->
+  <a href="fox-helper.html" class="tool-card">
+    <div class="tool-card-icon"><img src="icon-foxhelper-320.png" alt="Лисёнок-помощник" width="320" height="320" loading="lazy" decoding="async"></div>
     <div class="tool-card-body">
-      <div class="tool-card-name" data-i18n="t4_name">Скоро</div>
-      <div class="tool-card-desc" data-i18n="t4_desc">Следующий инструмент — в разработке.</div>
-      <span class="soon-badge">Coming soon</span>
+      <div class="tool-card-name" data-i18n="t4_name">Лисёнок-помощник</div>
+      <div class="tool-card-desc" data-i18n="t4_desc">Милый лисёнок на рабочем столе: следит за распорядком дня, напоминает и подкидывает идеи. Для Windows.</div>
+      <div class="tool-card-cta">
+        <span data-i18n="download">Скачать</span>
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </div>
     </div>
-  </div>
+  </a>
 
 </div>
 
@@ -329,8 +332,9 @@ const I18N = {
   t2_name:  { ru: 'Световой референс', en: 'Lighting Reference' },
   t2_desc:  { ru: 'PBR-шар с цветовым кругом. Тёплый свет — холодная тень. Живая теория для художников.', en: 'A PBR sphere with a color wheel. Warm light — cool shadow. Living theory for artists.' },
   t3_desc:  { ru: 'Скоро. В разработке.', en: 'Coming soon. In development.' },
-  t4_name:  { ru: 'Скоро', en: 'Coming soon' },
-  t4_desc:  { ru: 'Следующий инструмент — в разработке.', en: 'The next tool is in development.' }
+  t4_name:  { ru: 'Лисёнок-помощник', en: 'Fox Helper' },
+  t4_desc:  { ru: 'Милый лисёнок на рабочем столе: следит за распорядком дня, напоминает и подкидывает идеи. Для Windows.', en: 'A cute fox on your desktop: looks after your daily routine, reminds you and tosses you ideas. For Windows.' },
+  download: { ru: 'Скачать', en: 'Download' }
 };
 
 function applyLang(lang) {
