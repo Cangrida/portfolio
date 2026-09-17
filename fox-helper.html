@@ -110,7 +110,16 @@ body {
 .fh-faq[open] summary::before { content: '− '; }
 .fh-faq summary:hover { color: #ff6b35; }
 .fh-faq p { margin-top: 10px; font-size: 0.82rem; }
+/* что нового: история версий под приложением */
+.fh-log { width: 100%; max-width: 960px; margin-top: 72px; }
+.fh-log h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.3rem; color: #f5f0e8; margin-bottom: 8px; }
+.fh-rel { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding: 22px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+.fh-ver { display: inline-block; font-weight: 600; color: #ff6b35; border: 1px solid rgba(255,107,53,0.45); border-radius: 999px; padding: 3px 12px; font-size: 0.85rem; }
+.fh-date { display: block; margin-top: 8px; font-size: 0.75rem; color: #9d8b6f; letter-spacing: 0.3px; }
+.fh-rel ul { padding-left: 20px; color: #cbbba3; font-size: 0.88rem; line-height: 1.75; }
+.fh-rel li::marker { color: #ff6b35; }
 @media (max-width: 760px) {
+  .fh-rel { grid-template-columns: 1fr; gap: 10px; }
   .fh { grid-template-columns: 1fr; gap: 32px; }
   .fh-video { max-width: 360px; margin: 0 auto; height: auto; min-height: 0; aspect-ratio: 9/16; }
   .fh-download { align-self: stretch; }
@@ -199,7 +208,8 @@ body {
       <h2 data-i18n="what_h">Что умеет</h2>
       <ul>
         <li data-i18n="f1">Живёт по вашему расписанию дня и заранее предупреждает об обеде и перерывах</li>
-        <li data-i18n="f2">Напоминает о важном через 15 минут, час или три</li>
+        <li data-i18n="f2">Напоминает о важном: через час или в нужный день, например о дне рождения</li>
+        <li data-i18n="f9">Зовёт размяться, попить воды и дать отдых глазам</li>
         <li data-i18n="f3">Открывает программы: достаточно написать название</li>
         <li data-i18n="f4">Подкидывает идеи для рисунков, когда вы застряли</li>
         <li data-i18n="f5">Записывает мысли, пока они не убежали</li>
@@ -230,6 +240,34 @@ body {
   </div>
 </div>
 
+<section class="fh-log">
+  <h2 data-i18n="log_h">Что нового</h2>
+  <div class="fh-rel">
+    <div><span class="fh-ver">0.3.0</span><span class="fh-date" data-i18n="d17">17 сентября 2026</span></div>
+    <ul>
+      <li data-i18n="r030_1">Напоминания на дату: день рождения, оплата, встреча. С повтором каждую неделю, месяц или год и напоминанием за день или за неделю</li>
+      <li data-i18n="r030_2">Забота о себе: в рабочее время лисёнок зовёт размяться, попить воды и дать отдых глазам</li>
+      <li data-i18n="r030_3">Зарядка для глаз на минуту: лисёнок ведёт по шагам</li>
+    </ul>
+  </div>
+  <div class="fh-rel">
+    <div><span class="fh-ver">0.2.9</span><span class="fh-date" data-i18n="d17">17 сентября 2026</span></div>
+    <ul>
+      <li data-i18n="r029_1">Лисёнок научился зевать: ночью он сонный, в пижаме и с подушкой</li>
+      <li data-i18n="r029_2">Смотрит к центру экрана, а меню открывается с той стороны, где есть место</li>
+    </ul>
+  </div>
+  <div class="fh-rel">
+    <div><span class="fh-ver">0.2.0–0.2.8</span><span class="fh-date" data-i18n="d14">14 сентября 2026</span></div>
+    <ul>
+      <li data-i18n="r020_1">Обновление одной кнопкой, без повторного скачивания</li>
+      <li data-i18n="r020_2">Экран «О программе»</li>
+      <li data-i18n="r020_3">Время в расписании вводится с цифрового блока, размер лисёнка настраивается плавно</li>
+      <li data-i18n="r020_4">Реплика лисёнка видна и при открытом меню</li>
+    </ul>
+  </div>
+</section>
+
 <div class="page-footer">
   <a href="index.html">cangrida.com</a> · <span data-i18n="rights">персонаж и анимации © Cangrida</span>
 </div>
@@ -244,7 +282,8 @@ const I18N = {
   meta:     { ru: 'Windows 10 и 11 · без установки · бесплатно', en: 'Windows 10 and 11 · no installation · free' },
   what_h:   { ru: 'Что умеет', en: 'What it does' },
   f1: { ru: 'Живёт по вашему расписанию дня и заранее предупреждает об обеде и перерывах', en: 'Follows your daily schedule and warns you ahead about lunch and breaks' },
-  f2: { ru: 'Напоминает о важном через 15 минут, час или три', en: 'Reminds you of important things in 15 minutes, an hour or three' },
+  f2: { ru: 'Напоминает о важном: через час или в нужный день, например о дне рождения', en: 'Reminds you of important things: in an hour or on the right day, like a birthday' },
+  f9: { ru: 'Зовёт размяться, попить воды и дать отдых глазам', en: 'Reminds you to stretch, drink water and rest your eyes' },
   f3: { ru: 'Открывает программы: достаточно написать название', en: 'Opens programs: just type the name' },
   f4: { ru: 'Подкидывает идеи для рисунков, когда вы застряли', en: 'Tosses you drawing ideas when you are stuck' },
   f5: { ru: 'Записывает мысли, пока они не убежали', en: 'Jots down thoughts before they run away' },
@@ -260,6 +299,18 @@ const I18N = {
   faq_q: { ru: 'Windows показывает предупреждение?', en: 'Windows shows a warning?' },
   faq_a: { ru: 'Windows так встречает любую новую программу без платной подписи издателя. Нажмите «Подробнее», затем «Выполнить в любом случае». Лисёнок не просит прав администратора, ничего не устанавливает в систему, а всё, что он о вас знает, хранится обычными файлами в одной папке на вашем компьютере.',
            en: 'Windows greets every new program without a paid publisher signature this way. Click “More info”, then “Run anyway”. The fox asks for no administrator rights, installs nothing into the system, and everything it knows about you is kept as plain files in one folder on your computer.' },
+  log_h:  { ru: 'Что нового', en: "What's new" },
+  d17:    { ru: '17 сентября 2026', en: '17 September 2026' },
+  d14:    { ru: '14 сентября 2026', en: '14 September 2026' },
+  r030_1: { ru: 'Напоминания на дату: день рождения, оплата, встреча. С повтором каждую неделю, месяц или год и напоминанием за день или за неделю', en: 'Reminders on a date: a birthday, a payment, a meeting. Repeating every week, month or year, with a reminder a day or a week before' },
+  r030_2: { ru: 'Забота о себе: в рабочее время лисёнок зовёт размяться, попить воды и дать отдых глазам', en: 'Take care of yourself: during work time the fox reminds you to stretch, drink water and rest your eyes' },
+  r030_3: { ru: 'Зарядка для глаз на минуту: лисёнок ведёт по шагам', en: 'A one-minute eye workout, with the fox guiding you step by step' },
+  r029_1: { ru: 'Лисёнок научился зевать: ночью он сонный, в пижаме и с подушкой', en: 'The fox learned to yawn: at night it gets sleepy, in pajamas and with a pillow' },
+  r029_2: { ru: 'Смотрит к центру экрана, а меню открывается с той стороны, где есть место', en: 'It looks toward the center of the screen, and the menu opens on the side where there is room' },
+  r020_1: { ru: 'Обновление одной кнопкой, без повторного скачивания', en: 'Updates with one button, no need to download again' },
+  r020_2: { ru: 'Экран «О программе»', en: 'An “About” screen' },
+  r020_3: { ru: 'Время в расписании вводится с цифрового блока, размер лисёнка настраивается плавно', en: 'Schedule times can be typed on the number pad, and the fox size adjusts smoothly' },
+  r020_4: { ru: 'Реплика лисёнка видна и при открытом меню', en: "The fox's lines stay visible when the menu is open" },
   rights: { ru: 'персонаж и анимации © Cangrida', en: 'character and animations © Cangrida' }
 };
 function applyLang(lang) {
