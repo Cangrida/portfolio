@@ -214,6 +214,7 @@ body {
         <li data-i18n="f4">Подкидывает идеи для рисунков, когда вы застряли</li>
         <li data-i18n="f5">Записывает мысли, пока они не убежали</li>
         <li data-i18n="f6">Таймбокс: работа без отвлечений 15, 25, 45 или 60 минут</li>
+        <li data-i18n="f10">Помогает держать три главных дела на день и молчит по команде «не беспокоить»</li>
         <li data-i18n="f7">Меняет настроение по клику и просто радует</li>
         <li data-i18n="f8">Говорит по-русски и по-английски, обновляется сам</li>
       </ul>
@@ -242,6 +243,16 @@ body {
 
 <section class="fh-log">
   <h2 data-i18n="log_h">Что нового</h2>
+  <div class="fh-rel">
+    <div><span class="fh-ver">0.3.1</span><span class="fh-date" data-i18n="d23">23 сентября 2026</span></div>
+    <ul>
+      <li data-i18n="r031_1">Напоминание больше не исчезает само: под ним кнопки «Готово» и «отложить на 10 минут, 30 минут или час»</li>
+      <li data-i18n="r031_2">«Не беспокоить» из меню и из трея: на 30 минут, час, два или до конца дня. Пока на весь экран открыта игра или презентация, лисёнок молчит сам</li>
+      <li data-i18n="r031_3">«Три дела на сегодня»: утром лисёнок спрашивает, какие дела главные, вечером что получилось</li>
+      <li data-i18n="r031_4">Забота выходит из трея и умеет напоминать не только в рабочее время</li>
+      <li data-i18n="r031_5">Лисёнок повисает, когда его тащат по экрану, и возвращается на место после сна компьютера</li>
+    </ul>
+  </div>
   <div class="fh-rel">
     <div><span class="fh-ver">0.3.0</span><span class="fh-date" data-i18n="d17">17 сентября 2026</span></div>
     <ul>
@@ -283,6 +294,7 @@ const I18N = {
   what_h:   { ru: 'Что умеет', en: 'What it does' },
   f1: { ru: 'Живёт по вашему расписанию дня и заранее предупреждает об обеде и перерывах', en: 'Follows your daily schedule and warns you ahead about lunch and breaks' },
   f2: { ru: 'Напоминает о важном: через час или в нужный день, например о дне рождения', en: 'Reminds you of important things: in an hour or on the right day, like a birthday' },
+  f10: { ru: 'Помогает держать три главных дела на день и молчит по команде «не беспокоить»', en: 'Helps you keep three main things for the day, and goes quiet on "do not disturb"' },
   f9: { ru: 'Зовёт размяться, попить воды и дать отдых глазам', en: 'Reminds you to stretch, drink water and rest your eyes' },
   f3: { ru: 'Открывает программы: достаточно написать название', en: 'Opens programs: just type the name' },
   f4: { ru: 'Подкидывает идеи для рисунков, когда вы застряли', en: 'Tosses you drawing ideas when you are stuck' },
@@ -300,6 +312,12 @@ const I18N = {
   faq_a: { ru: 'Windows так встречает любую новую программу без платной подписи издателя. Нажмите «Подробнее», затем «Выполнить в любом случае». Лисёнок не просит прав администратора, ничего не устанавливает в систему, а всё, что он о вас знает, хранится обычными файлами в одной папке на вашем компьютере.',
            en: 'Windows greets every new program without a paid publisher signature this way. Click “More info”, then “Run anyway”. The fox asks for no administrator rights, installs nothing into the system, and everything it knows about you is kept as plain files in one folder on your computer.' },
   log_h:  { ru: 'Что нового', en: "What's new" },
+  d23:    { ru: '23 сентября 2026', en: '23 September 2026' },
+  r031_1: { ru: 'Напоминание больше не исчезает само: под ним кнопки «Готово» и «отложить на 10 минут, 30 минут или час»', en: "A reminder no longer disappears by itself: under it there are \u201cDone\u201d and snooze buttons for 10 minutes, 30 minutes or an hour" },
+  r031_2: { ru: '«Не беспокоить» из меню и из трея: на 30 минут, час, два или до конца дня. Пока на весь экран открыта игра или презентация, лисёнок молчит сам', en: '\u201cDo not disturb\u201d from the menu and the tray: 30 minutes, an hour, two, or until the end of the day. While a game or presentation is full screen, the fox goes quiet by itself' },
+  r031_3: { ru: '«Три дела на сегодня»: утром лисёнок спрашивает, какие дела главные, вечером что получилось', en: '\u201cThree things for today\u201d: in the morning the fox asks what matters most, in the evening how it went' },
+  r031_4: { ru: 'Забота выходит из трея и умеет напоминать не только в рабочее время', en: 'Care reminders come out of the tray and can work outside work time too' },
+  r031_5: { ru: 'Лисёнок повисает, когда его тащат по экрану, и возвращается на место после сна компьютера', en: 'The fox hangs while you drag it across the screen, and comes back after the computer wakes up' },
   d17:    { ru: '17 сентября 2026', en: '17 September 2026' },
   d14:    { ru: '14 сентября 2026', en: '14 September 2026' },
   r030_1: { ru: 'Напоминания на дату: день рождения, оплата, встреча. С повтором каждую неделю, месяц или год и напоминанием за день или за неделю', en: 'Reminders on a date: a birthday, a payment, a meeting. Repeating every week, month or year, with a reminder a day or a week before' },
