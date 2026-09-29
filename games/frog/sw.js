@@ -1,6 +1,6 @@
 // Оффлайн-кэш: игра — один файл, поэтому кладём его целиком вместе с иконками.
 // Версию поднимать при каждой выкладке, иначе телефон покажет старую сборку.
-const V = 'frog-29.09-0926';
+const V = 'frog-29.09-1053';
 const FILES = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-192.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });

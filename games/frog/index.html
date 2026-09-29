@@ -112,7 +112,7 @@ const T = {
     best: 'Рекорд', height: 'Высота', flies: 'Мухи', score: 'Очки', m: ' м', splash: 'Плюх!',
     title: 'Лягушка', sub: 'Прыгай выше, лови мух!', ctrl1: 'Лягушка прыгает сама', ctrl2: 'Управляй:', ctrlOr: 'или',
     stingRow: 'Укусы', newBest: 'Новый рекорд!', toBest: n => 'До рекорда не хватило ' + n + ' м',
-    l_swarm: 'осы летают парами', l_narrow: 'кочки стали уже', l_night: 'темнеет, кочки видно хуже',
+    l_swarm: 'осы летают парами', l_narrow: 'кочки стали уже', l_night: 'то темнеет, то светлеет, кочки видно хуже',
     hintSteer: 'стрелки внизу: держи, чтобы рулить', hintBubble: 'пузырь несёт вверх, стрелки рулят',
     l_fly: 'мух лови языком, он достаёт сам', l_fly_tap: 'тапни по мухе, язык достанет', l_flood: 'вода прибывает снизу', l_moving: 'банка ныряет после прыжка',
     l_crumble: 'трухлявая рассыпается под лапами', l_bubble: 'пузырь ловится телом, не языком',
@@ -123,7 +123,7 @@ const T = {
     best: 'Best', height: 'Height', flies: 'Flies', score: 'Score', m: ' m', splash: 'Splash!',
     title: 'FROGGY HOP', sub: 'Jump higher, catch flies!', ctrl1: 'The frog hops by itself', ctrl2: 'Steer:', ctrlOr: 'or',
     stingRow: 'Stings', newBest: 'New best!', toBest: n => n + ' m short of your best',
-    l_swarm: 'wasps now fly in pairs', l_narrow: 'the logs get narrower', l_night: 'night falls, logs are harder to see',
+    l_swarm: 'wasps now fly in pairs', l_narrow: 'the logs get narrower', l_night: 'night comes and goes, logs are harder to see',
     hintSteer: 'hold an arrow below to steer', hintBubble: 'the bubble lifts you, arrows steer',
     l_fly: 'the tongue catches flies on its own', l_fly_tap: 'tap a fly to catch it', l_flood: 'water is rising from below', l_moving: 'the can sinks after a jump',
     l_crumble: 'rotten logs crumble underfoot', l_bubble: 'catch the bubble with your body, not the tongue',
@@ -150,7 +150,10 @@ const LESSONS = [
   {n: 62, key: 'swarm'},     // дальше игра не кончается: три ступени второго горизонта (Галя 27.09: «контент кончается на 50-й»)
   {n: 78, key: 'narrow'},
   {n: 95, key: 'night'}];
-const NIGHT_FADE = 6;        // за сколько секунд после плашки «темнеет» вуаль набирает полную силу
+// Ночь приходит волной и уходит: это временное усложнение, а не конец света (Галя 29.09).
+// Полный круг: темнеет NIGHT_FADE, держится NIGHT_HOLD, светлеет NIGHT_FADE, светло NIGHT_GAP.
+const NIGHT_FADE = 6, NIGHT_HOLD = 12, NIGHT_GAP = 14;
+const NIGHT_CYCLE = NIGHT_FADE * 2 + NIGHT_HOLD + NIGHT_GAP;
 const NIGHT_MAX = 0.42;      // предел темноты: кочки ещё читаются, но хуже
 const FALL_FREEZE = 0.35;    // после падения мир стоит, чтобы было видно, что сгорело сердечко (короче, чем было)
 const LESSON_T = 5, LESSON_FREEZE = 0; // плашка урока больше не останавливает мир: Галя 27.09 — «зависает на приземлении»
@@ -163,7 +166,10 @@ function lessonStep(){ // уроки идут по кочке, на котору
 }
 const FLOOD_V = 110, FLOOD_START = 520, FLOOD_SINK = 26, FLOOD_LAG = 0.6; // прилив: фронт воды ползёт снизу FLOOD_V px/с (×0.6 в передышку, ×1.5 в напряжение); отстаёт не дальше FLOOD_LAG экранов
 let flood = {y: FLOOD_START, t: 0};
-const SPEED_STEP = 0.08, SPEED_EVERY = 300, SPEED_MAX = 1.6; // каждые 300 м игра быстрее на 8 % (было 1000 м: до такой высоты не доживали), потолок ×1.6
+// Разгон ступенями (Галя 29.09: «прошёл часть пути, скорость ещё прибавилась, и так далее»).
+// Было 300 м и 8 %: при её рекорде 455 м игрок видел одну ступеньку и разгона не замечал.
+// Стало 150 м и 7 %, потолок выше: на 450 м уже плюс пятая часть, на 1000 м почти в полтора раза.
+const SPEED_STEP = 0.07, SPEED_EVERY = 150, SPEED_MAX = 2.0;
 function speedMul(){ return Math.min(SPEED_MAX, 1 + SPEED_STEP * Math.floor(stats.height / SPEED_EVERY)); }
 const CAM_BACK = 170;        // авто: при промахе камера идёт вниз за лягушкой, пока кочка отрыва не окажется на столько выше низа экрана       // авто: доля экрана сверху, где держится лягушка (0.62 в рогатке); ниже 0.55 — кочка отрыва (318 px под вершиной) выпадает из кадра
 function CAM_AT(){ return ctrl === 'auto' ? CAM_AUTO : 0.62; }
@@ -637,7 +643,7 @@ const col = {pond:C('--pond'), deep:C('--pond-deep'), mist:C('--mist'), lily:C('
 let state = 'start';
 let frog, platforms, items, cam, drag, tongue, parts, stats, seed, t0, gauge, btn, tongueCd = 0;
 let aim = {on: false, t: 0};  // прицеливание на красном трамплине
-let night = 0;                // 0..1, насколько опустилась ночь
+let night = 0, nightT = 0;                // 0..1, насколько опустилась ночь
 let best = 0; // рекорд в метрах (Галя 27.09: «метры интереснее»)
 try { best = +localStorage.getItem('frog.bestM') || 0; } catch(e) {}
 
@@ -654,7 +660,7 @@ function reset(s){
   sideRun = 0; sideSign = 0; lastHeartN = -100; flood = {y: FLOOD_START, t: 0};
   unlocked = {}; pending = {}; lesson = null; lessonI = 0; freeze = 0;
   frog.on = platforms[0];
-  items = []; parts = []; tongue = null; tongueCd = 0; aim = {on: false, t: 0}; night = 0;
+  items = []; parts = []; tongue = null; tongueCd = 0; aim = {on: false, t: 0}; night = 0; nightT = 0;
   drag = {on: false, steer: false, hold: 0, moved: 0, sx: 0, sy: 0, cx: 0, cy: 0, power: 0, dx: 0, dy: -1}; // hold: -1/1 = палец слева/справа (авто)
   gauge = {phase: 0, power: 0}; btn = {press: 0};
   cam = {y: -H + 140, target: -H + 140};
@@ -1095,7 +1101,14 @@ function update(dt){
   }
   // язык
   const mouth = mouthPos();
-  if (unlocked.night) night = Math.min(1, night + dt / NIGHT_FADE);
+  if (unlocked.night){
+    nightT += dt;
+    const p = nightT % NIGHT_CYCLE;
+    night = p < NIGHT_FADE ? p / NIGHT_FADE
+      : p < NIGHT_FADE + NIGHT_HOLD ? 1
+      : p < NIGHT_FADE * 2 + NIGHT_HOLD ? 1 - (p - NIGHT_FADE - NIGHT_HOLD) / NIGHT_FADE
+      : 0;
+  }
   if (tongueCd > 0) tongueCd -= dt;
   if (!tongue && tongueMode === 'auto'){
     let nearest = null, nd = TONGUE_RANGE;
@@ -1574,7 +1587,7 @@ window.__frog = {update, reset, launch, dragStart, dragMove, dragEnd, startGame,
   get frog(){ return frog; }, get platforms(){ return platforms; }, get items(){ return items; }, addItem, addPlatform, land, popBubble,
   startGeom: () => ({o: startOrigin(), k: startK(), play: startRect('play'), rules: startRect('rules')}),
   get unlocked(){ return unlocked; }, get freeze(){ return freeze; }, get lesson(){ return lesson; }, get flood(){ return flood; },
-  get stats(){ return stats; }, get cam(){ return cam; }, get night(){ return night; }, get parts(){ return parts; }, get tongue(){ return tongue; }, tongueGeom, mouthPos, throatPos, gapPos, get H(){ return H; }, get drag(){ return drag; }, W,
+  get stats(){ return stats; }, get cam(){ return cam; }, get night(){ return night; }, speedMul, get parts(){ return parts; }, get tongue(){ return tongue; }, tongueGeom, mouthPos, throatPos, gapPos, get H(){ return H; }, get drag(){ return drag; }, W,
   edit, editItems, editDown, editMove, editNudge, editLayout, editApply, editReset, editToggle, get START_AT(){ return START_AT; },
   setLang, t, get lang(){ return lang; }, get aim(){ return aim; }, setTongueMode: v => { tongueMode = v; }, tapTongue, get tongueMode(){ return tongueMode; },
   popGeom: () => { const o = popOrigin(), k = POP_K, r = {}; for (const b of SET_BTN) r[b.k] = [o.x + b.x * k, o.y + b.y * k]; return r; }};
