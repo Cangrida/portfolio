@@ -688,7 +688,7 @@ const A = (() => {
   function ev(name, extra){
     if (!live()) return;
     sent++;
-    const row = {e: name, s: sid, v: '21.10 13:32'};
+    const row = {e: name, s: sid, v: '21.10 15:48'};
     if (extra) for (const k in extra) row[k] = extra[k];
     q.push(row);
     if (q.length >= 12) flush();
