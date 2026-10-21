@@ -1,6 +1,6 @@
 // Оффлайн-кэш: игра — один файл, поэтому кладём его целиком вместе с иконками.
 // Версию поднимать при каждой выкладке, иначе телефон покажет старую сборку.
-const V = 'frog-21.10-1548';
+const V = 'frog-21.10-1558';
 const FILES = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-192.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 // addAll ходит в сеть, но через обычный кэш браузера, а страница игры отдаётся

@@ -1,4 +1,10 @@
 <meta charset="utf-8">
+<!-- Без этой строки телефон считает страницу настольной и рисует её в 980 логических
+     пикселей: холст потом растягивается и выглядит прилично, а вся обычная вёрстка
+     (полоска «есть новая версия») уменьшается в два с половиной раза. Заодно телефон
+     переставал рисовать втрое больше пикселей, чем у него есть. Галя 21.10: «очень
+     крошечная кнопка, я чуть не пропустила». -->
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Лягушка-прыгунья</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0d2327"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Лягушка"><meta name="mobile-web-app-capable" content="yes">
 <script defer src="pwa.js"></script>
@@ -13,7 +19,7 @@ html,body{margin:0;height:100%;background:var(--pond-deep);overflow:hidden;overs
    «плюха». Во время забега её нет совсем, иначе она закрыла бы кочки и сбила прыжок. */
 #upd{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:12px;
   background:var(--panel);border:2px solid #ffffff22;border-radius:18px;padding:10px 12px 10px 16px;
-  box-shadow:0 10px 26px #00000066;font-size:14px;color:var(--ink);max-width:min(340px,calc(100vw - 32px))}
+  box-shadow:0 10px 26px #00000066;font-size:15px;color:var(--ink);max-width:min(340px,calc(100vw - 32px));cursor:pointer}
 #upd[hidden]{display:none}
 /* без этого надпись ужимается до минимальной ширины и ломается на три строки */
 #updtext{white-space:nowrap}
@@ -606,7 +612,8 @@ function setLang(v){ lang = v; try { localStorage.setItem('frog.lang', v); } cat
 // только между забегами: на старте и после «плюха». Во время игры полоски нет совсем.
 const upd = {ready: false, shown: null,
   el: document.getElementById('upd'), txt: document.getElementById('updtext'), btn: document.getElementById('updbtn')};
-if (upd.btn) upd.btn.addEventListener('click', () => { try { location.reload(); } catch(e) {} });
+// Нажимается вся полоска, а не только кнопка: мишень больше, промахнуться труднее.
+if (upd.el) upd.el.addEventListener('click', () => { try { location.reload(); } catch(e) {} });
 addEventListener('frog:update-ready', () => { upd.ready = true; });
 function updPaint(){
   if (!upd.el) return;
@@ -688,7 +695,7 @@ const A = (() => {
   function ev(name, extra){
     if (!live()) return;
     sent++;
-    const row = {e: name, s: sid, v: '21.10 15:48'};
+    const row = {e: name, s: sid, v: '21.10 15:58'};
     if (extra) for (const k in extra) row[k] = extra[k];
     q.push(row);
     if (q.length >= 12) flush();
