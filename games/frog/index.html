@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Лягушка-прыгунья</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0d2327"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Лягушка"><meta name="mobile-web-app-capable" content="yes">
 <script defer src="pwa.js"></script>
@@ -8,6 +9,17 @@
 :root{--pond:#173a3f;--pond-deep:#0d2327;--mist:#a9d7c7;--lily:#6faa45;--lily-rim:#3f7526;--frog:#a6d24a;--frog-dark:#5c8f2a;--fly:#4a2b28;--tongue:#ef6f8a;--ink:#f5f2dc;--ink-dim:#b7c9b6;--panel:#0f2a2ecc;--accent:#ffd166}
 html,body{margin:0;height:100%;background:var(--pond-deep);overflow:hidden;overscroll-behavior:none;font-family:"Rubik",system-ui,sans-serif;color:var(--ink)}
 #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--pond-deep)}
+/* Полоска «есть новая версия». Показывается только между забегами: на старте и после
+   «плюха». Во время забега её нет совсем, иначе она закрыла бы кочки и сбила прыжок. */
+#upd{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:12px;
+  background:var(--panel);border:2px solid #ffffff22;border-radius:18px;padding:10px 12px 10px 16px;
+  box-shadow:0 10px 26px #00000066;font-size:14px;color:var(--ink);max-width:min(340px,calc(100vw - 32px))}
+#upd[hidden]{display:none}
+/* без этого надпись ужимается до минимальной ширины и ломается на три строки */
+#updtext{white-space:nowrap}
+#updbtn{font-family:inherit;font-size:14px;font-weight:700;color:#2a1e12;background:var(--accent);border:none;
+  border-radius:12px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+#updbtn:active{transform:translateY(1px)}
 canvas{display:block;touch-action:none;-webkit-user-select:none;user-select:none;background:var(--pond)}
 .screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;pointer-events:none}
 .screen[hidden]{display:none}
@@ -30,6 +42,457 @@ button:focus-visible{outline:3px solid #fff}
 @media (prefers-reduced-motion:reduce){button:active{transform:none}}
 </style>
 <div id="wrap"><canvas id="c"></canvas></div>
+<script id="fxsrc" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+// Собрано из tools/fx_src.glsl скриптом tools/mkfx.py. Руками не править: правка
+// потеряется при следующей пересборке. Крутить ручки в tools/fx_src.glsl.
+uniform vec3  iResolution;   // размер холста В ПИКСЕЛЯХ ЭКРАНА
+uniform float iTime;
+uniform int   iFrame;
+uniform float uPx;           // пикселей экрана на один логический пиксель игры (dpr*scale)
+uniform float uWaterY;       // экранный Y поверхности в логических пикселях
+uniform float uAgitation;    // 0..1, волнение
+uniform float uMist;         // 0..1, сколько дымки
+uniform vec3  uSplash0, uSplash1, uSplash2; // (x, y, возраст в секундах); возраст < 0 значит слот пуст
+out vec4 oColor;
+// «Лягушка», обновление 1.1: один слой на три эффекта.
+//
+// Прилив, дымка над водой и брызги при падении живут в одном полноэкранном шейдере.
+// Разносить их по трём проходам незачем: все три опираются на одну и ту же линию
+// поверхности, а на телефоне три прохода это три раза прочитать весь экран.
+//
+// Игра рисует этот слой вторым канвасом поверх своего, как сейчас рисует заливку воды.
+// Что она передаёт в рабочей версии (в Shadertoy эти значения считаются сами):
+//   uWaterY     экранный Y поверхности, тот же flood.y - cam.y
+//   uAgitation  0..1, волнение; игра поднимает его в «напряжение» волны сложности
+//   uMist       0..1, сколько дымки; можно гасить в ноль на старте и в паузе
+//   uSplash[3]  последние три падения: vec3(экранный X, экранный Y, возраст в секундах),
+//               возраст меньше нуля значит слот пустой
+//   uTime       flood.t
+// Альфа в fragColor.a: игра кладёт слой поверх сцены обычным смешиванием.
+
+#define DEBUG_MODE 0   // 0 итог, 1 высота поверхности, 2 маски (пена/каустика/блики), 3 только альфа, 4 дымка и лучи
+
+// Library code below is bundled from shader-skills (MIT): https://github.com/gokayfem/shader-skills
+// ---- shader-skills library: common ----
+const float TAU = 6.28318530717959;
+// 2D rotation matrix. `rot2(a) * v` rotates v counter-clockwise by a radians. (cos, sin) is renormalized because GLSL ES leaves trig precision undefined: on SwiftShader and some mobile GPUs a raw cos/sin pair is far enough from unit length that rotations stop preserving distances.
+mat2 rot2(float a) {
+    vec2 cs = normalize(vec2(cos(a), sin(a)));
+    return mat2(cs.x, cs.y, -cs.y, cs.x);
+}
+
+// ---- shader-skills library: hash ----
+// PCG-style 1D integer hash.
+uint pcgHash(uint v) {
+    uint state = v * 747796405u + 2891336453u;
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
+}
+// 3D integer hash, three decorrelated outputs.
+uvec3 pcg3d(uvec3 v) {
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y * v.z;
+    v.y += v.z * v.x;
+    v.z += v.x * v.y;
+    v ^= v >> 16u;
+    v.x += v.y * v.z;
+    v.y += v.z * v.x;
+    v.z += v.x * v.y;
+    return v;
+}
+// Map a uint to [0,1) using the top 24 bits, so the result can never round up to 1.0.
+float uintToUnit(uint h) { return float(h >> 8u) * (1.0 / 16777216.0); }
+vec2 uintToUnit(uvec2 h) { return vec2(h >> 8u) * (1.0 / 16777216.0); }
+vec3 uintToUnit(uvec3 h) { return vec3(h >> 8u) * (1.0 / 16777216.0); }
+vec4 uintToUnit(uvec4 h) { return vec4(h >> 8u) * (1.0 / 16777216.0); }
+// Random float in [0,1) for an integer-valued 2D input.
+float hash12(vec2 p) {
+    uvec2 q = uvec2(ivec2(floor(p)));
+    return uintToUnit(pcgHash(q.x + pcgHash(q.y)));
+}
+// Random vec2 in [0,1)^2 for an integer-valued 2D input.
+vec2 hash22(vec2 p) {
+    ivec2 q = ivec2(floor(p));
+    return uintToUnit(pcg3d(uvec3(q.x, q.y, 0x2545u))).xy;
+}
+// Random vec3 in [0,1)^3 for an integer-valued 3D input.
+vec3 hash33(vec3 p) { return uintToUnit(pcg3d(uvec3(ivec3(floor(p))))); }
+
+// ---- shader-skills library: noise ----
+// Quintic fade 6t^5 - 15t^4 + 10t^3: C2-continuous interpolation weights for lattice noise.
+vec2 quinticFade(vec2 f) { return f * f * f * (f * (f * 6.0 - 15.0) + 10.0); }
+vec3 quinticFade(vec3 f) { return f * f * f * (f * (f * 6.0 - 15.0) + 10.0); }
+// Derivative of quinticFade: 30 t^2 (t - 1)^2.
+vec2 quinticFadeDeriv(vec2 f) { return 30.0 * f * f * (f * (f - 2.0) + 1.0); }
+vec3 quinticFadeDeriv(vec3 f) { return 30.0 * f * f * (f * (f - 2.0) + 1.0); }
+// Unit gradient for a 2D lattice point.
+vec2 latticeGradient(vec2 cell) {
+    float a = TAU * hash12(cell);
+    return vec2(cos(a), sin(a));
+}
+// 2D gradient (Perlin-style) noise with analytic derivatives. Returns vec3(value, d/dx, d/dy). Gradient noise has less grid-aligned blockiness than value noise. Prefer it for fBm.
+vec3 gradientNoiseD(vec2 p) {
+    vec2 i = floor(p), f = fract(p);
+    vec2 u = quinticFade(f), du = quinticFadeDeriv(f);
+    vec2 ga = latticeGradient(i);
+    vec2 gb = latticeGradient(i + vec2(1.0, 0.0));
+    vec2 gc = latticeGradient(i + vec2(0.0, 1.0));
+    vec2 gd = latticeGradient(i + vec2(1.0, 1.0));
+    float va = dot(ga, f);
+    float vb = dot(gb, f - vec2(1.0, 0.0));
+    float vc = dot(gc, f - vec2(0.0, 1.0));
+    float vd = dot(gd, f - vec2(1.0, 1.0));
+    float k = va - vb - vc + vd;
+    float value = va + u.x * (vb - va) + u.y * (vc - va) + u.x * u.y * k;
+    vec2 deriv = ga + u.x * (gb - ga) + u.y * (gc - ga) + u.x * u.y * (ga - gb - gc + gd)
+               + du * (vec2(vb - va, vc - va) + u.yx * k);
+    return vec3(value, deriv);
+}
+// 2D gradient noise.
+float gradientNoise(vec2 p) { return gradientNoiseD(p).x; }
+// 2D simplex noise with analytic gradient. Returns vec3(value, d/dx, d/dy). Sums three radial kernels (0.5 - r^2)^4 on a triangular lattice instead of blending four square-cell corners, so it has fewer axis-aligned artifacts than gradientNoise. rotation (radians) spins every lattice gradient: animating it gives flow noise that churns in place instead of sliding (Perlin and Neyret 2001). Scaled so |value| <= 1 exactly.
+vec3 simplexNoiseD(vec2 p, float rotation) {
+    const float SKEW = 0.36602540378;     // (sqrt(3) - 1) / 2: square lattice -> triangle lattice
+    const float UNSKEW = 0.21132486541;   // (3 - sqrt(3)) / 6
+    vec2 cell = floor(p + (p.x + p.y) * SKEW);
+    vec2 d0 = p - cell + (cell.x + cell.y) * UNSKEW;
+    vec2 o = (d0.x > d0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);   // which of the cell's two triangles holds p
+    vec2 corners[3] = vec2[3](cell, cell + o, cell + 1.0);
+    vec2 offsets[3] = vec2[3](d0, d0 - o + UNSKEW, d0 - 1.0 + 2.0 * UNSKEW);
+    mat2 spin = rot2(rotation);
+    vec3 sum = vec3(0.0);
+    for (int k = 0; k < 3; k++) {
+        vec2 d = offsets[k];
+        float t = max(0.5 - dot(d, d), 0.0);
+        vec2 g = spin * latticeGradient(corners[k]);
+        float gd = dot(g, d);
+        float t3 = t * t * t;
+        // value t^4 (g.d); gradient t^4 g - 8 t^3 (g.d) d
+        sum += vec3(t3 * t * gd, t3 * t * g - 8.0 * t3 * gd * d);
+    }
+    return 99.2 * sum;   // 1 / max over the simplex of sum t^4 |d|
+}
+vec3 simplexNoiseD(vec2 p) { return simplexNoiseD(p, 0.0); }
+// 2D simplex noise.
+float simplexNoise(vec2 p) { return simplexNoiseD(p, 0.0).x; }
+// Dot product of a hashed 3D gradient with the offset to its lattice corner.
+float latticeGradDot(vec3 cell, vec3 corner, vec3 f) {
+    vec3 g = hash33(cell + corner) * 2.0 - 1.0;
+    return dot(g, f - corner);
+}
+// 3D gradient noise.
+float gradientNoise(vec3 p) {
+    vec3 i = floor(p), f = fract(p);
+    vec3 u = quinticFade(f);
+    return mix(mix(mix(latticeGradDot(i, vec3(0, 0, 0), f), latticeGradDot(i, vec3(1, 0, 0), f), u.x),
+                   mix(latticeGradDot(i, vec3(0, 1, 0), f), latticeGradDot(i, vec3(1, 1, 0), f), u.x), u.y),
+               mix(mix(latticeGradDot(i, vec3(0, 0, 1), f), latticeGradDot(i, vec3(1, 0, 1), f), u.x),
+                   mix(latticeGradDot(i, vec3(0, 1, 1), f), latticeGradDot(i, vec3(1, 1, 1), f), u.x), u.y), u.z);
+}
+// 3D gradient noise with analytic derivatives. Returns vec4(value, d/dx, d/dy, d/dz); value equals gradientNoise(p). The trilinear blend is expanded as a polynomial in the fade weights, so the gradient is the same blend of the corner gradients plus the chain-rule term of the fade.
+vec4 gradientNoiseD(vec3 p) {
+    vec3 i = floor(p), f = fract(p);
+    vec3 u = quinticFade(f), du = quinticFadeDeriv(f);
+    vec3 g000 = hash33(i) * 2.0 - 1.0;
+    vec3 g100 = hash33(i + vec3(1, 0, 0)) * 2.0 - 1.0;
+    vec3 g010 = hash33(i + vec3(0, 1, 0)) * 2.0 - 1.0;
+    vec3 g110 = hash33(i + vec3(1, 1, 0)) * 2.0 - 1.0;
+    vec3 g001 = hash33(i + vec3(0, 0, 1)) * 2.0 - 1.0;
+    vec3 g101 = hash33(i + vec3(1, 0, 1)) * 2.0 - 1.0;
+    vec3 g011 = hash33(i + vec3(0, 1, 1)) * 2.0 - 1.0;
+    vec3 g111 = hash33(i + vec3(1, 1, 1)) * 2.0 - 1.0;
+    float v000 = dot(g000, f);
+    float v100 = dot(g100, f - vec3(1, 0, 0));
+    float v010 = dot(g010, f - vec3(0, 1, 0));
+    float v110 = dot(g110, f - vec3(1, 1, 0));
+    float v001 = dot(g001, f - vec3(0, 0, 1));
+    float v101 = dot(g101, f - vec3(1, 0, 1));
+    float v011 = dot(g011, f - vec3(0, 1, 1));
+    float v111 = dot(g111, f - vec3(1, 1, 1));
+    // value = v000 + kx u.x + ky u.y + kz u.z + kxy u.x u.y + kyz u.y u.z + kzx u.z u.x + kxyz u.x u.y u.z
+    float kx = v100 - v000, ky = v010 - v000, kz = v001 - v000;
+    float kxy = v000 - v100 - v010 + v110;
+    float kyz = v000 - v010 - v001 + v011;
+    float kzx = v000 - v100 - v001 + v101;
+    float kxyz = -v000 + v100 + v010 - v110 + v001 - v101 - v011 + v111;
+    float value = v000 + kx * u.x + ky * u.y + kz * u.z
+                + kxy * u.x * u.y + kyz * u.y * u.z + kzx * u.z * u.x + kxyz * u.x * u.y * u.z;
+    vec3 grad = g000 + (g100 - g000) * u.x + (g010 - g000) * u.y + (g001 - g000) * u.z
+              + (g000 - g100 - g010 + g110) * u.x * u.y
+              + (g000 - g010 - g001 + g011) * u.y * u.z
+              + (g000 - g100 - g001 + g101) * u.z * u.x
+              + (-g000 + g100 + g010 - g110 + g001 - g101 - g011 + g111) * u.x * u.y * u.z
+              + du * vec3(kx + kxy * u.y + kzx * u.z + kxyz * u.y * u.z,
+                          ky + kxy * u.x + kyz * u.z + kxyz * u.x * u.z,
+                          kz + kyz * u.y + kzx * u.x + kxyz * u.x * u.y);
+    return vec4(value, grad);
+}
+const int FBM_MAX_OCTAVES = 12;
+// Fractional Brownian motion over 2D gradient noise. Each octave is rotated to hide lattice alignment. persistence 0.5 is the classic look (H = 1). Lower is smoother, higher is rougher.
+float fbm(vec2 p, int octaves, float lacunarity, float persistence) {
+    const mat2 octaveRotation = mat2(0.8, 0.6, -0.6, 0.8);
+    float sum = 0.0, amp = 1.0, norm = 0.0;
+    for (int i = 0; i < FBM_MAX_OCTAVES; i++) {
+        if (i >= octaves) break;
+        sum += amp * gradientNoise(p);
+        norm += amp;
+        amp *= persistence;
+        p = lacunarity * (octaveRotation * p) + vec2(17.13, -3.71);
+    }
+    return 1.4 * sum / norm;
+}
+// 2D fBm with the usual defaults (lacunarity 2.01 so octave peaks never re-align, persistence 0.5).
+float fbm(vec2 p, int octaves) { return fbm(p, octaves, 2.01, 0.5); }
+// fBm over 3D gradient noise.
+float fbm(vec3 p, int octaves, float lacunarity, float persistence) {
+    const mat3 octaveRotation = mat3(0.00, 0.80, 0.60,
+                                     -0.80, 0.36, -0.48,
+                                     -0.60, -0.48, 0.64);
+    float sum = 0.0, amp = 1.0, norm = 0.0;
+    for (int i = 0; i < FBM_MAX_OCTAVES; i++) {
+        if (i >= octaves) break;
+        sum += amp * gradientNoise(p);
+        norm += amp;
+        amp *= persistence;
+        p = lacunarity * (octaveRotation * p) + vec3(17.13, -3.71, 5.29);
+    }
+    return sum / norm;
+}
+// Cellular (Worley/Voronoi) noise. Returns vec4(F1, F2, nearestCell.xy). F1 = distance to nearest feature point, F2 = second nearest. nearestCell is integer-valued, so hash it for per-cell randomness. jitter in [0,1] (0 = regular grid). Searches 3x3 cells. F2 can be slightly off at jitter 1.
+vec4 voronoi(vec2 p, float jitter) {
+    vec2 ip = floor(p), fp = fract(p);
+    float f1 = 8.0, f2 = 8.0;
+    vec2 nearest = vec2(0.0);
+    for (int j = -1; j <= 1; j++)
+    for (int i = -1; i <= 1; i++) {
+        vec2 g = vec2(float(i), float(j));
+        vec2 r = g + jitter * hash22(ip + g) - fp;
+        float d = dot(r, r);
+        if (d < f1) { f2 = f1; f1 = d; nearest = ip + g; }
+        else if (d < f2) { f2 = d; }
+    }
+    return vec4(sqrt(f1), sqrt(f2), nearest);
+}
+
+// ---- shader-skills library: color ----
+// Exact sRGB decode (EOTF): encoded [0,1] -> linear.
+vec3 srgbToLinear(vec3 c) {
+    c = max(c, 0.0);
+    return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c));
+}
+// Exact sRGB encode (OETF): linear -> display [0,1]. Apply exactly once, after tonemapping. pow(c, 1/2.2) is visibly wrong near black (0.001 encodes to 0.013 here vs 0.043 with 2.2).
+vec3 linearToSrgb(vec3 c) {
+    c = max(c, 0.0);
+    return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
+}
+
+// ---- shader-skills library: post ----
+// Triangular-PDF dither of +-1 LSB for 8-bit output. Add AFTER linearToSrgb, right before writing fragColor.
+vec3 ditherTPDF(vec2 fragCoord, int frame) {
+    vec2 r = hash22(vec2(floor(fragCoord) + 7919.0 * float(frame % 1024)));
+    return vec3((r.x + r.y - 1.0) / 255.0);
+}
+
+// ---- shader ----
+// ---------- художественные ручки ----------
+const vec3  WATER_TOP   = vec3(0.090, 0.227, 0.247);  // #173a3f, --pond
+const vec3  WATER_DEEP  = vec3(0.051, 0.137, 0.153);  // #0d2327, --pond-deep
+const vec3  FOAM        = vec3(0.874, 0.953, 0.961);  // #dff3f5, та же пена, что в игре
+const vec3  GLINT       = vec3(0.663, 0.843, 0.780);  // #a9d7c7, --mist
+const vec3  MIST_COL    = vec3(0.663, 0.843, 0.780);  // дымка берёт тот же --mist, чтобы не ввести новый цвет
+
+const float BODY_ALPHA  = 0.62;   // прозрачность воды: ровно как в нынешней заливке
+const float DEPTH_FADE  = 170.0;  // за сколько пикселей вглубь вода темнеет до дна
+const float WAVE_AMP    = 6.0;    // размах гребня в пикселях при спокойной воде
+const float WAVE_LEN    = 165.0;  // длина основной волны в пикселях
+const float FOAM_W      = 8.0;    // толщина пенного канта
+const float FOAM_TRAIL  = 15.0;   // как глубоко уходит вторая, слабая полоса пены
+const float CAUSTIC_SC  = 0.070;  // масштаб сетки света под водой
+const float CAUSTIC_WARP= 10.0;   // насколько гнуть жилки: 0 даёт прямые рёбра многоугольников
+const float CAUSTIC_AMT = 0.13;   // яркость жилок света
+const float CAUSTIC_SQ  = 0.75;   // сплющивание ячеек по высоте: ниже 0.5 жилки вытягиваются в корни
+const float GLINT_AMT   = 0.5;    // яркость бликов у самой поверхности
+const float EDGE_SOFT   = 2.6;    // мягкость кромки воды в пикселях
+
+const float MIST_H      = 95.0;   // на сколько пикселей дымка поднимается над водой
+const float MIST_AMT    = 0.34;   // плотность дымки на пике
+const float SHAFT_AMT   = 0.05;   // полосы света сверху; выше 0.08 начинают мешать читать кочки
+const float SHAFT_TILT  = 0.34;   // наклон полос
+
+const float RING_V      = 210.0;  // с какой скоростью расходится кольцо от падения, px/с
+const float RING_LIFE   = 1.5;    // за сколько секунд кольцо гаснет
+const float CROWN_H     = 11.0;   // высота всплеска в первый момент
+const float CROWN_W     = 16.0;   // ширина всплеска в пикселях: шире тридцати это уже не брызги, а горб
+
+// ---------- поверхность ----------
+// Три синуса разной длины и скорости плюс медленный шум: от одной пары синусов
+// глаз за полминуты выучивает период и волна начинает «мигать» на месте.
+float surfaceY(float x, float t, float agitation){
+    float amp = WAVE_AMP * (0.75 + 0.75 * agitation);
+    float h  = sin(x * (6.2831853 / WAVE_LEN)        + t * 1.15) * amp;
+    h += sin(x * (6.2831853 / (WAVE_LEN * 0.55)) - t * 1.70) * amp * 0.38;
+    h += sin(x * (6.2831853 / (WAVE_LEN * 0.27)) + t * 2.40) * amp * 0.10 * agitation;
+    h += (simplexNoise(vec2(x * 0.0075, t * 0.28))) * amp * 0.45;   // сбивает период
+    return h;
+}
+
+// Горб от падения. Кольцо расходится в обе стороны от точки входа, а в первый момент
+// на месте падения стоит корона. Знак минус потому, что Y у нас растёт вниз.
+float splashLift(vec3 sp, float x){
+    if (sp.z < 0.0) return 0.0;
+    float r   = abs(x - sp.x);
+    float age = sp.z;
+    float life = exp(-age / RING_LIFE * 1.5);
+    // Гребень с двумя впадинами по бокам («мексиканская шляпа»), а не одиночный горб:
+    // от простого гаусса вода вспухает холмом и читается как пузырь, а не как волна.
+    float k = (r - age * RING_V) / 13.0;
+    float ring  = (1.0 - 2.0 * k * k) * exp(-k * k) * 7.0 * life;
+    float crown = exp(-r * r / (CROWN_W * CROWN_W)) * CROWN_H * exp(-age * 7.0);
+    return -(ring + crown);
+}
+
+// Пена от падения: та же волна, но уже как белая отметина на гребне.
+float splashFoam(vec3 sp, float x){
+    if (sp.z < 0.0) return 0.0;
+    float r   = abs(x - sp.x);
+    float age = sp.z;
+    float k   = (r - age * RING_V) / 11.0;
+    return exp(-k * k) * exp(-age / RING_LIFE * 1.8)
+         + exp(-r * r / (CROWN_W * CROWN_W * 1.6)) * exp(-age * 5.0);
+}
+
+// Наклон гребня: по нему ярче пена на подъёме волны. Считаем конечной разностью, но
+// на семи пикселях, а не на двух: на двух она ловит мелкую рябь и кант выходит рваным.
+float surfaceSlope(float x, float t, float agitation){
+    float e = 7.0;
+    return (surfaceY(x + e, t, agitation) - surfaceY(x - e, t, agitation)) / (2.0 * e);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    // Пиксели игры, Y вниз: шейдер живёт в той же системе, что и canvas,
+    // иначе при переносе придётся всё переворачивать и путаться в знаках.
+    vec2 px = vec2(fragCoord.x, iResolution.y - fragCoord.y) / uPx;
+    float t = iTime;
+
+    // ---------- вход от игры ----------
+    // В Shadertoy всё это считается само, чтобы было видно весь диапазон.
+    // В рабочей версии четыре строки ниже заменяются на uniform-ы.
+    float waterY    = uWaterY;
+    float agitation = uAgitation;
+    float mistAmt   = uMist;
+    vec3  sp0 = uSplash0;
+    vec3  sp1 = uSplash1;
+    vec3  sp2 = uSplash2;
+
+    // ---------- линия поверхности ----------
+    float lift = splashLift(sp0, px.x) + splashLift(sp1, px.x) + splashLift(sp2, px.x);
+    float surf = waterY + surfaceY(px.x, t, agitation) + lift;
+    float d    = px.y - surf;                        // >0 под водой
+
+    float aa = EDGE_SOFT;                            // мягкость кромки в пикселях
+    float under = smoothstep(-aa, aa, d);
+
+    // ---------- над водой: дымка и полосы света ----------
+    // Дымка живёт лентой над самой поверхностью и ползёт вбок медленнее волны.
+    // Выше MIST_H её нет совсем: игроку надо видеть кочки, а не атмосферу.
+    float up = max(0.0, -d);
+    float mistBand = exp(-up / MIST_H) * smoothstep(0.0, 10.0, up);
+    float mn = fbm(vec2(px.x * 0.0055 + t * 0.045, px.y * 0.011 - t * 0.02), 3);
+    float mist = mistBand * (0.30 + 0.70 * (0.5 + 0.5 * mn)) * MIST_AMT * mistAmt * (1.0 - under);
+
+    // Полосы света сверху: очень слабые, это воздух, а не прожектор.
+    float sx = (px.x + px.y * SHAFT_TILT) * 0.011;
+    float shaft = (0.5 + 0.5 * sin(sx * 2.1 + t * 0.09)) * (0.5 + 0.5 * sin(sx * 0.7 - t * 0.05));
+    shaft *= exp(-px.y / (iResolution.y * 0.75)) * SHAFT_AMT * mistAmt * (1.0 - under);
+
+    vec3  airCol = srgbToLinear(MIST_COL);
+    float airA   = clamp(mist + shaft, 0.0, 1.0);
+
+    if (under <= 0.001 && DEBUG_MODE == 0){
+        vec3 a = linearToSrgb(clamp(airCol * airA, 0.0, 1.0));
+        fragColor = vec4(a / max(airA, 0.001), airA);
+        return;
+    }
+
+    // ---------- тело воды ----------
+    float depth = clamp(d / DEPTH_FADE, 0.0, 1.0);
+    vec3  body  = mix(srgbToLinear(WATER_TOP), srgbToLinear(WATER_DEEP), depth * depth);
+
+    // ---------- свет под поверхностью ----------
+    // Ячейки Вороного это многоугольники, и без искривления координат жилки выходят
+    // прямыми отрезками с углами. Гнём вход плавным шумом, рёбра становятся дугами.
+    vec2  cp = vec2(px.x, px.y * CAUSTIC_SQ);
+    vec2  warp = vec2(simplexNoise(cp * 0.010 + vec2(t * 0.07, 0.0)),
+                      simplexNoise(cp * 0.010 + vec2(5.2, t * 0.05))) * CAUSTIC_WARP;
+    vec2  cw = cp + warp;
+    vec4  v1 = voronoi(cw * CAUSTIC_SC + vec2(t * 0.22, -t * 0.09), 1.0);
+    vec4  v2 = voronoi(cw * CAUSTIC_SC * 1.9 + vec2(-t * 0.14, t * 0.05), 1.0);
+    // Порог шире, чем узкая жилка: узкая читается как процарапанная линия, широкая как свет.
+    float net = (1.0 - smoothstep(0.0, 0.17, v1.y - v1.x))
+              + (1.0 - smoothstep(0.0, 0.12, v2.y - v2.x)) * 0.45;
+    net *= net;                                      // мягкое ядро, нет резкого канта
+    float causticFade = exp(-d / 45.0);              // свет гаснет в первых метрах
+    float caustic = net * causticFade * CAUSTIC_AMT * (0.6 + 0.6 * agitation);
+
+    // ---------- блики у самой поверхности ----------
+    float glintBand = exp(-d / 22.0) * smoothstep(0.0, 6.0, d);
+    float gs = simplexNoise(vec2(px.x * 0.09 - t * 1.1, d * 0.14 + t * 0.4));
+    float glint = smoothstep(0.38, 0.95, gs) * glintBand * GLINT_AMT * (0.5 + agitation);
+
+    // ---------- пена ----------
+    float slope = surfaceSlope(px.x, t, agitation);
+    float tear  = 0.5 + 0.5 * simplexNoise(vec2(px.x * 0.022 + t * 0.55, t * 0.35));
+    float crest = smoothstep(-0.16, 0.30, slope);                     // на подъёме гуще
+    float ringF = splashFoam(sp0, px.x) + splashFoam(sp1, px.x) + splashFoam(sp2, px.x);
+    float w     = FOAM_W * (0.78 + 0.44 * tear) * (0.82 + 0.36 * agitation) * (1.0 + 1.6 * clamp(ringF, 0.0, 1.0));
+    // Два смягчения подряд: плотное ядро у самой кромки и длинный пологий хвост вниз,
+    // иначе пена обрывается ступенькой и кант выглядит вырезанным ножницами.
+    float foam  = (1.0 - smoothstep(0.0, w, d));
+    foam = foam * foam * (3.0 - 2.0 * foam);
+    foam *= under * (0.68 + 0.42 * crest);
+
+    // вторая полоса, слабее и глубже: она уже есть в нынешнем рисунке, оставляем узнаваемость
+    float td = d - FOAM_TRAIL * (0.85 + 0.4 * tear);
+    float trail = exp(-td * td / 46.0) * 0.26 * (0.5 + 0.5 * agitation);
+
+    // ---------- сборка ----------
+    vec3 col = body;
+    col += srgbToLinear(GLINT) * caustic;
+    col += srgbToLinear(GLINT) * glint;
+    col  = mix(col, srgbToLinear(FOAM), clamp(foam + trail, 0.0, 1.0));
+
+    // Пена непрозрачная, вода полупрозрачная: сквозь воду должны просвечивать кочки,
+    // иначе игрок перестаёт понимать, что именно утонуло.
+    float alpha = mix(BODY_ALPHA, 1.0, clamp(foam, 0.0, 1.0)) * under;
+
+    // Воздух поверх воды: у самой кромки дымка почти кончилась, но стык должен быть мягким.
+    col   = mix(col, airCol, clamp(airA * (1.0 - under), 0.0, 1.0));
+    alpha = clamp(alpha + airA * (1.0 - under), 0.0, 1.0);
+
+    col = linearToSrgb(clamp(col, 0.0, 1.0));
+    col += ditherTPDF(fragCoord, iFrame);            // полосы на плавном переходе вглубь
+
+    if (DEBUG_MODE == 1){ fragColor = vec4(vec3(0.5 + 0.02 * (surf - waterY)), 1.0); return; }
+    if (DEBUG_MODE == 2){ fragColor = vec4(foam + trail, caustic, glint, 1.0); return; }
+    if (DEBUG_MODE == 3){ fragColor = vec4(vec3(alpha), 1.0); return; }
+    if (DEBUG_MODE == 4){ fragColor = vec4(mist, shaft * 8.0, 0.0, 1.0); return; }
+    fragColor = vec4(col, alpha);
+}
+
+// ---------- на что крутить ----------
+// Вода:    WAVE_AMP и WAVE_LEN это размах и длина волны; EDGE_SOFT мягкость кромки;
+//          BODY_ALPHA прозрачность; DEPTH_FADE как быстро темнеет вглубь.
+// Пена:    FOAM_W толщина канта, FOAM_TRAIL глубина второй полосы.
+// Свет:    CAUSTIC_AMT яркость жилок, CAUSTIC_SC их размер, CAUSTIC_SQ их округлость,
+//          CAUSTIC_WARP кривизна
+//          (поставить 0 и увидеть, почему он нужен); GLINT_AMT искры у поверхности.
+// Дымка:   MIST_H высота ленты над водой, MIST_AMT плотность; SHAFT_AMT полосы света,
+//          выше 0.08 они начинают мешать читать кочки.
+// Брызги:  RING_V скорость кольца, RING_LIFE сколько живёт, CROWN_H и CROWN_W всплеск.
+
+void main(){ vec4 c; mainImage(c, gl_FragCoord.xy); oColor = c; }</script>
+<div id="upd" hidden><span id="updtext"></span><button id="updbtn" type="button"></button></div>
 <div class="screen" id="start" hidden><!-- старт рисуется на холсте (drawStart), карточка оставлена ради id -->
   <div class="card">
     <h1>Лягушка</h1>
@@ -112,28 +575,47 @@ const T = {
     best: 'Рекорд', height: 'Высота', flies: 'Мухи', score: 'Очки', m: ' м', splash: 'Плюх!',
     title: 'Лягушка', sub: 'Прыгай выше, лови мух!', ctrl1: 'Лягушка прыгает сама', ctrl2: 'Управляй:', ctrlOr: 'или',
     stingRow: 'Укусы', newBest: 'Новый рекорд!', toBest: n => 'До рекорда не хватило ' + n + ' м',
-    l_swarm: 'осы летают парами', l_narrow: 'кочки стали уже', l_night: 'то темнеет, то светлеет, кочки видно хуже',
+    l_swarm: 'осы летают парами', l_narrow: 'кочки стали уже', l_night: 'экран темнеет каждый раз, когда игра ускоряется',
     hintSteer: 'стрелки внизу: держи, чтобы рулить', hintBubble: 'пузырь несёт вверх, стрелки рулят',
     l_fly: 'мух лови языком, он достаёт сам', l_fly_tap: 'тапни по мухе, язык достанет', l_flood: 'вода прибывает снизу', l_moving: 'банка ныряет после прыжка',
     l_crumble: 'трухлявая рассыпается под лапами', l_bubble: 'пузырь ловится телом, не языком',
     l_slip: 'мокрый камень несёт вбок, держи стрелку против', l_wasp: 'оса жалит, язык её не берёт',
     l_spring: 'трамплин подбрасывает выше', l_heart: 'сердечко вернёт жизнь',
-    l_aim: 'красный трамплин подбрасывает ещё выше'},
+    l_aim: 'красный трамплин подбрасывает ещё выше',
+    updText: 'Есть новая версия', updBtn: 'Обновить'},
   en: {play: 'PLAY', rules: 'HOW TO PLAY', back: 'BACK', again: 'AGAIN', resume: 'RESUME', quit: 'QUIT', pause: 'PAUSED',
     best: 'Best', height: 'Height', flies: 'Flies', score: 'Score', m: ' m', splash: 'Splash!',
     title: 'FROGGY HOP', sub: 'Jump higher, catch flies!', ctrl1: 'The frog hops by itself', ctrl2: 'Steer:', ctrlOr: 'or',
     stingRow: 'Stings', newBest: 'New best!', toBest: n => n + ' m short of your best',
-    l_swarm: 'wasps now fly in pairs', l_narrow: 'the logs get narrower', l_night: 'night comes and goes, logs are harder to see',
+    l_swarm: 'wasps now fly in pairs', l_narrow: 'the logs get narrower', l_night: 'the screen darkens each time the game speeds up',
     hintSteer: 'hold an arrow below to steer', hintBubble: 'the bubble lifts you, arrows steer',
     l_fly: 'the tongue catches flies on its own', l_fly_tap: 'tap a fly to catch it', l_flood: 'water is rising from below', l_moving: 'the can sinks after a jump',
     l_crumble: 'rotten logs crumble underfoot', l_bubble: 'catch the bubble with your body, not the tongue',
     l_slip: 'wet stone slides you sideways, hold the opposite arrow', l_wasp: 'wasps sting, the tongue cannot take them',
     l_spring: 'the springboard throws you higher', l_heart: 'a heart gives a life back',
+    updText: 'A new version is ready', updBtn: 'Update',
     l_aim: 'the red springboard throws you even higher'}};
 let lang = 'ru';
 try { lang = localStorage.getItem('frog.lang') || ((navigator.language || '').toLowerCase().startsWith('ru') ? 'ru' : 'en'); } catch(e) {}
 function t(k){ if (k === 'l_fly' && tongueMode === 'tap') k = 'l_fly_tap'; const d = T[lang] || T.ru, v = d[k] != null ? d[k] : T.ru[k]; return v; }
-function setLang(v){ lang = v; try { localStorage.setItem('frog.lang', v); } catch(e) {} }
+function setLang(v){ lang = v; try { localStorage.setItem('frog.lang', v); } catch(e) {} if (upd.shown){ upd.shown = null; } }
+
+// ---------- полоска «есть новая версия» ----------
+// Телефон обновляет сборку в фоне, но открытое окно остаётся на старой: оно уже нарисовано.
+// Перезапустить его на ходу нельзя, это убьёт забег. Поэтому просто предлагаем кнопку, и
+// только между забегами: на старте и после «плюха». Во время игры полоски нет совсем.
+const upd = {ready: false, shown: null,
+  el: document.getElementById('upd'), txt: document.getElementById('updtext'), btn: document.getElementById('updbtn')};
+if (upd.btn) upd.btn.addEventListener('click', () => { try { location.reload(); } catch(e) {} });
+addEventListener('frog:update-ready', () => { upd.ready = true; });
+function updPaint(){
+  if (!upd.el) return;
+  const show = upd.ready && (state === 'start' || state === 'over');
+  if (show === upd.shown) return;                 // дёргаем разметку только на переходе
+  upd.shown = show;
+  upd.el.hidden = !show;
+  if (show){ upd.txt.textContent = t('updText'); upd.btn.textContent = t('updBtn'); }
+}
 // обучение по ходу игры (Галя 10.09.2026: «внедрять постепенно, сначала плашка, потом объект»):
 // каждый тип включается на своей кочке, перед первым появлением внизу висит плашка с объяснением
 const LESSONS = [
@@ -150,10 +632,15 @@ const LESSONS = [
   {n: 62, key: 'swarm'},     // дальше игра не кончается: три ступени второго горизонта (Галя 27.09: «контент кончается на 50-й»)
   {n: 78, key: 'narrow'},
   {n: 95, key: 'night'}];
-// Ночь приходит волной и уходит: это временное усложнение, а не конец света (Галя 29.09).
-// Полный круг: темнеет NIGHT_FADE, держится NIGHT_HOLD, светлеет NIGHT_FADE, светло NIGHT_GAP.
-const NIGHT_FADE = 6, NIGHT_HOLD = 12, NIGHT_GAP = 14;
-const NIGHT_CYCLE = NIGHT_FADE * 2 + NIGHT_HOLD + NIGHT_GAP;
+// Затемнение это не таймер, а СИГНАЛ переключения сложности (Галя 21.10):
+// «после затемнения скорость чуть-чуть увеличивается, мы допрыгиваем до определённой
+// высоты, снова затемнение, и скорость ещё немного увеличивается».
+// Поэтому вспышка привязана к ступени разгона, а не к часам: темнеет NIGHT_FADE,
+// на пике держится NIGHT_HOLD и ровно там прибавляется скорость, светлеет NIGHT_FADE,
+// дальше экран чистый до следующей высоты. Раньше круг шёл по часам и держал полную
+// тьму двенадцать секунд подряд, что и читалось как «навсегда».
+const NIGHT_FADE = 4, NIGHT_HOLD = 3;
+const NIGHT_PULSE = NIGHT_FADE * 2 + NIGHT_HOLD;
 const NIGHT_MAX = 0.42;      // предел темноты: кочки ещё читаются, но хуже
 const FALL_FREEZE = 0.35;    // после падения мир стоит, чтобы было видно, что сгорело сердечко (короче, чем было)
 const LESSON_T = 5, LESSON_FREEZE = 0; // плашка урока больше не останавливает мир: Галя 27.09 — «зависает на приземлении»
@@ -161,16 +648,89 @@ let unlocked = {}, pending = {}, lesson = null, lessonI = 0, freeze = 0;
 function lessonStep(){ // уроки идут по кочке, на которую села лягушка: плашка успевает появиться раньше самого объекта
   while (lessonI < LESSONS.length && frog.lastN >= LESSONS[lessonI].n){
     const L = LESSONS[lessonI++]; unlocked[L.key] = true; pending[L.key] = true; lesson = {t: LESSON_T, key: L.key}; if (LESSON_FREEZE) freeze = LESSON_FREEZE;
+    A.lesson(L.key, L.n);   // ступенька лестницы: по ней видно, где обрывается половина игроков
     if (L.key === 'flood') flood.y = frog.y + H * 0.9; // вода приходит из-под нижнего края, а не рывком
   }
 }
 const FLOOD_V = 110, FLOOD_START = 520, FLOOD_SINK = 26, FLOOD_LAG = 0.6; // прилив: фронт воды ползёт снизу FLOOD_V px/с (×0.6 в передышку, ×1.5 в напряжение); отстаёт не дальше FLOOD_LAG экранов
-let flood = {y: FLOOD_START, t: 0};
+let flood = {y: FLOOD_START, t: 0, wv: 0};  // wv это волна сложности 0..1, её же шейдер берёт как волнение воды
 // Разгон ступенями (Галя 29.09: «прошёл часть пути, скорость ещё прибавилась, и так далее»).
 // Было 300 м и 8 %: при её рекорде 455 м игрок видел одну ступеньку и разгона не замечал.
 // Стало 150 м и 7 %, потолок выше: на 450 м уже плюс пятая часть, на 1000 м почти в полтора раза.
 const SPEED_STEP = 0.07, SPEED_EVERY = 150, SPEED_MAX = 2.0;
-function speedMul(){ return Math.min(SPEED_MAX, 1 + SPEED_STEP * Math.floor(stats.height / SPEED_EVERY)); }
+const SPEED_STEPS = Math.floor((SPEED_MAX - 1) / SPEED_STEP); // выше потолка объявлять нечего, вспышки прекращаются
+// Ступень, до которой игрок уже дорос по высоте, и ступень, которая уже ПРИМЕНЕНА.
+// Пока ночь не открыта, вторая догоняет первую молча. После урока разрыв между ними
+// закрывается только на пике затемнения: игрок видит причину раньше, чем чувствует следствие.
+function heightStep(){ return Math.min(SPEED_STEPS, Math.floor(stats.height / SPEED_EVERY)); }
+// Пока урок ночи не сыгран, объявлять нечем, и скорость просто идёт за высотой.
+function speedMul(){ return Math.min(SPEED_MAX, 1 + SPEED_STEP * (unlocked.night ? speedStep : heightStep())); }
+
+// ---------- счётчик: докуда доходят игроки ----------
+// Вопрос Гали 04.10: «на каком моменте люди бросают». itch знает только про страницу,
+// внутрь игры он не видит, поэтому считаем сами. Семь событий, больше не нужно.
+// В записи НЕТ ни имени, ни почты, ни IP: случайный номер визита, который живёт до
+// закрытия вкладки, и игровые числа. Так обещано на странице игры.
+// sendBeacon выбран потому, что переживает закрытие вкладки и не требует разрешений CORS.
+const STATS_URL = 'https://frogstats.green.irish/e';
+const STATS_ON = true;            // рубильник: false — счётчик молчит совсем
+const A = (() => {
+  const SEND_MAX = 400;           // предохранитель: больше этого за визит не шлём никогда
+  let q = [], sid = '', runs = 0, sent = 0, runT0 = 0, visitT0 = 0, jumped = false, quitSent = false;
+  const sec = () => { try { return performance.now() / 1000; } catch(e){ return Date.now() / 1000; } };
+  try { sid = Math.random().toString(36).slice(2, 12) || 'x'; } catch(e) { sid = ''; }
+  const live = () => STATS_ON && sid && sent < SEND_MAX;
+  function flush(){
+    if (!q.length) return;
+    const body = JSON.stringify(q); q = [];
+    try { navigator.sendBeacon(STATS_URL, new Blob([body], {type: 'text/plain'})); } catch(e) {}
+  }
+  function ev(name, extra){
+    if (!live()) return;
+    sent++;
+    const row = {e: name, s: sid, v: '21.10 13:32'};
+    if (extra) for (const k in extra) row[k] = extra[k];
+    q.push(row);
+    if (q.length >= 12) flush();
+  }
+  return {
+    flush,                                // наружу ради тестов: очередь отдаётся по требованию
+    load(){
+      visitT0 = sec();
+      let mob = false, w = 0, h = 0;
+      try { mob = matchMedia('(pointer: coarse)').matches; w = innerWidth; h = innerHeight; } catch(e) {}
+      ev('load', {lang: lang, mobile: mob, w: w, h: h});
+    },
+    start(){
+      if (runs) ev('again', {r: runs});     // «Ещё раз» это отдельный сигнал: по нему видно, цепляет ли игра
+      runs++; jumped = false; runT0 = sec();
+      ev('start', {r: runs});
+    },
+    jump(){
+      if (jumped) return;
+      jumped = true;
+      ev('first_jump', {r: runs, t: +(sec() - runT0).toFixed(2)});
+    },
+    lesson(key, n){ ev('lesson', {r: runs, key: key, n: n, m: stats.height}); },
+    over(){
+      ev('over', {r: runs, m: stats.height, flies: stats.flies, jumps: stats.jumps,
+        falls: stats.falls, stung: stats.stung, hearts: stats.hearts,
+        secs: +(sec() - runT0).toFixed(1)});
+      flush();                              // конец забега: отдаём сразу, вкладку могут закрыть
+    },
+    quit(){
+      if (quitSent) return;
+      quitSent = true;
+      ev('quit', {runs: runs, secs: +(sec() - visitT0).toFixed(1)});
+      flush();
+    }
+  };
+})();
+try {
+  // visibilitychange надёжнее unload: на телефоне вкладку часто не закрывают, а сворачивают
+  addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') A.quit(); });
+  addEventListener('pagehide', () => A.quit());
+} catch(e) {}
 const CAM_BACK = 170;        // авто: при промахе камера идёт вниз за лягушкой, пока кочка отрыва не окажется на столько выше низа экрана       // авто: доля экрана сверху, где держится лягушка (0.62 в рогатке); ниже 0.55 — кочка отрыва (318 px под вершиной) выпадает из кадра
 function CAM_AT(){ return ctrl === 'auto' ? CAM_AUTO : 0.62; }
 
@@ -633,6 +1193,75 @@ const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 let H = 800, scale = 1, dpr = 1;
 
+// ---------- слой эффектов: вода, дымка над ней, брызги от падения ----------
+// Рисуется шейдером на своём холсте и ОДНОЙ картинкой вставляется в общий рисунок
+// ровно туда, где раньше рисовалась заливка воды. Вторым холстом поверх игры его
+// класть нельзя: поднявшаяся вода накрыла бы стрелки и счётчик внизу экрана.
+// Нет WebGL2 (старые телефоны) или нет текста шейдера (несобранный src.html) —
+// слой молча не включается, играется старая заливка, игра этого не замечает.
+const FX = (() => {
+  const SPLASH_LIFE = 2.2;                 // сколько живёт след от падения, секунд
+  const sp = [[0, 0, -1], [0, 0, -1], [0, 0, -1]];  // три слота: (x, y, возраст); возраст < 0 значит пусто
+  let gl = null, pr = null, cv = null, u = {}, spNext = 0, frames = 0;
+
+  function sh(type, src){
+    const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o);
+    if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)){ console.warn('FX:', gl.getShaderInfoLog(o)); return null; }
+    return o;
+  }
+  function init(){
+    try {
+      const el = document.getElementById('fxsrc');
+      const src = el && el.textContent || '';
+      if (src.indexOf('mainImage') < 0) return false;   // текста шейдера нет: src.html не собран
+      cv = document.createElement('canvas');
+      gl = cv.getContext('webgl2', {alpha: true, premultipliedAlpha: false, antialias: false, depth: false});
+      if (!gl) return false;
+      const vs = sh(gl.VERTEX_SHADER, '#version 300 es\nin vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }');
+      const fs = sh(gl.FRAGMENT_SHADER, src);
+      if (!vs || !fs) return false;
+      pr = gl.createProgram(); gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)){ console.warn('FX:', gl.getProgramInfoLog(pr)); return false; }
+      gl.useProgram(pr);
+      const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(pr, 'p');
+      gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      for (const n of ['iResolution','iTime','iFrame','uPx','uWaterY','uAgitation','uMist','uSplash0','uSplash1','uSplash2'])
+        u[n] = gl.getUniformLocation(pr, n);
+      return true;
+    } catch(e){ console.warn('FX:', e); return false; }
+  }
+  const ok = init();
+
+  return {
+    get ok(){ return ok; },
+    clear(){ for (const s of sp) s[2] = -1; },
+    splash(x){ if (!ok) return; sp[spNext] = [x, 0, 0]; spNext = (spNext + 1) % sp.length; },
+    age(dt){ for (const s of sp){ if (s[2] >= 0){ s[2] += dt; if (s[2] > SPLASH_LIFE) s[2] = -1; } } },
+    // Рисует слой и отдаёт холст; вставляет его в общий рисунок тот, кто вызвал.
+    render(t, waterY, agitation, mist){
+      if (!ok) return null;
+      const pw = Math.round(W * scale * dpr), ph = Math.round(H * scale * dpr);
+      if (cv.width !== pw || cv.height !== ph){ cv.width = pw; cv.height = ph; }
+      gl.viewport(0, 0, pw, ph);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform3f(u.iResolution, pw, ph, 1);
+      gl.uniform1f(u.iTime, t); gl.uniform1i(u.iFrame, frames++);
+      gl.uniform1f(u.uPx, scale * dpr);
+      gl.uniform1f(u.uWaterY, waterY);
+      gl.uniform1f(u.uAgitation, agitation);
+      gl.uniform1f(u.uMist, mist);
+      gl.uniform3f(u.uSplash0, sp[0][0], sp[0][1], sp[0][2]);
+      gl.uniform3f(u.uSplash1, sp[1][0], sp[1][1], sp[1][2]);
+      gl.uniform3f(u.uSplash2, sp[2][0], sp[2][1], sp[2][2]);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      return cv;
+    }
+  };
+})();
+
 const css = getComputedStyle(document.documentElement);
 const C = n => css.getPropertyValue(n).trim() || '#f0f';
 const col = {pond:C('--pond'), deep:C('--pond-deep'), mist:C('--mist'), lily:C('--lily'), lilyRim:C('--lily-rim'),
@@ -643,7 +1272,8 @@ const col = {pond:C('--pond'), deep:C('--pond-deep'), mist:C('--mist'), lily:C('
 let state = 'start';
 let frog, platforms, items, cam, drag, tongue, parts, stats, seed, t0, gauge, btn, tongueCd = 0;
 let aim = {on: false, t: 0};  // прицеливание на красном трамплине
-let night = 0, nightT = 0;                // 0..1, насколько опустилась ночь
+let night = 0, nightT = -1;               // night 0..1; nightT < 0 значит вспышки сейчас нет
+let speedStep = 0, nightArmed = false;    // применённая ступень разгона и признак «урок ночи уже сыграл»
 let best = 0; // рекорд в метрах (Галя 27.09: «метры интереснее»)
 try { best = +localStorage.getItem('frog.bestM') || 0; } catch(e) {}
 
@@ -657,10 +1287,11 @@ function reset(s){
   frog = {x: W/2, y: 0, vx: 0, vy: 0, on: null, face: 1, sx: 1, sy: 1, sxv: 0, syv: 0, air: 0, minY: 0,
     bubble: 0, inBubble: false, lives: LIVES, stun: 0, hurt: 0, lastN: 0, lastY: 0, landT: 0, vy0: -1, springAir: false, slipAir: 0, slipD: 0};
   platforms = [{x: W/2, y: 0, w: 140, vx: 0, ox: W/2, range: 0, n: 0, type: 'normal', crumble: 0, dropV: 0, squash: 0}]; // стартовая чуть шире обычной, спрайт не тянется
-  sideRun = 0; sideSign = 0; lastHeartN = -100; flood = {y: FLOOD_START, t: 0};
+  sideRun = 0; sideSign = 0; lastHeartN = -100; flood = {y: FLOOD_START, t: 0, wv: 0};
   unlocked = {}; pending = {}; lesson = null; lessonI = 0; freeze = 0;
   frog.on = platforms[0];
-  items = []; parts = []; tongue = null; tongueCd = 0; aim = {on: false, t: 0}; night = 0; nightT = 0;
+  items = []; parts = []; tongue = null; tongueCd = 0; aim = {on: false, t: 0}; night = 0; nightT = -1; speedStep = 0; nightArmed = false;
+  FX.clear();
   drag = {on: false, steer: false, hold: 0, moved: 0, sx: 0, sy: 0, cx: 0, cy: 0, power: 0, dx: 0, dy: -1}; // hold: -1/1 = палец слева/справа (авто)
   gauge = {phase: 0, power: 0}; btn = {press: 0};
   cam = {y: -H + 140, target: -H + 140};
@@ -901,7 +1532,7 @@ function autoWrap(){ // авто: от края экрана отскакива�
 function autoJump(){ // авто: отскок с кочки строго вверх, рулёжка вбок сохраняется
   if (frog.on && frog.on.range > 0) sink(frog.on);
   frog.on = null; frog.vy = -AUTO_V; frog.vy0 = frog.vy; frog.air = 0;
-  frog.sx = 0.75; frog.sy = 1.35; stats.jumps++;
+  frog.sx = 0.75; frog.sy = 1.35; stats.jumps++; A.jump();
 }
 function launch(dx, dy, power){
   const v = jumpV(power);
@@ -909,7 +1540,7 @@ function launch(dx, dy, power){
   if (frog.on && frog.on.range > 0) sink(frog.on);
   frog.on = null; frog.air = 0; frog.vy0 = frog.vy;
   frog.sx = 0.75; frog.sy = 1.35; // стретч на вылете
-  stats.jumps++;
+  stats.jumps++; A.jump();
 }
 canvas.addEventListener('pointerdown', e => { e.preventDefault(); sfxInit(); try { window.focus(); } catch(err) {} canvas.setPointerCapture(e.pointerId); const p = toLogical(e); if (edit.on && editDown(p.x, p.y)) return; dragStart(p.x, p.y); });
 canvas.addEventListener('pointermove', e => { const p = toLogical(e); if (edit.on){ if (edit.drag) editMove(p.x, p.y); return; } dragMove(p.x, p.y); });
@@ -1093,22 +1724,32 @@ function update(dt){
   // прилив: фронт ползёт вверх, кочки под ним тонут, лягушка под ним — как упала
   if (ctrl === 'auto' && unlocked.flood){
     const wv = (1 - Math.cos(2 * Math.PI * frog.lastN / WAVE_N)) / 2;
+    flood.wv = wv;                                  // та же волна кормит шейдер воды
     let fv = FLOOD_V * (0.6 + 0.9 * wv);
     const dist = flood.y - frog.y; if (dist > H * FLOOD_LAG) fv += (dist - H * FLOOD_LAG) * 0.6; // не отпускать дальше экрана с лишним
     flood.y -= fv * dt; flood.t += dt;
     for (const p of platforms){ if (!p.flooded && p.y > flood.y - 6){ p.flooded = true; p.floodT = 0; if (p.y < cam.y + H + 40) splash(p.x, p.y, col.bubble, 4); } if (p.flooded) p.floodT += dt; }
+    FX.age(dt);
     if (frog.on && frog.on.flooded){ frog.on = null; frog.vy = 60; frog.air = 0; }
   }
   // язык
   const mouth = mouthPos();
   if (unlocked.night){
-    nightT += dt;
-    const p = nightT % NIGHT_CYCLE;
-    night = p < NIGHT_FADE ? p / NIGHT_FADE
-      : p < NIGHT_FADE + NIGHT_HOLD ? 1
-      : p < NIGHT_FADE * 2 + NIGHT_HOLD ? 1 - (p - NIGHT_FADE - NIGHT_HOLD) / NIGHT_FADE
-      : 0;
-  }
+    // Первая вспышка идёт сразу за плашкой, не дожидаясь высоты (Галя 28.09): так видно,
+    // что именно она обозначает. Скорость на ней не прибавляется, усложнение тут само
+    // затемнение, кочки стало видно хуже.
+    if (!nightArmed){ nightArmed = true; nightT = 0; }
+    if (nightT < 0 && heightStep() > speedStep) nightT = 0;  // доросли до следующей ступени
+    if (nightT >= 0){
+      nightT += dt;
+      night = nightT < NIGHT_FADE ? nightT / NIGHT_FADE
+        : nightT < NIGHT_FADE + NIGHT_HOLD ? 1
+        : nightT < NIGHT_PULSE ? 1 - (nightT - NIGHT_FADE - NIGHT_HOLD) / NIGHT_FADE
+        : 0;
+      if (nightT >= NIGHT_FADE) speedStep = heightStep();    // прибавка ровно на пике темноты
+      if (nightT >= NIGHT_PULSE){ nightT = -1; night = 0; }
+    }
+  } else speedStep = heightStep();                            // до урока ночи ступени идут молча
   if (tongueCd > 0) tongueCd -= dt;
   if (!tongue && tongueMode === 'auto'){
     let nearest = null, nd = TONGUE_RANGE;
@@ -1149,6 +1790,7 @@ function update(dt){
   // падение
   if (frog.y > cam.y + H + 30 || (ctrl === 'auto' && frog.y > flood.y + 18)){ // ступни на 30 ниже края: лягушка скрылась целиком; или прилив накрыл
     sfx('water');
+    FX.splash(frog.x);               // кольцо по воде там, где ушла под воду
     if (frog.lives > 1){ // минус сердечко и всегда одно и то же: спасательная кочка под лягушкой, прилив отступает, мир на миг стоит (Галя 27.09: «наказание должно быть одинаковым»)
       frog.lives--; stats.falls++; frog.hurt = 1.2; if (frog.inBubble) popBubble();
       const w = Math.max(76, 128 - frog.lastN * 1.1);
@@ -1232,6 +1874,7 @@ function splash(x, y, c, n){
 }
 function gameOver(){
   state = 'over';
+  A.over();
   if (stats.height > best){ best = stats.height; try { localStorage.setItem('frog.bestM', best); } catch(e) {} }
   document.getElementById('over').hidden = true; // попап рисуется на холсте (drawPopup), карточка в разметке осталась только ради id
   document.getElementById('best0').textContent = best;
@@ -1465,10 +2108,13 @@ function draw(){
       for (let i = 1; i < 4; i++){ ctx.beginPath(); ctx.moveTo(bx - 10, by + bh*i/4); ctx.lineTo(bx + 10, by + bh*i/4); ctx.stroke(); }
     }
   }
-  // прилив: тёмная пелена с волнистым краем и пеной
+  // прилив: шейдерный слой, а если его нет — прежняя тёмная пелена с волнистым краем
   if (ctrl === 'auto' && state !== 'start' && state !== 'rules'){
     const fy = flood.y - cam.y;
-    if (fy < H + 40){
+    if (fy < H + 40 && FX.ok){
+      const im = FX.render(flood.t, fy, flood.wv, 1);
+      if (im) ctx.drawImage(im, 0, 0, W, H);
+    } else if (fy < H + 40){
       const edge = x => fy + Math.sin(x * 0.05 + flood.t * 2.2) * 6 + Math.sin(x * 0.11 - flood.t * 1.5) * 3;
       ctx.beginPath(); ctx.moveTo(0, edge(0)); for (let x = 8; x <= W; x += 8) ctx.lineTo(x, edge(x)); ctx.lineTo(W, H + 60); ctx.lineTo(0, H + 60); ctx.closePath();
       ctx.fillStyle = 'rgba(11,42,51,0.62)'; ctx.fill();
@@ -1526,6 +2172,7 @@ function draw(){
   else if (state === 'start') drawStart();
   else if (state === 'rules') drawRules();
   if (edit.on && editWin()) editDraw();
+  updPaint();
 }
 
 const edit = {on: false, allowed: false};
@@ -1565,13 +2212,14 @@ window.addEventListener('resize', resize);
 resize(); reset();
 
 function startGame(){
-  sfxInit(); reset(); state = 'play';
+  sfxInit(); reset(); state = 'play'; A.start();
   document.getElementById('start').hidden = true;
   document.getElementById('over').hidden = true;
 }
 document.getElementById('play').addEventListener('click', startGame);
 document.getElementById('again').addEventListener('click', startGame);
 document.getElementById('best0').textContent = best;
+A.load();   // счётчик: игра показала стартовый экран. Дальше видно, сколько с него ушло, не нажав «Играть»
 for (const b of document.querySelectorAll('.segb')) b.addEventListener('click', () => setBg(b.dataset.bg));
 setBg(bgKey);
 for (const b of document.querySelectorAll('.segc')) b.addEventListener('click', () => setCtrl(b.dataset.ctrl));
@@ -1581,13 +2229,13 @@ if (document.fonts && document.fonts.load) Promise.all([document.fonts.load('700
 requestAnimationFrame(frame);
 
 // для тестов
-window.__frog = {update, reset, launch, dragStart, dragMove, dragEnd, startGame, jumpButton, autoDir, autoJump, setCtrl, setJump, draw, jumpFrame, idleFrame,
+window.__frog = {update, reset, launch, dragStart, dragMove, dragEnd, startGame, A, jumpButton, autoDir, autoJump, setCtrl, setJump, draw, jumpFrame, idleFrame,
   get ctrl(){ return ctrl; }, get gauge(){ return gauge; },
   get state(){ return state; }, set state(v){ state = v; },
   get frog(){ return frog; }, get platforms(){ return platforms; }, get items(){ return items; }, addItem, addPlatform, land, popBubble,
   startGeom: () => ({o: startOrigin(), k: startK(), play: startRect('play'), rules: startRect('rules')}),
   get unlocked(){ return unlocked; }, get freeze(){ return freeze; }, get lesson(){ return lesson; }, get flood(){ return flood; },
-  get stats(){ return stats; }, get cam(){ return cam; }, get night(){ return night; }, speedMul, get parts(){ return parts; }, get tongue(){ return tongue; }, tongueGeom, mouthPos, throatPos, gapPos, get H(){ return H; }, get drag(){ return drag; }, W,
+  get stats(){ return stats; }, get cam(){ return cam; }, get night(){ return night; }, speedMul, get parts(){ return parts; }, get flood(){ return flood; }, FX, get platforms(){ return platforms; }, get tongue(){ return tongue; }, tongueGeom, mouthPos, throatPos, gapPos, get H(){ return H; }, get drag(){ return drag; }, W,
   edit, editItems, editDown, editMove, editNudge, editLayout, editApply, editReset, editToggle, get START_AT(){ return START_AT; },
   setLang, t, get lang(){ return lang; }, get aim(){ return aim; }, setTongueMode: v => { tongueMode = v; }, tapTongue, get tongueMode(){ return tongueMode; },
   popGeom: () => { const o = popOrigin(), k = POP_K, r = {}; for (const b of SET_BTN) r[b.k] = [o.x + b.x * k, o.y + b.y * k]; return r; }};
