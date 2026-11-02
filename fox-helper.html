@@ -348,8 +348,13 @@ document.querySelectorAll('.lang-switch button').forEach(b => {
   b.addEventListener('click', () => applyLang(b.dataset.lang));
 });
 
-let savedLang = 'ru';
-try { savedLang = localStorage.getItem('lang') || 'ru'; } catch (e) {}
+// Язык: сначала выбор посетителя, иначе язык браузера (русский и соседние кириллические остаются на русском, остальным английский)
+let savedLang = null;
+try { savedLang = localStorage.getItem('lang'); } catch (e) {}
+if (!savedLang) {
+  const nav = ((navigator.languages && navigator.languages[0]) || navigator.language || 'ru').toLowerCase();
+  savedLang = /^(ru|uk|be|kk)/.test(nav) ? 'ru' : 'en';
+}
 if (savedLang !== 'ru') applyLang(savedLang);
 </script>
 
