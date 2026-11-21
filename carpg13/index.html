@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Адвент CARPG XIII</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Chakra+Petch:wght@400;600&family=Manrope:wght@400;600&display=swap">
+<style>
+/* Layout: экран молчащего сервера Olympus — шапка-терминал с круговой шкалой, сквозная дорожка-схема пути героя, полосы четырёх миров с HUD-окошками */
+:root{
+  --void:#0e131b; --night:#1d2531; --night-2:#252f3d; --line:#3a4656;
+  --bone:#e6dcc8; --bone-dim:#a89f8d;
+  --teal:#1e6a6a; --teal-deep:#123f42; --glow:#4fd1c5;
+  --bronze:#6e5438; --bronze-deep:#3f2f20; --gold:#e8b830; --ochre:#a8782a;
+  --alert:#e0604a;
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --hud:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --body:"Manrope","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--void);color:var(--bone);font-family:var(--body);font-size:15px;line-height:1.55;overflow-x:hidden}
+.in{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hud{font-family:var(--hud);text-transform:uppercase;letter-spacing:.14em}
+
+/* ===== шапка-терминал ===== */
+header{position:relative;background:
+  linear-gradient(rgba(79,209,197,.06) 1px,transparent 1px) 0 0/40px 40px,
+  linear-gradient(90deg,rgba(79,209,197,.06) 1px,transparent 1px) 0 0/40px 40px,
+  radial-gradient(80% 120% at 85% 30%,#16303a,var(--void) 70%);overflow:hidden;border-bottom:1px solid var(--line)}
+header::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+.ticker{border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;font-size:11.5px;color:var(--glow);padding-block:7px;position:relative;z-index:1}
+.ticker span{display:inline-block;padding-left:100%}
+@media (prefers-reduced-motion:no-preference){.ticker span{animation:tick 38s linear infinite}}
+@keyframes tick{to{transform:translateX(-100%)}}
+.ticker b{color:var(--alert);font-weight:600}
+.top{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center;padding-block:34px 40px}
+@media (max-width:760px){.top{grid-template-columns:1fr}}
+.brk{position:relative;padding:22px 26px}
+.brk::before,.brk::after{content:"";position:absolute;width:26px;height:26px;border:2px solid var(--glow);opacity:.8}
+.brk::before{top:0;left:0;border-right:0;border-bottom:0}
+.brk::after{bottom:0;right:0;border-left:0;border-top:0}
+.sys{font-size:12px;color:var(--glow)}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(32px,6.6vw,72px);line-height:.98;letter-spacing:.03em;margin:10px 0 12px;text-wrap:balance;
+  background:linear-gradient(180deg,#f4ecdc 30%,#b9ab90);-webkit-background-clip:text;background-clip:text;color:transparent}
+.theme{font-family:var(--display);font-size:clamp(16px,2.4vw,22px);color:var(--bone-dim);letter-spacing:.06em}
+.byline{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12px;color:var(--bone-dim)}
+.byline b{color:var(--gold);font-weight:600}
+.gauge{width:220px;max-width:100%;justify-self:center;position:relative}
+.gauge svg{width:100%;height:auto;display:block;overflow:visible}
+.gauge .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.gauge .c strong{display:block;font-family:var(--hud);font-size:40px;line-height:1;color:var(--bone)}
+.gauge .c span{display:block;font-size:10.5px;color:var(--glow);margin-top:6px}
+
+/* ===== путь героя ===== */
+main{position:relative}
+.trace{position:absolute;top:0;bottom:0;left:max(22px,calc(50% - 600px + 22px));width:2px;background:linear-gradient(var(--glow),var(--gold) 55%,var(--glow));opacity:.55;z-index:2;pointer-events:none}
+@media (max-width:900px){.trace{display:none}}
+
+/* ===== миры ===== */
+.realm{position:relative;overflow:hidden;padding-block:44px 52px}
+.realm .in{position:relative;z-index:1}
+@media (min-width:901px){.realm .in{padding-left:max(64px,env(safe-area-inset-left,0px))}}
+.ghost{position:absolute;right:-1%;top:6px;font-family:var(--display);font-weight:900;font-size:clamp(70px,15vw,190px);line-height:1;letter-spacing:.02em;opacity:.07;pointer-events:none;white-space:nowrap;color:currentColor;z-index:0}
+.head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:22px;position:relative}
+.node{position:absolute;left:-48px;top:50%;transform:translateY(-50%);width:20px;height:22px;background:var(--acc);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);filter:drop-shadow(0 0 8px var(--acc))}
+@media (max-width:900px){.node{display:none}}
+.sector{font-size:11px;color:var(--acc);border:1px solid var(--acc);padding:3px 8px;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.head h2{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.6vw,36px);letter-spacing:.05em;margin:0}
+.head .corp{font-size:11px;opacity:.7}
+.r-harbor{background:linear-gradient(180deg,var(--night),#171e29);color:var(--bone);--acc:var(--gold);--card:rgba(14,19,27,.7);--dim:var(--bone-dim)}
+.r-thal{background:radial-gradient(90% 120% at 20% 0%,#2a8481,var(--teal) 45%,var(--teal-deep));color:var(--bone);--acc:var(--glow);--card:rgba(10,40,42,.72);--dim:#a9d6cf}
+.r-aur{background:radial-gradient(90% 120% at 80% 0%,#c99a3a,var(--ochre) 30%,var(--bronze) 65%,var(--bronze-deep));color:#fbf1dc;--acc:#ffd860;--card:rgba(40,28,16,.72);--dim:#ead3a3}
+.r-rift{background:radial-gradient(70% 90% at 50% 10%,#1a4a4c,var(--void) 70%);color:var(--bone);--acc:var(--gold);--card:rgba(10,20,26,.78);--dim:#9fc8c3}
+.r-rift::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.25;background:
+  linear-gradient(100deg,transparent 30%,var(--gold) 30.2%,transparent 30.5%),
+  linear-gradient(75deg,transparent 62%,var(--gold) 62.15%,transparent 62.4%),
+  linear-gradient(120deg,transparent 80%,var(--glow) 80.15%,transparent 80.4%)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:22px 18px}
+
+/* ===== окошко-HUD ===== */
+.door{position:relative;display:block;min-width:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--acc) 22%,transparent))}
+.door .body{position:relative;background:var(--card);clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px)}
+.door svg.frame{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;overflow:visible}
+.door svg.frame *{vector-effect:non-scaling-stroke}
+.pic{aspect-ratio:3/4;max-width:100%;position:relative;display:grid;place-items:center;overflow:hidden;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px)}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.gr{position:absolute;top:12px;left:16px;font-family:var(--display);font-weight:900;font-size:34px;line-height:1;color:var(--acc);text-shadow:0 0 12px color-mix(in srgb,var(--acc) 60%,transparent)}
+.tid{position:absolute;top:16px;right:14px;font-size:10px;color:var(--dim)}
+.q{font-family:var(--display);font-weight:900;font-size:92px;line-height:1;color:var(--dim);opacity:.5;position:relative}
+.q::before,.q::after{content:"?";position:absolute;inset:0;opacity:0}
+@media (prefers-reduced-motion:no-preference){
+  .q{animation:jit 3.6s steps(1) infinite}
+  .q::before{color:var(--acc);animation:sl1 3.6s steps(1) infinite}
+  .q::after{color:var(--alert);animation:sl2 3.6s steps(1) infinite}
+  .px i{animation:fl 2.4s steps(2) infinite}
+  .door:hover .scan{animation:scan 1.1s linear}
+}
+@keyframes jit{0%,88%,100%{transform:none}90%{transform:translate(3px,-1px)}93%{transform:translate(-4px,1px)}}
+@keyframes sl1{0%,88%,100%{opacity:0}90%{opacity:.7;clip-path:inset(20% 0 55% 0);transform:translateX(-6px)}}
+@keyframes sl2{0%,91%,100%{opacity:0}93%{opacity:.6;clip-path:inset(60% 0 15% 0);transform:translateX(7px)}}
+@keyframes fl{50%{opacity:.15}}
+@keyframes scan{from{top:-10%}to{top:110%}}
+.scan{position:absolute;left:0;right:0;top:-10%;height:14%;background:linear-gradient(transparent,color-mix(in srgb,var(--acc) 35%,transparent),transparent);pointer-events:none;z-index:2}
+.px{position:absolute;inset:0;pointer-events:none}
+.px i{position:absolute;background:var(--acc);opacity:.6}
+.deny{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:10px;color:var(--alert);letter-spacing:.18em}
+.deny small{display:block;color:var(--dim);font-size:9.5px;margin-top:2px}
+.cap{padding:11px 16px 16px;border-top:1px dashed color-mix(in srgb,var(--acc) 40%,transparent);display:grid;gap:3px}
+.cap strong{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.03em;text-wrap:balance}
+.cap span{font-size:12.5px;color:var(--dim)}
+button.door{cursor:zoom-in}
+button.door:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
+
+footer{border-top:1px solid var(--line);background:var(--void);font-size:11px;color:var(--bone-dim)}
+footer .in{padding-block:16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px}
+
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(8,11,16,.96);z-index:20;display:grid;grid-template-rows:auto 1fr auto;
+  padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lb-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.lb-top h3{font-family:var(--display);font-weight:700;margin:0;font-size:20px;min-width:0}
+.lb button{background:transparent;color:var(--glow);border:1px solid var(--glow);padding:6px 14px;font:600 12px var(--hud);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.lb-img{overflow:auto;display:grid;place-items:center;min-height:0;margin-block:10px}
+.lb-img img{max-width:100%;max-height:100%;cursor:zoom-in}
+.lb-img.zoom{place-items:start}
+.lb-img.zoom img{max-width:none;max-height:none;cursor:zoom-out}
+.lb-desc{max-width:70ch;margin:0 auto;color:var(--bone-dim);font-size:14px;white-space:pre-line}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="ticker hud" aria-hidden="true"><span>Olympus Systems :: узел Сериф :: <b>ping olympus — нет ответа</b> :: Pelagic Industries — протоколы работают без оператора :: Midas Holdings — рост золота не остановлен :: Moirai System — нити судьбы рвутся :: дары активны · хозяева не отвечают :: <b>запрос доступа — отказано</b> ::</span></div>
+  <div class="in top">
+    <div class="brk">
+      <div class="sys hud">Smirnov School · номинация 2D Hard</div>
+      <h1>Concept Artist RPG XIII</h1>
+      <div class="theme">Царства, которых нет · Олимпийский кодекс</div>
+      <div class="byline hud"><span>Автор <b>Cangrida</b></span><span>Старт <b>19.11.2026</b></span><span>Сдача <b>21.12 · 23:59 МСК</b></span></div>
+    </div>
+    <div class="gauge" aria-label="Открыто окошек"><svg id="ring" viewBox="-70 -70 140 140"></svg>
+      <div class="c"><div><strong id="opened">0</strong><span class="hud">из 16 · доступ</span></div></div></div>
+  </div>
+</header>
+
+<main id="realms"><div class="trace" aria-hidden="true"></div></main>
+<footer class="hud"><div class="in"><span>Дары работают без хозяев</span><span>Окошко открывается, когда готова работа</span></div></footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-labelledby="lb-title">
+  <div class="lb-top"><h3 id="lb-title"></h3><button type="button" id="lb-close">Закрыть</button></div>
+  <div class="lb-img" id="lb-img"><img id="lb-pic" alt=""></div>
+  <div class="lb-desc" id="lb-desc"></div>
+</div>
+
+<script>
+/* Открыть окошко: положить картинку рядом (images/NN.jpg) и вписать img и desc. */
+const REALMS=[
+ {name:"Последняя гавань",ghost:"ΣΕΡΙΦΟΣ",sector:"сектор 01",corp:"задания 1–3",cls:"r-harbor",items:[1,2,3]},
+ {name:"Талассар",ghost:"ΘΑΛΑΣΣΑ",sector:"сектор 02",corp:"Pelagic Industries · задания 4–8",cls:"r-thal",items:[4,5,6,7,8]},
+ {name:"Аурелис",ghost:"ΑΥΡΕΛΙΣ",sector:"сектор 03",corp:"Midas Holdings · задания 9–13",cls:"r-aur",items:[9,10,11,12,13]},
+ {name:"Излом",ghost:"ΡΗΓΜΑ",sector:"сектор 04",corp:"Moirai System · задания 14–16",cls:"r-rift",items:[14,15,16]}
+];
+const TASKS={
+ 1:{title:"Герой",sub:"Как ты выглядишь?",img:null,desc:""},
+ 2:{title:"Дар богов",sub:"Спутник, артефакт или оружие",img:null,desc:""},
+ 3:{title:"Последняя гавань",sub:"Стартовая локация",img:null,desc:""},
+ 4:{title:"Талассар",sub:"Поглощённое царство",img:null,desc:""},
+ 5:{title:"Панцирный собиратель",sub:"Порождение глубин",img:null,desc:""},
+ 6:{title:"Морской народ",sub:"Жители Талассара",img:null,desc:""},
+ 7:{title:"Морская ведьма",sub:"Верховная жрица",img:null,desc:""},
+ 8:{title:"Хранитель Талассара",sub:"Первый босс",img:null,desc:""},
+ 9:{title:"Аурелис",sub:"Золотое царство",img:null,desc:""},
+ 10:{title:"Позолоченные",sub:"Золотая армия",img:null,desc:""},
+ 11:{title:"Генерал",sub:"Последний чемпион Мидаса",img:null,desc:""},
+ 12:{title:"Голем",sub:"Последняя воля павшего легиона",img:null,desc:""},
+ 13:{title:"Мидас",sub:"Второй босс",img:null,desc:""},
+ 14:{title:"Излом",sub:"Вне пространства и времени",img:null,desc:""},
+ 15:{title:"Ткач судеб",sub:"Финальное испытание",img:null,desc:""},
+ 16:{title:"Склейка",sub:"Летопись путешествия",img:null,desc:""}
+};
+const GR=["","Α′","Β′","Γ′","Δ′","Ε′","Ϛ′","Ζ′","Η′","Θ′","Ι′","ΙΑ′","ΙΒ′","ΙΓ′","ΙΔ′","ΙΕ′","ΙϚ′"];
+const FRAME=`<svg class="frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+ <path d="M7 0.4 H99.6 V93 L93 99.6 H0.4 V7 Z" fill="none" stroke="var(--acc)" stroke-width="1.4" opacity=".85"/>
+ <path d="M34 0.4 H66 L63 2.6 H37 Z" fill="var(--acc)"/>
+ <path d="M0.4 60 V80" stroke="var(--acc)" stroke-width="4"/>
+ <path d="M2.6 62 V64 M2.6 66 V68 M2.6 70 V72 M2.6 74 V76" stroke="var(--acc)" stroke-width="2" opacity=".7"/>
+ <path d="M80 99.6 H90" stroke="var(--acc)" stroke-width="4"/>
+ <circle cx="86" cy="4" r=".9" fill="var(--acc)"/><circle cx="90" cy="4" r=".9" fill="var(--acc)"/><circle cx="94" cy="4" r=".9" fill="var(--acc)" opacity=".4"/>
+</svg>`;
+function pixels(seed){let s=seed*7919;const r=()=>(s=(s*9301+49297)%233280)/233280;let h="";
+  for(let k=0;k<12;k++){const sz=3+Math.floor(r()*7);h+=`<i style="left:${55+r()*32}%;top:${26+r()*38}%;width:${sz}px;height:${sz}px;animation-delay:${(r()*2).toFixed(2)}s"></i>`;}return h;}
+const main=document.getElementById("realms");let opened=0;
+for(const r of REALMS){
+  const sec=document.createElement("section");sec.className="realm "+r.cls;
+  sec.innerHTML=`<div class="ghost" aria-hidden="true">${r.ghost}</div><div class="in"><div class="head"><span class="node" aria-hidden="true"></span><span class="sector hud">${r.sector}</span><h2>${r.name}</h2><span class="corp hud">${r.corp}</span></div><div class="grid"></div></div>`;
+  const grid=sec.querySelector(".grid");
+  for(const n of r.items){
+    const t=TASKS[n];const open=!!t.img;if(open)opened++;
+    const el=document.createElement(open?"button":"div");el.className="door";
+    if(open){el.type="button";el.setAttribute("aria-label",`Открыть: ${n}. ${t.title}`);el.addEventListener("click",()=>show(n));}
+    el.innerHTML=`<div class="body"><div class="pic">${open?`<img src="${t.img}" alt="${t.title}" loading="lazy">`
+      :`<span class="q" aria-hidden="true">?</span><div class="px" aria-hidden="true">${pixels(n)}</div><div class="deny hud">απαγορεύεται<small>нет доступа</small></div>`}
+      <span class="gr" aria-hidden="true">${GR[n]}</span><span class="tid hud">task_${String(n).padStart(2,"0")}</span><span class="scan" aria-hidden="true"></span></div>
+      <div class="cap"><strong>${t.title}</strong><span>${t.sub}</span></div></div>${FRAME}`;
+    grid.appendChild(el);
+  }
+  main.appendChild(sec);
+}
+/* круговая шкала из 16 сегментов */
+(function(){const svg=document.getElementById("ring");let h="";const R=58,gap=3.2;
+  for(let i=0;i<16;i++){const a0=(i*22.5+gap/2-90)*Math.PI/180,a1=((i+1)*22.5-gap/2-90)*Math.PI/180;
+    const p=(a,rr)=>`${(rr*Math.cos(a)).toFixed(2)} ${(rr*Math.sin(a)).toFixed(2)}`;
+    const lit=i<opened;
+    h+=`<path d="M${p(a0,R)} A${R} ${R} 0 0 1 ${p(a1,R)}" fill="none" stroke="${lit?"#e8b830":"#3a4656"}" stroke-width="9" ${lit?'style="filter:drop-shadow(0 0 4px #e8b830)"':""}/>`;}
+  h+=`<circle r="46" fill="none" stroke="#4fd1c5" stroke-width=".8" stroke-dasharray="2 4" opacity=".7"/>`;
+  h+=`<circle r="66" fill="none" stroke="#4fd1c5" stroke-width=".6" opacity=".35"/>`;
+  for(let i=0;i<4;i++){const a=i*Math.PI/2;h+=`<line x1="${(69*Math.cos(a)).toFixed(1)}" y1="${(69*Math.sin(a)).toFixed(1)}" x2="${(74*Math.cos(a)).toFixed(1)}" y2="${(74*Math.sin(a)).toFixed(1)}" stroke="#4fd1c5" stroke-width="1.5"/>`;}
+  svg.innerHTML=h;})();
+document.getElementById("opened").textContent=opened;
+const lb=document.getElementById("lb"),pic=document.getElementById("lb-pic"),box=document.getElementById("lb-img");let last=null;
+function show(n){const t=TASKS[n];last=document.activeElement;document.getElementById("lb-title").textContent=`${GR[n]} ${t.title}`;
+  pic.src=t.img;pic.alt=t.title;document.getElementById("lb-desc").textContent=t.desc||"";box.classList.remove("zoom");lb.hidden=false;document.getElementById("lb-close").focus();}
+function hide(){lb.hidden=true;if(last)last.focus();}
+pic.addEventListener("click",()=>box.classList.toggle("zoom"));
+document.getElementById("lb-close").addEventListener("click",hide);
+lb.addEventListener("click",e=>{if(e.target===lb)hide();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)hide();});
+</script>
+</body>
+</html>
