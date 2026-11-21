@@ -134,6 +134,22 @@ input[type=range].r::-webkit-slider-thumb{background:var(--rim)}
 #chipPick{display:none}
 canvas#c{cursor:crosshair}
 canvas#c:active{cursor:grabbing}
+/* значки света над моделью */
+.lhandle{position:absolute;left:0;top:0;z-index:4;width:34px;height:34px;margin:-17px 0 0 -17px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;user-select:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.8));transition:opacity .15s}
+.lhandle svg{pointer-events:none}
+.lhandle.back{opacity:.45}
+.lhandle:hover{opacity:1}
+.lhandle:active{cursor:grabbing}
+.lhandle.off{display:none}
+/* мои материалы */
+.mats{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:9px}
+.mat{position:relative;aspect-ratio:1;border-radius:50%;cursor:pointer;border:1px solid var(--border);transition:transform .15s}
+.mat:hover{transform:scale(1.1);border-color:var(--accent)}
+.mat .x{position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;background:var(--panel);border:1px solid var(--border);color:var(--muted);font-size:11px;line-height:13px;text-align:center;display:none}
+.mat .x:hover{color:var(--accent);border-color:var(--accent)}
+.mat:hover .x{display:block}
+@media (hover:none){.mat .x{display:block}}
+.mats-empty{font-size:11px;color:var(--muted);line-height:1.6;grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -213,10 +229,17 @@ canvas#c:active{cursor:grabbing}
         <button class="pbtn" data-m="1" data-r="0.4" data-c="#d4a060" data-ru="Бронза" data-en="Bronze">Бронза</button>
       </div>
     </div>
+    <div>
+      <div class="stitle" id="i-mymats">Мои материалы</div>
+      <button class="pbtn" id="matSave" style="width:100%">+ Сохранить текущий</button>
+      <div class="mats" id="mats"></div>
+    </div>
   </div>
 
   <div class="canvas-area" id="canvasArea">
-    <canvas id="c" title="ЛКМ — вращать · ПКМ или Shift+ЛКМ — двигать · колесо — зум · двойной клик — сброс"></canvas>
+    <canvas id="c" title="ЛКМ — вращать · клик — пипетка · солнце и кольцо — тянуть свет · ПКМ или Shift+ЛКМ — двигать · колесо — зум · двойной клик — сброс"></canvas>
+    <div class="lhandle" id="hKey"><svg width="32" height="32" viewBox="0 0 32 32"><g stroke="#c8a96e" stroke-width="2.2" stroke-linecap="round"><path d="M16 2.5v4.5M16 25v4.5M2.5 16h4.5M25 16h4.5M6.5 6.5l3.2 3.2M22.3 22.3l3.2 3.2M6.5 25.5l3.2-3.2M22.3 9.7l3.2-3.2"/></g><circle id="hKeyDot" cx="16" cy="16" r="6" fill="#fff4e0" stroke="#c8a96e" stroke-width="2.2"/></svg></div>
+    <div class="lhandle" id="hRim"><svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="9.5" fill="none" stroke="#c86e8a" stroke-width="2.2" stroke-dasharray="3 2.4"/><circle id="hRimDot" cx="13" cy="13" r="5" fill="#3a6aff" stroke="#c86e8a" stroke-width="1.6"/></svg></div>
     <div class="zoom-ctl">
       <button id="zOut" title="Отдалить / Zoom out">&#8722;</button>
       <span id="zoomVal">100%</span>
@@ -244,6 +267,7 @@ canvas#c:active{cursor:grabbing}
         <div class="sr"><div class="sl"><span id="i-ki-lbl">Интенсивность</span><span class="v" id="kiV">2.0</span></div><input type="range" id="ki" min="0" max="5" step="0.1" value="2"></div>
         <div class="sr"><div class="sl"><span id="i-kh-lbl">Горизонталь °</span><span class="v" id="khV">45</span></div><input type="range" id="kh" min="0" max="360" step="1" value="45"></div>
         <div class="sr"><div class="sl"><span id="i-kv-lbl">Вертикаль °</span><span class="v" id="kvV">40</span></div><input type="range" id="kv" min="-90" max="90" step="1" value="40"></div>
+        <div class="sr"><div class="sl"><span id="i-ks-lbl">Мягкость</span><span class="v" id="ksV">0.00</span></div><input type="range" id="ks" min="0" max="1" step="0.01" value="0"></div>
       </div>
     </div>
     <div>
@@ -383,7 +407,24 @@ mat.onBeforeCompile=s=>{
     '#include <project_vertex>\n  vFloorH=(modelMatrix*vec4(transformed,1.0)).y-uFloorY;');
   s.fragmentShader='varying float vFloorH;\n'+s.fragmentShader.replace('#include <aomap_fragment>',
     '#include <aomap_fragment>\n  reflectedLight.indirectDiffuse*=mix(0.2,1.0,smoothstep(0.0,0.45,vFloorH));');
+  addSoft(s);
   addTones(s);};
+
+// Мягкость света: рассеянная часть заходит за терминатор (wrap), полутон шире.
+// Блик не трогаем, иначе он вылезает на теневую сторону. Собственная тень у терминатора
+// при мягком свете тоже отпускается, иначе по краю остаётся жёсткая ступенька.
+const SOFT={value:0};
+function addSoft(s){
+  const lp0=THREE.ShaderChunk.lights_physical_pars_fragment, lb0=THREE.ShaderChunk.lights_fragment_begin;
+  const dOld='reflectedLight.directDiffuse += ( 1.0 - clearcoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );';
+  const lp1=lp0.replace(dOld,'reflectedLight.directDiffuse += ( 1.0 - clearcoatDHR ) * saturate( ( dot( geometry.normal, directLight.direction ) + uSoft ) / ( 1.0 + uSoft ) ) * directLight.color * BRDF_Diffuse_Lambert( material.diffuseColor );');
+  const lb1=lb0.replace(/(directLight\.color \*= all\( bvec2\( directLight\.visible, receiveShadow \) \) \? )(getShadow\( directionalShadowMap\[ i \][^;]*?)( : 1\.0;)/,
+    '$1softShadow( $2, dot( geometry.normal, directLight.direction ) )$3');
+  if(lp1===lp0||lb1===lb0) console.warn('мягкость: шейдер three.js не совпал', lp1===lp0, lb1===lb0);
+  s.uniforms.uSoft=SOFT;
+  s.fragmentShader='uniform float uSoft;\nfloat softShadow(float sh,float nl){return mix(sh,1.0,uSoft*(1.0-smoothstep(-0.1,0.45,nl)));}\n'+
+    s.fragmentShader.replace('#include <lights_physical_pars_fragment>',lp1).replace('#include <lights_fragment_begin>',lb1);
+}
 
 let mesh=null,curObj='sphere',autoRot=true,rotX=0,rotY=0;
 // ── EMBEDDED HEAD GEOMETRY (GLB ретопология без децимации) ──
@@ -570,7 +611,7 @@ canvas.addEventListener('touchmove',e=>{
 function lp(h,v,d=5){h*=Math.PI/180;v*=Math.PI/180;return new THREE.Vector3(d*Math.cos(v)*Math.sin(h),d*Math.sin(v),d*Math.cos(v)*Math.cos(h));}
 
 // ── STATE ──
-const S={fc:'#6e675f',fon:true,bn:1,oc:'#c8c0b4',kc:'#fff4e0',ki:2,kh:45,kv:40,rc:'#3a6aff',ri:1.5,rh:220,rv:-20,ron:true,met:0,rough:0.75};
+const S={ks:0,fc:'#6e675f',fon:true,bn:1,oc:'#c8c0b4',kc:'#fff4e0',ki:2,kh:45,kv:40,rc:'#3a6aff',ri:1.5,rh:220,rv:-20,ron:true,met:0,rough:0.75};
 function h2r(h){return{r:parseInt(h.slice(1,3),16)/255,g:parseInt(h.slice(3,5),16)/255,b:parseInt(h.slice(5,7),16)/255};}
 function r2h(r,g,b){const c=v=>Math.max(0,Math.min(255,Math.round(v*255)));return'#'+[c(r),c(g),c(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 function mx(a,b,t){return{r:a.r*(1-t)+b.r*t,g:a.g*(1-t)+b.g*t,b:a.b*(1-t)+b.b*t};}
@@ -602,6 +643,7 @@ function apply(){
   ambL.intensity=0.18;
   // свет снизу не проходит сквозь пол: пока пол есть, источники не опускаются ниже 5°
   if(S.fon){keyL.position.copy(lp(S.kh,Math.max(S.kv,5)));rimL.position.copy(lp(S.rh,Math.max(S.rv,5)));}
+  SOFT.value=S.ks*0.6; keyL.shadow.radius=5+S.ks*14;  // 0.6: дальше свет обходит шар целиком
   floor.visible=S.fon; floorMat.color.set(S.fc);
   // сколько света ключа падает на пол, столько пол и отдаёт обратно, в своём цвете
   const kup=Math.max(0,Math.sin(S.kv*Math.PI/180))*S.ki*BOUNCE*S.bn;
@@ -622,6 +664,7 @@ function updateKey(){
   S.ki=+document.getElementById('ki').value;document.getElementById('kiV').textContent=S.ki.toFixed(1);
   S.kh=+document.getElementById('kh').value;document.getElementById('khV').textContent=S.kh;
   S.kv=+document.getElementById('kv').value;document.getElementById('kvV').textContent=S.kv;
+  S.ks=+document.getElementById('ks').value;document.getElementById('ksV').textContent=S.ks.toFixed(2);
   apply();
 }
 function updateRim(){
@@ -639,7 +682,7 @@ function updateMat(){
 }
 
 document.getElementById('objColor').addEventListener('input',updateObj);
-['keyCol','ki','kh','kv'].forEach(id=>document.getElementById(id).addEventListener('input',updateKey));
+['keyCol','ki','kh','kv','ks'].forEach(id=>document.getElementById(id).addEventListener('input',updateKey));
 ['rimCol','ri','rh','rv','rimOn'].forEach(id=>document.getElementById(id).addEventListener('input',updateRim));
 ['met','rough'].forEach(id=>document.getElementById(id).addEventListener('input',updateMat));
 
@@ -716,6 +759,7 @@ let t=0;
   requestAnimationFrame(loop);
   if(autoRot&&mesh){t+=0.004;mesh.rotation.y=t*.35;}
   syncFloor();
+  placeHandles();
   renderContact();
   renderer.render(scene,camera);
 })();
@@ -1007,6 +1051,9 @@ const UI_STRINGS = {
     zNames:{light:'Свет',shd:'Тень',mid:'Полутон',rim:'Рим'},
     floor:'Пол и рефлекс', floorOwn:'Свой', bounce:'Рефлекс', pick:'Пипетка', pickBg:'фон',
     t0:'Цвет', t5:'5 тонов', t3:'3 тона',
+    soft:'Мягкость', mymats:'Мои материалы', matSave:'+ Сохранить текущий', matDel:'Удалить',
+    matsEmpty:'Пока пусто. Настрой цвет и материал и нажми «Сохранить» — он останется в этом браузере.',
+    hKey:'Ключевой свет: тяни. Внутри круга — спереди, за краем — сзади модели', hRim:'Рим-свет: тяни. Внутри круга — спереди, за краем — сзади модели',
   },
   en: {
     title:'Lighting Reference', sub:"Artist's Tool · PBR",
@@ -1022,12 +1069,15 @@ const UI_STRINGS = {
     zNames:{light:'Light',shd:'Shadow',mid:'Midtone',rim:'Rim'},
     floor:'Floor & bounce', floorOwn:'Custom', bounce:'Bounce light', pick:'Picker', pickBg:'background',
     t0:'Color', t5:'5 values', t3:'3 values',
+    soft:'Softness', mymats:'My materials', matSave:'+ Save current', matDel:'Delete',
+    matsEmpty:'Empty for now. Set a color and material and press Save — it stays in this browser.',
+    hKey:'Key light: drag. Inside the circle — in front, past the edge — behind the model', hRim:'Rim light: drag. Inside the circle — in front, past the edge — behind the model',
   }
 };
 
 const MODAL_HELP = {
-  ru: `<h2>Как пользоваться инструментом</h2><div class="modal-step"><div class="modal-num">1</div><div class="modal-body"><div class="modal-title">Выбери объект и материал</div><div class="modal-desc">Вверху — переключатель <span class="modal-chip">Шар</span> <span class="modal-chip">Куб</span> <span class="modal-chip">Голова</span>. В левой панели выбери цвет из палитры. Пресеты — быстрый старт: Гипс, Кожа, Металл.</div></div></div><div class="modal-step"><div class="modal-num">2</div><div class="modal-body"><div class="modal-title">Настрой ключевой свет</div><div class="modal-desc">Правая панель — цвет, интенсивность, угол. Тёплый свет автоматически даёт холодную тень — и наоборот.</div></div></div><div class="modal-step"><div class="modal-num">3</div><div class="modal-body"><div class="modal-title">Рим-свет</div><div class="modal-desc">Включи тумблером. Ставится сзади-сбоку, противоположно ключевому.</div></div></div><div class="modal-step"><div class="modal-num">4</div><div class="modal-body"><div class="modal-title">Цветовой круг</div><div class="modal-desc">Кликни на <span class="modal-chip">Свет</span> <span class="modal-chip">Тень</span> <span class="modal-chip">Полутон</span> <span class="modal-chip">Рим</span> — точка на круге. Перетащи — шар обновится. <b style="color:var(--text)">← Назад</b> вернёт теоретически верный цвет.</div></div></div><div class="modal-step"><div class="modal-num">5</div><div class="modal-body"><div class="modal-title">Перенеси цвета</div><div class="modal-desc">HEX-коды из «Читаемый цвет» — вставь в Photoshop, Procreate или Blender.</div></div></div><div class="modal-step"><div class="modal-num">6</div><div class="modal-body"><div class="modal-title">Пол, тона и пипетка</div><div class="modal-desc">Выбери пол справа и смотри на низ объекта: тень снизу окрашена цветом пола, это рефлекс. Кнопки <span class="modal-chip">5 тонов</span> <span class="modal-chip">3 тона</span> над холстом сводят картинку к ступеням яркости, как будто прищурилась. Клик по объекту без сдвига мыши показывает и копирует HEX этого места.</div></div></div><button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">Закрыть</button>`,
-  en: `<h2>How to use this tool</h2><div class="modal-step"><div class="modal-num">1</div><div class="modal-body"><div class="modal-title">Choose object and material</div><div class="modal-desc">At the top — switch between <span class="modal-chip">Sphere</span> <span class="modal-chip">Cube</span> <span class="modal-chip">Head</span>. Pick object color from the palette. Presets: Plaster, Skin, Metal, etc.</div></div></div><div class="modal-step"><div class="modal-num">2</div><div class="modal-body"><div class="modal-title">Set up the key light</div><div class="modal-desc">Right panel — color, intensity, angle. A warm key light automatically produces a cool shadow — and vice versa.</div></div></div><div class="modal-step"><div class="modal-num">3</div><div class="modal-body"><div class="modal-title">Rim light</div><div class="modal-desc">Toggle it on. Usually placed behind and to the side, opposite the key.</div></div></div><div class="modal-step"><div class="modal-num">4</div><div class="modal-body"><div class="modal-title">Color wheel</div><div class="modal-desc">Click <span class="modal-chip">Light</span> <span class="modal-chip">Shadow</span> <span class="modal-chip">Midtone</span> <span class="modal-chip">Rim</span> — a dot appears on the wheel. Drag it — sphere updates live. <b style="color:var(--text)">← Reset</b> restores the theory color.</div></div></div><div class="modal-step"><div class="modal-num">5</div><div class="modal-body"><div class="modal-title">Transfer colors</div><div class="modal-desc">HEX codes from Color Readout — paste into Photoshop, Procreate, or Blender.</div></div></div><div class="modal-step"><div class="modal-num">6</div><div class="modal-body"><div class="modal-title">Floor, values and picker</div><div class="modal-desc">Pick a floor on the right and look at the underside: the shadow there takes the floor's color, that is bounce light. <span class="modal-chip">5 values</span> <span class="modal-chip">3 values</span> above the canvas reduce the image to steps of lightness, like squinting. Click the object without dragging to read and copy the HEX of that spot.</div></div></div><button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">Close</button>`
+  ru: `<h2>Как пользоваться инструментом</h2><div class="modal-step"><div class="modal-num">1</div><div class="modal-body"><div class="modal-title">Выбери объект и материал</div><div class="modal-desc">Вверху — переключатель <span class="modal-chip">Шар</span> <span class="modal-chip">Куб</span> <span class="modal-chip">Голова</span>. В левой панели выбери цвет из палитры. Пресеты — быстрый старт: Гипс, Кожа, Металл.</div></div></div><div class="modal-step"><div class="modal-num">2</div><div class="modal-body"><div class="modal-title">Настрой ключевой свет</div><div class="modal-desc">Тяни значок-солнце прямо над моделью: внутри круга свет спереди, за его краем уходит за модель. Кольцо — то же для рим-света. Правая панель — цвет, интенсивность, угол, мягкость. Тёплый свет автоматически даёт холодную тень — и наоборот.</div></div></div><div class="modal-step"><div class="modal-num">3</div><div class="modal-body"><div class="modal-title">Рим-свет</div><div class="modal-desc">Включи тумблером. Ставится сзади-сбоку, противоположно ключевому.</div></div></div><div class="modal-step"><div class="modal-num">4</div><div class="modal-body"><div class="modal-title">Цветовой круг</div><div class="modal-desc">Кликни на <span class="modal-chip">Свет</span> <span class="modal-chip">Тень</span> <span class="modal-chip">Полутон</span> <span class="modal-chip">Рим</span> — точка на круге. Перетащи — шар обновится. <b style="color:var(--text)">← Назад</b> вернёт теоретически верный цвет.</div></div></div><div class="modal-step"><div class="modal-num">5</div><div class="modal-body"><div class="modal-title">Перенеси цвета</div><div class="modal-desc">HEX-коды из «Читаемый цвет» — вставь в Photoshop, Procreate или Blender.</div></div></div><div class="modal-step"><div class="modal-num">6</div><div class="modal-body"><div class="modal-title">Пол, тона и пипетка</div><div class="modal-desc">Выбери пол справа и смотри на низ объекта: тень снизу окрашена цветом пола, это рефлекс. Кнопки <span class="modal-chip">5 тонов</span> <span class="modal-chip">3 тона</span> над холстом сводят картинку к ступеням яркости, как будто прищурилась. Клик по объекту без сдвига мыши показывает и копирует HEX этого места.</div></div></div><button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">Закрыть</button>`,
+  en: `<h2>How to use this tool</h2><div class="modal-step"><div class="modal-num">1</div><div class="modal-body"><div class="modal-title">Choose object and material</div><div class="modal-desc">At the top — switch between <span class="modal-chip">Sphere</span> <span class="modal-chip">Cube</span> <span class="modal-chip">Head</span>. Pick object color from the palette. Presets: Plaster, Skin, Metal, etc.</div></div></div><div class="modal-step"><div class="modal-num">2</div><div class="modal-body"><div class="modal-title">Set up the key light</div><div class="modal-desc">Drag the sun icon right over the model: inside the circle the light is in front, past its edge it goes behind. The ring does the same for the rim light. Right panel — color, intensity, angle, softness. A warm key light automatically produces a cool shadow — and vice versa.</div></div></div><div class="modal-step"><div class="modal-num">3</div><div class="modal-body"><div class="modal-title">Rim light</div><div class="modal-desc">Toggle it on. Usually placed behind and to the side, opposite the key.</div></div></div><div class="modal-step"><div class="modal-num">4</div><div class="modal-body"><div class="modal-title">Color wheel</div><div class="modal-desc">Click <span class="modal-chip">Light</span> <span class="modal-chip">Shadow</span> <span class="modal-chip">Midtone</span> <span class="modal-chip">Rim</span> — a dot appears on the wheel. Drag it — sphere updates live. <b style="color:var(--text)">← Reset</b> restores the theory color.</div></div></div><div class="modal-step"><div class="modal-num">5</div><div class="modal-body"><div class="modal-title">Transfer colors</div><div class="modal-desc">HEX codes from Color Readout — paste into Photoshop, Procreate, or Blender.</div></div></div><div class="modal-step"><div class="modal-num">6</div><div class="modal-body"><div class="modal-title">Floor, values and picker</div><div class="modal-desc">Pick a floor on the right and look at the underside: the shadow there takes the floor's color, that is bounce light. <span class="modal-chip">5 values</span> <span class="modal-chip">3 values</span> above the canvas reduce the image to steps of lightness, like squinting. Click the object without dragging to read and copy the HEX of that spot.</div></div></div><button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('open')">Close</button>`
 };
 
 const MODAL_THEORY = {
@@ -1065,6 +1115,8 @@ function setLang(l) {
   document.querySelectorAll('.fbtn[data-ru] span').forEach(s => s.textContent = s.parentNode.dataset[l]);
   _set('i-floor',u.floor); _set('i-floor-own',u.floorOwn); _set('i-bounce-lbl',u.bounce); _set('i-pick',u.pick);
   _set('i-t0',u.t0); _set('i-t5',u.t5); _set('i-t3',u.t3);
+  _set('i-ks-lbl',u.soft); _set('i-mymats',u.mymats); _set('matSave',u.matSave);
+  hKey.title=u.hKey; hRim.title=u.hRim; renderMats();
   const _pv=document.getElementById('cPick'); if(_pv&&(_pv.textContent==='фон'||_pv.textContent==='background')) _pv.textContent=u.pickBg;
   document.querySelectorAll('.obj-btn[data-ru]').forEach(b => {
     const svg = b.querySelector('svg');
@@ -1077,6 +1129,102 @@ function setLang(l) {
   document.getElementById('theoryModal').querySelector('.modal').innerHTML = MODAL_THEORY[l];
   window._zNames = u.zNames;
 }
+
+// ══════════════════════════════════════════════════════
+// СВЕТ МЫШЬЮ: солнце — ключ, кольцо — рим
+// ══════════════════════════════════════════════════════
+// Круг радиусом LR вокруг центра модели. Внутри круга свет спереди (как точка на полушарии),
+// от края круга до двух радиусов — то же полушарие, но сзади: так ставится контровой свет.
+var LR=1.15;
+var hKey=document.getElementById("hKey"), hRim=document.getElementById("hRim");
+let hDrag=null;
+function lightCircle(){
+  const v=new THREE.Vector3(0,0,0).project(camera);
+  return {x:(v.x+1)/2*canvas.clientWidth+canvas.offsetLeft, y:(1-v.y)/2*canvas.clientHeight+canvas.offsetTop, R:LR/unitsPerPx()};
+}
+function placeHandle(el,h,v){
+  const d=lp(h,v,1).applyQuaternion(camera.quaternion.clone().invert()); // оси камеры: x вправо, y вверх, z к зрителю
+  const c=lightCircle(), rr=Math.hypot(d.x,d.y);
+  const ux=rr>1e-4?d.x/rr:0, uy=rr>1e-4?d.y/rr:1, k=d.z>=0?rr:2-rr;
+  el.style.transform='translate('+(c.x+ux*k*c.R).toFixed(1)+'px,'+(c.y-uy*k*c.R).toFixed(1)+'px)';
+  el.classList.toggle('back',d.z<0);
+}
+function placeHandles(){
+  if(!hKey) return;  // первый кадр цикла идёт раньше, чем дочитан скрипт
+  // с полом свет не опускается ниже 5°: значок показывает, где свет на самом деле
+  placeHandle(hKey,S.kh,S.fon?Math.max(S.kv,5):S.kv);
+  hRim.classList.toggle('off',!S.ron);
+  if(S.ron) placeHandle(hRim,S.rh,S.fon?Math.max(S.rv,5):S.rv);
+  document.getElementById('hKeyDot').setAttribute('fill',S.kc);
+  document.getElementById('hRimDot').setAttribute('fill',S.rc);
+}
+function dirFromScreen(cx,cy){
+  const a=area.getBoundingClientRect(), c=lightCircle();
+  let x=(cx-a.left-c.x)/c.R, y=-(cy-a.top-c.y)/c.R, r=Math.hypot(x,y), z;
+  if(r>1.98){x*=1.98/r;y*=1.98/r;r=1.98;}
+  if(r<=1) z=Math.sqrt(1-r*r);
+  else{const r2=2-r;x*=r2/r;y*=r2/r;z=-Math.sqrt(Math.max(0,1-r2*r2));}
+  const d=new THREE.Vector3(x,y,z).applyQuaternion(camera.quaternion).normalize();
+  let h=Math.round(Math.atan2(d.x,d.z)*180/Math.PI); if(h<0)h+=360;
+  return {h:h%360, v:Math.round(Math.asin(Math.max(-1,Math.min(1,d.y)))*180/Math.PI)};
+}
+[[hKey,'k'],[hRim,'r']].forEach(([el,w])=>{
+  el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();autoRot=false;hDrag=w;try{el.setPointerCapture(e.pointerId);}catch(_){}});
+  el.addEventListener('pointermove',e=>{
+    if(hDrag!==w) return;
+    const d=dirFromScreen(e.clientX,e.clientY);
+    const [hi,vi,fn]=w==='k'?['kh','kv',updateKey]:['rh','rv',updateRim];
+    document.getElementById(hi).value=d.h; document.getElementById(vi).value=d.v; fn();
+  });
+  const end=()=>{hDrag=null;};
+  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+});
+hKey.title=UI_STRINGS.ru.hKey; hRim.title=UI_STRINGS.ru.hRim;
+
+// ══════════════════════════════════════════════════════
+// МОИ МАТЕРИАЛЫ: цвет + metalness + roughness, хранятся в этом браузере
+// ══════════════════════════════════════════════════════
+const MKEY='cangrida-light-mats', MMAX=15;
+let MATS=(()=>{try{const a=JSON.parse(localStorage.getItem(MKEY)||'[]');
+  return Array.isArray(a)?a.filter(m=>m&&/^#[0-9a-f]{6}$/i.test(m.c)&&isFinite(m.m)&&isFinite(m.r)):[];}catch(e){return [];}})();
+function saveMats(){try{localStorage.setItem(MKEY,JSON.stringify(MATS));}catch(e){}}
+// шарик-превью: чем глаже материал, тем меньше и ярче блик; металл темнее в тени
+function matBall(m){
+  const hs=Math.round(14+34*m.r), ha=(0.95-0.6*m.r).toFixed(2), dk=m.m>0.5?'#050508':'#15151c';
+  return 'radial-gradient(circle at 34% 30%,rgba(255,255,255,'+ha+') 0,rgba(255,255,255,0) '+hs+'%),'+
+         'radial-gradient(circle at 40% 36%,'+m.c+' 0,'+m.c+' 34%,'+dk+' 100%)';
+}
+function setMaterial(m,r,c){
+  document.querySelectorAll('.pbtn[data-m]').forEach(b=>b.classList.remove('on'));
+  S.met=m;S.rough=r;S.oc=c;
+  document.getElementById('met').value=m;document.getElementById('rough').value=r;
+  document.getElementById('objColor').value=c;
+  document.getElementById('metV').textContent=m.toFixed(2);
+  document.getElementById('roughV').textContent=r.toFixed(2);
+  sp('oc','objPrev','objHex',c);
+  apply();
+}
+function renderMats(){
+  const box=document.getElementById('mats'), u=UI_STRINGS[LANG];
+  box.innerHTML='';
+  if(!MATS.length){const e=document.createElement('div');e.className='mats-empty';e.textContent=u.matsEmpty;box.appendChild(e);return;}
+  MATS.forEach((m,i)=>{
+    const d=document.createElement('div'); d.className='mat'; d.style.background=matBall(m);
+    d.title=m.c.toUpperCase()+' · metal '+(+m.m).toFixed(2)+' · rough '+(+m.r).toFixed(2);
+    const x=document.createElement('span'); x.className='x'; x.textContent='×'; x.title=u.matDel;
+    x.addEventListener('click',e=>{e.stopPropagation();MATS.splice(i,1);saveMats();renderMats();});
+    d.appendChild(x);
+    d.addEventListener('click',()=>setMaterial(+m.m,+m.r,m.c));
+    box.appendChild(d);
+  });
+}
+document.getElementById('matSave').addEventListener('click',()=>{
+  const n={c:S.oc.toLowerCase(),m:+S.met.toFixed(2),r:+S.rough.toFixed(2)};
+  MATS=MATS.filter(m=>!(m.c===n.c&&m.m===n.m&&m.r===n.r));
+  MATS.unshift(n); if(MATS.length>MMAX) MATS.length=MMAX;
+  saveMats(); renderMats();
+});
+renderMats();
 
 </script>
 
