@@ -124,12 +124,10 @@ footer a{color:var(--glow)}
 <script>
 /* Шаги задания. Новый шаг: добавить объект; закрытый шаг - img:null. */
 const STEPS=[
- {title:"Поиск фигуры",date:"24.11.2026",img:"images/01-poisk.jpg",
-  text:["Десять фигур: рыбак, у которого вместо правой руки протез-колонна.","Отмечены 1, 7, 8 и 10. Десятая собрана из трёх: масса руки от первой, асимметрия и полы от седьмой, драпировка от восьмой."]},
- {title:"Лайн",date:"24.11.2026",img:"images/01-lain.jpg",
-  text:["Чистовая линия по десятой фигуре.","Волюта капители на плече со знаком Ω, сеть с поплавками на поясе, меандр на вороте и поясе, выбритый висок с линиями импланта."]},
- {title:"Цвет",date:"",img:null,text:["Палитра Последней гавани: ночь, кость, бронза и золото."]},
- {title:"Финальный лист",date:"",img:null,text:["Герой, поиски и детали на одном листе."]}
+ {title:"Поиск фигуры",date:"24.11.2026",img:"images/01-poisk.jpg",text:[]},
+ {title:"Лайн",date:"24.11.2026",img:"images/01-lain.jpg",text:[]},
+ {title:"Цвет",date:"",img:null,text:[]},
+ {title:"Финальный лист",date:"",img:null,text:[]}
 ];
 const ol=document.getElementById("steps");let done=0;
 STEPS.forEach((s,i)=>{
@@ -137,7 +135,7 @@ STEPS.forEach((s,i)=>{
   const n=String(i+1).padStart(2,"0");
   li.innerHTML=`<span class="node" aria-hidden="true"></span>
    <div class="sh"><span class="no hud">шаг ${n}</span><h2>${s.title}</h2>${s.date?`<span class="date hud">${s.date}</span>`:""}</div>
-   <div class="txt">${s.text.map(t=>`<p>${t}</p>`).join("")}</div>
+   ${s.text.length?`<div class="txt">${s.text.map(t=>`<p>${t}</p>`).join("")}</div>`:""}
    ${s.img?`<button type="button" class="shot" aria-label="Открыть крупно: ${s.title}"><img src="${s.img}" alt="${s.title}" loading="lazy"></button>`
      :`<div class="lockbox"><span class="q" aria-hidden="true">?</span><span><span class="deny hud">απαγορεύεται</span>Шаг ещё в работе</span></div>`}`;
   if(s.img)li.querySelector(".shot").addEventListener("click",()=>show(s));
