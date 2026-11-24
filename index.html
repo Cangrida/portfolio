@@ -1404,6 +1404,12 @@
         </div>
 
         <div class="video-grid">
+            <!-- v7 --> <a class="video-card reveal" data-yt="9q9RA0ejecg" data-yt-en="Qt0I2CYyF58" data-ratio="16/9">
+                <img src="posters/v-bilet.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="Билет на вчера">
+                <span class="video-dur">3:44</span>
+                <span class="play-badge"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg></span>
+                <div class="video-meta"><h3 data-i18n="v7">Билет на вчера</h3><p data-i18n="v7c">Короткий мультфильм · Full HD</p></div>
+            </a>
             <!-- v6 --> <a class="video-card reveal" data-src="videos/grossmeyster-ru.mp4" data-src-en="videos/grossmeyster-en.mp4" data-ratio="16/9">
                 <img src="posters/v-grossmeyster.jpg" width="1344" height="768" loading="lazy" decoding="async" alt="Гроссмейстер">
                 <span class="video-dur">1:17</span>
@@ -1611,7 +1617,8 @@
                 const vertical = card.dataset.ratio === '9/16';
                 if (card.dataset.yt) {
                     const f = document.createElement('iframe');
-                    f.src = 'https://www.youtube-nocookie.com/embed/' + card.dataset.yt + '?autoplay=1&rel=0';
+                    const ytId = (document.documentElement.lang === 'en' && card.dataset.ytEn) ? card.dataset.ytEn : card.dataset.yt;
+                    f.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0';
                     f.allow = 'autoplay; fullscreen';
                     f.allowFullscreen = true;
                     if (vertical) f.classList.add('vertical');
@@ -1725,6 +1732,8 @@
             v5c: { ru: 'Из цикла «Ожидание»', en: 'From the “Waiting” series' },
             v6:  { ru: 'Гроссмейстер', en: 'Grandmaster' },
             v6c: { ru: 'Короткий мультфильм', en: 'A short animated film' },
+            v7: { ru: 'Билет на вчера', en: 'Ticket to Yesterday' },
+            v7c: { ru: 'Короткий мультфильм · Full HD', en: 'A short animated film · Full HD' },
             games_label: { ru: '04 — Игры', en: '04 — Games' },
             games_title: {
                 ru: 'Мои <span class="accent">игры</span>',
