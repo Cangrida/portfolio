@@ -7,7 +7,7 @@
 <title>Адвент CARPG XIII</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Chakra+Petch:wght@400;600&family=Manrope:wght@400;600&display=swap">
 <style>
-/* Layout: экран молчащего сервера Olympus — шапка-терминал с круговой шкалой, сквозная дорожка-схема пути героя, полосы четырёх миров с HUD-окошками */
+/* Layout: экран молчащего сервера Olympus - шапка-терминал с круговой шкалой, сквозная дорожка-схема пути героя, полосы четырёх миров с HUD-окошками */
 :root{
   --void:#0e131b; --night:#1d2531; --night-2:#252f3d; --line:#3a4656;
   --bone:#e6dcc8; --bone-dim:#a89f8d;
@@ -113,6 +113,10 @@ main{position:relative}
 .cap strong{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.03em;text-wrap:balance}
 .cap span{font-size:12.5px;color:var(--dim)}
 button.door{cursor:zoom-in}
+a.door{text-decoration:none;cursor:pointer}
+a.door:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
+.pic img{object-position:top}
+.wip{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-size:10.5px;color:var(--void);background:var(--acc);text-align:center;z-index:2}
 button.door:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
 
 footer{border-top:1px solid var(--line);background:var(--void);font-size:11px;color:var(--bone-dim)}
@@ -134,7 +138,7 @@ footer .in{padding-block:16px;display:flex;flex-wrap:wrap;justify-content:space-
 <body>
 
 <header>
-  <div class="ticker hud" aria-hidden="true"><span>Olympus Systems :: узел Сериф :: <b>ping olympus — нет ответа</b> :: Pelagic Industries — протоколы работают без оператора :: Midas Holdings — рост золота не остановлен :: Moirai System — нити судьбы рвутся :: дары активны · хозяева не отвечают :: <b>запрос доступа — отказано</b> ::</span></div>
+  <div class="ticker hud" aria-hidden="true"><span>Olympus Systems :: узел Сериф :: <b>ping olympus - нет ответа</b> :: Pelagic Industries - протоколы работают без оператора :: Midas Holdings - рост золота не остановлен :: Moirai System - нити судьбы рвутся :: дары активны · хозяева не отвечают :: <b>запрос доступа - отказано</b> ::</span></div>
   <div class="in top">
     <div class="brk">
       <div class="sys hud">Smirnov School · номинация 2D Hard</div>
@@ -148,7 +152,7 @@ footer .in{padding-block:16px;display:flex;flex-wrap:wrap;justify-content:space-
 </header>
 
 <main id="realms"><div class="trace" aria-hidden="true"></div></main>
-<footer class="hud"><div class="in"><span>Дары работают без хозяев</span><span>Окошко открывается, когда готова работа</span></div></footer>
+<footer class="hud"><div class="in"><span>Дары работают без хозяев</span><span>Окошко открывается, когда начата работа</span></div></footer>
 
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-labelledby="lb-title">
   <div class="lb-top"><h3 id="lb-title"></h3><button type="button" id="lb-close">Закрыть</button></div>
@@ -165,7 +169,7 @@ const REALMS=[
  {name:"Излом",ghost:"ΡΗΓΜΑ",sector:"сектор 04",corp:"Moirai System · задания 14–16",cls:"r-rift",items:[14,15,16]}
 ];
 const TASKS={
- 1:{title:"Герой",sub:"Как ты выглядишь?",img:null,desc:""},
+ 1:{title:"Герой",sub:"Как ты выглядишь?",img:null,desc:"",page:"task-01.html",cover:"images/01-lain.jpg",wip:"в работе · 2 из 4"},
  2:{title:"Дар богов",sub:"Спутник, артефакт или оружие",img:null,desc:""},
  3:{title:"Последняя гавань",sub:"Стартовая локация",img:null,desc:""},
  4:{title:"Талассар",sub:"Поглощённое царство",img:null,desc:""},
@@ -199,10 +203,12 @@ for(const r of REALMS){
   sec.innerHTML=`<div class="ghost" aria-hidden="true">${r.ghost}</div><div class="in"><div class="head"><span class="node" aria-hidden="true"></span><span class="sector hud">${r.sector}</span><h2>${r.name}</h2><span class="corp hud">${r.corp}</span></div><div class="grid"></div></div>`;
   const grid=sec.querySelector(".grid");
   for(const n of r.items){
-    const t=TASKS[n];const open=!!t.img;if(open)opened++;
-    const el=document.createElement(open?"button":"div");el.className="door";
-    if(open){el.type="button";el.setAttribute("aria-label",`Открыть: ${n}. ${t.title}`);el.addEventListener("click",()=>show(n));}
-    el.innerHTML=`<div class="body"><div class="pic">${open?`<img src="${t.img}" alt="${t.title}" loading="lazy">`
+    const t=TASKS[n];const open=!!t.img;if(open)opened++;const page=!!t.page;
+    const el=document.createElement(page?"a":open?"button":"div");el.className="door";
+    if(page){el.href=t.page;el.setAttribute("aria-label",`Открыть страницу: ${n}. ${t.title}`);}
+    else if(open){el.type="button";el.setAttribute("aria-label",`Открыть: ${n}. ${t.title}`);el.addEventListener("click",()=>show(n));}
+    const cover=t.img||t.cover;
+    el.innerHTML=`<div class="body"><div class="pic">${cover?`<img src="${cover}" alt="${t.title}" loading="lazy">${t.wip&&!t.img?`<span class="wip hud">${t.wip}</span>`:""}`
       :`<span class="q" aria-hidden="true">?</span><div class="px" aria-hidden="true">${pixels(n)}</div><div class="deny hud">απαγορεύεται<small>нет доступа</small></div>`}
       <span class="gr" aria-hidden="true">${GR[n]}</span><span class="tid hud">task_${String(n).padStart(2,"0")}</span><span class="scan" aria-hidden="true"></span></div>
       <div class="cap"><strong>${t.title}</strong><span>${t.sub}</span></div></div>${FRAME}`;
@@ -230,5 +236,6 @@ document.getElementById("lb-close").addEventListener("click",hide);
 lb.addEventListener("click",e=>{if(e.target===lb)hide();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)hide();});
 </script>
+
 </body>
 </html>
