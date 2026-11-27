@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Дар богов · CARPG XIII</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Chakra+Petch:wght@400;600&family=Manrope:wght@400;600&display=swap">
+<style>
+:root{
+  --void:#0e131b; --night:#1d2531; --line:#3a4656;
+  --bone:#e6dcc8; --bone-dim:#a89f8d; --glow:#4fd1c5;
+  --gold:#e8b830; --alert:#e0604a; --acc:var(--gold);
+  --display:"Cinzel",Georgia,serif; --hud:"Chakra Petch","Segoe UI",system-ui,sans-serif; --body:"Manrope","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--void);color:var(--bone);font-family:var(--body);font-size:15px;line-height:1.6;overflow-x:hidden}
+img{max-width:100%}
+[hidden]{display:none!important}
+.in{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hud{font-family:var(--hud);text-transform:uppercase;letter-spacing:.14em}
+header{position:relative;background:
+  linear-gradient(rgba(79,209,197,.06) 1px,transparent 1px) 0 0/40px 40px,
+  linear-gradient(90deg,rgba(79,209,197,.06) 1px,transparent 1px) 0 0/40px 40px,
+  radial-gradient(80% 120% at 85% 30%,#16303a,var(--void) 70%);border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top,0px)}
+header::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+.top{position:relative;z-index:1;padding-block:22px 34px}
+.back{display:inline-block;color:var(--glow);text-decoration:none;font-size:12px;border:1px solid var(--glow);padding:6px 14px;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.back:hover{background:rgba(79,209,197,.12)}
+.back:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+.ttl{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:22px}
+.gr{font-family:var(--display);font-weight:900;font-size:clamp(40px,7vw,64px);line-height:1;color:var(--gold);text-shadow:0 0 14px rgba(232,184,48,.5)}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(30px,5.5vw,56px);line-height:1;margin:0;
+  background:linear-gradient(180deg,#f4ecdc 30%,#b9ab90);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-family:var(--display);color:var(--bone-dim);font-size:clamp(16px,2.2vw,20px);margin-top:8px}
+.meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:12px;color:var(--bone-dim)}
+.meta b{color:var(--gold);font-weight:600}
+.bar{display:flex;gap:6px;margin-top:16px;max-width:360px}
+.bar i{flex:1;height:7px;background:var(--line)}
+.bar i.on{background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+main{position:relative;background:linear-gradient(180deg,var(--night),#171e29);padding-block:40px 60px}
+.steps{position:relative;list-style:none;margin:0;padding:0 0 0 46px}
+.steps::before{content:"";position:absolute;left:14px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--glow),var(--gold) 60%,var(--line));opacity:.6}
+.step{position:relative;margin-bottom:46px}
+.step:last-child{margin-bottom:0}
+.node{position:absolute;left:-41px;top:4px;width:20px;height:22px;background:var(--acc);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);filter:drop-shadow(0 0 8px var(--acc))}
+.step.lock .node{background:var(--line);filter:none}
+.sh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:12px}
+.no{font-size:11px;color:var(--gold);border:1px solid var(--gold);padding:2px 8px;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.step.lock .no{color:var(--bone-dim);border-color:var(--line)}
+.sh h2{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,28px);margin:0;letter-spacing:.03em}
+.date{font-size:11px;color:var(--bone-dim)}
+.txt{max-width:62ch;color:var(--bone);margin:0 0 16px}
+.txt p{margin:0 0 8px}
+.shot{display:block;padding:0;border:0;background:rgba(14,19,27,.7);cursor:zoom-in;max-width:100%;position:relative;
+  clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+.shot img{display:block;max-width:100%;height:auto;max-height:78vh}
+.shot:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.lockbox{border:1px dashed var(--line);padding:22px;max-width:520px;color:var(--bone-dim);font-size:13px;display:flex;align-items:center;gap:18px}
+.lockbox .q{font-family:var(--display);font-weight:900;font-size:56px;line-height:1;opacity:.5}
+.lockbox .deny{color:var(--alert);font-size:10.5px;letter-spacing:.18em;display:block;margin-bottom:4px}
+.story{position:relative;margin-bottom:54px;padding:24px 26px;background:rgba(14,19,27,.6);border-left:3px solid var(--gold);max-width:72ch}
+.story::before{content:"";position:absolute;right:0;top:0;width:26px;height:26px;border:2px solid var(--glow);border-left:0;border-bottom:0;opacity:.7}
+.story-txt p{margin:0 0 12px}
+.story-txt p:last-child{margin-bottom:0}
+.story-txt .big{font-family:var(--display);font-size:clamp(18px,2.4vw,22px);line-height:1.45;color:#f4ecdc}
+.err{color:var(--alert);font-size:.85em;letter-spacing:.08em}
+.steps-h{margin-bottom:22px}
+footer{border-top:1px solid var(--line);font-size:11px;color:var(--bone-dim);padding-bottom:env(safe-area-inset-bottom,0px)}
+footer .in{padding-block:16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px}
+footer a{color:var(--glow)}
+
+.lb{position:fixed;inset:0;background:rgba(8,11,16,.96);z-index:20;display:grid;grid-template-rows:auto 1fr;
+  padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lb-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.lb-top h3{font-family:var(--display);font-weight:700;margin:0;font-size:18px;min-width:0}
+.lb button{background:transparent;color:var(--glow);border:1px solid var(--glow);padding:6px 14px;font:600 12px var(--hud);letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.lb-img{overflow:auto;display:grid;place-items:center;min-height:0;margin-top:10px}
+.lb-img img{max-width:100%;max-height:100%;cursor:zoom-in}
+.lb-img.zoom{place-items:start}
+.lb-img.zoom img{max-width:none;max-height:none;cursor:zoom-out}
+</style>
+</head>
+<body>
+<header>
+  <div class="in top">
+    <a class="back hud" href="index.html">&#8592; Календарь</a>
+    <div class="ttl"><span class="gr" aria-hidden="true">Β′</span><h1>Дар богов</h1></div>
+    <div class="sub">Спутник, артефакт или оружие · гарпун Персея</div>
+    <div class="meta hud"><span>task_02</span><span>Автор <b>Cangrida</b></span><span>Статус <b id="st"></b></span></div>
+    <div class="bar" id="bar" aria-hidden="true"></div>
+  </div>
+</header>
+
+<main>
+  <div class="in">
+    <section class="story" aria-labelledby="story-h">
+      <div class="sh"><span class="no hud">досье</span><h2 id="story-h">Описание</h2></div>
+      <div class="story-txt">
+        <p class="big">Ты - Персей.<br>Тебе 22 года.<br>Ты живёшь в Последней гавани на острове Сериф.</p>
+        <p>Ты рыбак. Тебя вырастил старый Диктис - когда-то он вытащил из моря ящик, а в ящике был ты.</p>
+        <p>Говорят, твой отец - глава Olympus Systems. Ты его ни разу не видел.</p>
+        <p>В твоём мире были боги - в башнях. Olympus Systems, Pelagic Industries, Midas Holdings, Moirai System. Они раздавали людям дары: машины и протоколы, похожие на чудеса. Люди просили через терминалы, и боги отвечали.</p>
+        <p>Потом Olympus замолчал. Серверы гудят, огни на холме горят, но на любой запрос приходит одно: <span class="err hud">«нет ответа»</span>. Боги перестали отвечать.</p>
+        <p>А дары остались. Без хозяев они сбоят. В гавани пропадают корабли. Сети тянут из чёрной воды то, чего там быть не должно.</p>
+        <p>У тебя есть гарпун и протез, сомкнутый с его древком. Гарпун тебя слушается, но пиксельный распад уже дошёл до ключицы.</p>
+        <p>Ты не собирался быть героем. Просто больше некому идти туда, откуда приходит сбой: вниз, в затонувший Талассар, потом в золотой Аурелис - и дальше, в Излом, где рвутся нити судьбы.</p>
+      </div>
+    </section>
+    <div class="sh steps-h"><span class="no hud">ход работы</span><h2>Шаги</h2></div>
+    <ol class="steps" id="steps"></ol>
+  </div>
+</main>
+<footer class="hud"><div class="in"><span>Concept Artist RPG XIII · Олимпийский кодекс</span><a href="index.html">К календарю</a></div></footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-labelledby="lb-title">
+  <div class="lb-top"><h3 id="lb-title"></h3><button type="button" id="lb-close">Закрыть</button></div>
+  <div class="lb-img" id="lb-img"><img id="lb-pic" alt=""></div>
+</div>
+
+<script>
+/* Шаги задания. Новый шаг: добавить объект; закрытый шаг - img:null. */
+const STEPS=[
+ {title:"Поиск силуэта",date:"27.11.2026",img:"images/02-poisk.jpg",text:[]},
+ {title:"Лайн",date:"",img:null,text:[]}
+];
+const ol=document.getElementById("steps");let done=0;
+STEPS.forEach((s,i)=>{
+  const li=document.createElement("li");li.className="step"+(s.img?"":" lock");if(s.img)done++;
+  const n=String(i+1).padStart(2,"0");
+  li.innerHTML=`<span class="node" aria-hidden="true"></span>
+   <div class="sh"><span class="no hud">шаг ${n}</span><h2>${s.title}</h2>${s.date?`<span class="date hud">${s.date}</span>`:""}</div>
+   ${s.text.length?`<div class="txt">${s.text.map(t=>`<p>${t}</p>`).join("")}</div>`:""}
+   ${s.img?`<button type="button" class="shot" aria-label="Открыть крупно: ${s.title}"><img src="${s.img}" alt="${s.title}" loading="lazy"></button>`
+     :`<div class="lockbox"><span class="q" aria-hidden="true">?</span><span><span class="deny hud">απαγορεύεται</span>Шаг ещё в работе</span></div>`}`;
+  if(s.img)li.querySelector(".shot").addEventListener("click",()=>show(s));
+  ol.appendChild(li);
+});
+document.getElementById("st").textContent=done===STEPS.length?"готово":`в работе · ${done} из ${STEPS.length}`;
+document.getElementById("bar").innerHTML=STEPS.map((s,i)=>`<i class="${i<done?"on":""}"></i>`).join("");
+const lb=document.getElementById("lb"),pic=document.getElementById("lb-pic"),box=document.getElementById("lb-img");let last=null;
+function show(s){last=document.activeElement;document.getElementById("lb-title").textContent=s.title;pic.src=s.img;pic.alt=s.title;box.classList.remove("zoom");lb.hidden=false;document.getElementById("lb-close").focus();}
+function hide(){lb.hidden=true;if(last)last.focus();}
+pic.addEventListener("click",()=>box.classList.toggle("zoom"));
+document.getElementById("lb-close").addEventListener("click",hide);
+lb.addEventListener("click",e=>{if(e.target===lb)hide();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)hide();});
+</script>
+</body>
+</html>
